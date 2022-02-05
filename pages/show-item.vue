@@ -61,6 +61,17 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
+      <v-card-actions>
+        <v-btn text @click="put">
+          更新
+        </v-btn>
+        <v-btn text @click="remove">
+          削除
+        </v-btn>
+        <v-btn text @click="cancel">
+          キャンセル
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-container>
 </template>
@@ -75,7 +86,7 @@ export default {
       activePicker: null,
       menu: false,
       states: [{ text: '読みたい', value: 0 }, { text: '未読', value: 1 }, { text: '読中', value: 2 }, { text: '読了', value: 3 }],
-      id: this.$route.params.id,
+      id: null,
       title: null,
       isbn: null,
       authers: [],
@@ -102,6 +113,7 @@ export default {
   beforeMount () {
     db.books.where('id').equals(Number(this.$route.query.index)).toArray()
       .then((records) => {
+        this.id = records[0].id
         this.title = records[0].title
         this.isbn = records[0].isbn
         this.authers = records[0].authers
@@ -121,7 +133,36 @@ export default {
     save (date) {
       this.$refs.menu.save(date)
     },
+    put () {
+      const dt = new Date()
+      const tz = -dt.getTimezoneOffset() / 60
+      const sign = Math.sign(tz) < 0 ? '-' : '+'
 
+      db.books.update(this.id, {
+        title: this.title,
+        isbn: this.isbn,
+        authers: this.authers,
+        publisher: this.publisher,
+        publishdt: this.publishdt,
+        tags: this.tags,
+        status: this.status.value,
+        update: dt.toISOString().substr(0, 23) + sign + Math.abs(tz).toString().padStart(2, '0') + ':00',
+        rate: this.rate,
+        links: this.links,
+        memos: this.memos
+      })
+
+      this.$router.push('/')
+    },
+    remove () {
+      if (confirm('本当に削除しても良いですか？')) {
+        db.books.delete(this.id)
+        this.$router.push('/')
+      }
+    },
+    cancel () {
+      this.$router.push('/')
+    },
     datestring2localestring (datestr) {
       if (!datestr) {
         return 'Unregistered'
@@ -133,6 +174,7 @@ export default {
       dt.setHours(dt.getHours() + tz)
       return dt.toLocaleString()
     }
+
   }
 }
 </script>
