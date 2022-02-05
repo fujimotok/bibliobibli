@@ -4,7 +4,7 @@
       <v-card-title>
         {{ title }}
       </v-card-title>
-      <v-expansion-panels accordion>
+      <v-expansion-panels accordion flat>
         <v-expansion-panel>
           <v-expansion-panel-header>Book Info</v-expansion-panel-header>
           <v-expansion-panel-content>
