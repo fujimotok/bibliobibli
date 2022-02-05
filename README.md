@@ -1,4 +1,7 @@
 # bibliobibli
+PWA application which management reading-journals.  
+All data save locally.  
+No login. No cloud data.
 
 ## Build Setup
 
