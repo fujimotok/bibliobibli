@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <v-card class="justify-center">
+      <v-img :src="cover" max-height="256" contain />
       <v-card-title>
         {{ title }}
       </v-card-title>
@@ -43,6 +44,7 @@
                 @change="save"
               />
             </v-menu>
+            <v-text-field v-model="cover" label="cover" />
           </v-expansion-panel-content>
         </v-expansion-panel>
         <v-expansion-panel>
@@ -110,11 +112,12 @@ export default {
       menu: false,
       states: [{ text: '読みたい', value: 0 }, { text: '未読', value: 1 }, { text: '読中', value: 2 }, { text: '読了', value: 3 }],
       id: this.$route.params.id,
-      title: '',
+      title: 'タイトル',
       isbn: '',
       authors: [],
       publisher: '',
       publishdt: null,
+      cover: '/noimage.png',
       tags: [],
       status: { text: '未読', value: 1 },
       registerdt: null,
@@ -149,6 +152,7 @@ export default {
               this.authors = res.data[0].summary.author.split(' ')
               this.publisher = res.data[0].summary.publisher
               this.publishdt = res.data[0].summary.pubdate.substr(0, 4) + '-' + res.data[0].summary.pubdate.substr(4, 2) + '-' + res.data[0].summary.pubdate.substr(6, 2)
+              this.cover = res.data[0].summary.cover
             }
           })
       }
@@ -167,6 +171,7 @@ export default {
           isbn: this.isbn,
           publisher: this.publisher,
           publishdt: this.publishdt,
+          cover: this.cover,
           tags: this.tags,
           status: this.status.value,
           registerdt: this.registerdt,

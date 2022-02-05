@@ -2,7 +2,7 @@
   <v-list two-line>
     <v-list-item-group>
       <template v-for="(item, index) in items">
-        <v-list-item :key="item.id" @click="show(item.id)">
+        <v-list-item :key="index" @click="show(item.id)">
           <!-- <v-list-item-avatar> -->
           <!--   <v-img :src="item.img" /> -->
           <!-- </v-list-item-avatar> -->
@@ -28,9 +28,7 @@
             </v-icon>
           </v-list-item-action>
         </v-list-item>
-        <v-divider
-          :key="index"
-        />
+        <v-divider :key="`${index}-divider`" />
       </template>
     </v-list-item-group>
     <v-btn

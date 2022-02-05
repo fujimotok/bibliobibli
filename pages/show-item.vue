@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <v-card class="justify-center">
+      <v-img :src="cover" max-height="256" contain />
       <v-card-title>
         {{ title }}
       </v-card-title>
@@ -36,6 +37,7 @@
                 @change="save"
               />
             </v-menu>
+            <v-text-field v-model="cover" label="cover" />
           </v-expansion-panel-content>
         </v-expansion-panel>
         <v-expansion-panel>
@@ -87,10 +89,11 @@ export default {
       menu: false,
       states: [{ text: '読みたい', value: 0 }, { text: '未読', value: 1 }, { text: '読中', value: 2 }, { text: '読了', value: 3 }],
       id: null,
-      title: null,
-      isbn: null,
+      cover: '',
+      title: 'タイトル',
+      isbn: '',
       authors: [],
-      publisher: null,
+      publisher: '',
       publishdt: null,
       tags: [],
       status: { text: '未読', value: 1 },
@@ -119,6 +122,7 @@ export default {
         this.authors = records[0].authors
         this.publisher = records[0].publisher
         this.publishdt = records[0].publishdt
+        this.cover = records[0].cover
         this.tags = records[0].tags
         this.status = this.states.find(elem => elem.value === records[0].status)
         this.registerdt = this.datestring2localestring(records[0].registerdt)
@@ -144,6 +148,7 @@ export default {
         authors: this.authors,
         publisher: this.publisher,
         publishdt: this.publishdt,
+        cover: this.cover,
         tags: this.tags,
         status: this.status.value,
         update: dt.toISOString().substr(0, 23) + sign + Math.abs(tz).toString().padStart(2, '0') + ':00',
