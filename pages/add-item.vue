@@ -8,7 +8,14 @@
         <v-expansion-panel>
           <v-expansion-panel-header>Book Info</v-expansion-panel-header>
           <v-expansion-panel-content>
-            <v-text-field v-model="isbn" label="isbn13" />
+            <v-text-field
+              v-model="isbn"
+              :rules="[rules.counter]"
+              type="number"
+              counter="13"
+              label="isbn13"
+              @change="onChangeISBN(isbn)"
+            />
             <v-text-field v-model="title" label="title" />
             <v-combobox v-model="authers" multiple label="authers" />
             <v-text-field v-model="publisher" label="publisher" />
@@ -84,20 +91,29 @@
 </template>
 
 <script>
+import axios from 'axios'
 import { db } from '../js/db'
 
 export default {
   name: 'AddItem',
   data () {
     return {
+      rules: {
+        required: value => !!value || 'Required.',
+        counter: value => value.length <= 13 || 'Max 13 characters',
+        email: (value) => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          return pattern.test(value) || 'Invalid e-mail.'
+        }
+      },
       activePicker: null,
       menu: false,
       states: [{ text: '読みたい', value: 0 }, { text: '未読', value: 1 }, { text: '読中', value: 2 }, { text: '読了', value: 3 }],
       id: this.$route.params.id,
-      title: null,
-      isbn: null,
+      title: '',
+      isbn: '',
       authers: [],
-      publisher: null,
+      publisher: '',
       publishdt: null,
       tags: [],
       status: { text: '未読', value: 1 },
@@ -124,10 +140,23 @@ export default {
     save (date) {
       this.$refs.menu.save(date)
     },
+    onChangeISBN (isbn) {
+      if (isbn.length === 13) {
+        axios.get('https://api.openbd.jp/v1/get?isbn=' + isbn)
+          .then((res) => {
+            console.log(res)
+            if (res.status === 200) {
+              this.title = res.data[0].summary.title
+              this.authers = res.data[0].summary.author.split(' ')
+              this.publisher = res.data[0].summary.publisher
+              this.publishdt = res.data[0].summary.pubdate.substr(0, 4) + '-' + res.data[0].summary.pubdate.substr(4, 2) + '-' + res.data[0].summary.pubdate.substr(6, 2)
+            }
+          })
+      }
+    },
     add () {
       const dt = new Date()
       const tz = -dt.getTimezoneOffset() / 60
-      console.log(tz)
       const sign = Math.sign(tz) < 0 ? '-' : '+'
       this.registerdt = dt.toISOString().substr(0, 23) + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
       this.update = dt.toISOString().substr(0, 23) + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
