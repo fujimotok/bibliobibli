@@ -45,29 +45,50 @@
 </template>
 
 <script>
+import { db } from '../js/db'
+
 export default {
   name: 'BookInfo',
+
   data () {
     return {
       states: [{ text: '読みたい', value: 0 }, { text: '未読', value: 1 }, { text: '読中', value: 2 }, { text: '読了', value: 3 }],
       id: this.$route.params.id,
-      title: 'titletitletitletitletitletitletitletitletitletitletitletitletitle',
-      isbn: '9780123456789',
-      authers: ['hoge', 'fuga'],
-      publisher: '出版社',
-      publishdt: '2002-04-06T00:00:00',
-      tags: ['programming', 'javascript'],
+      title: null,
+      isbn: null,
+      authers: [],
+      publisher: null,
+      publishdt: null,
+      tags: [],
       status: { text: '未読', value: 1 },
-      registerdt: '2009-12-06T09:00:00',
-      readdt: '2009-12-06T09:00:00',
-      update: '2012-09-06T09:00:00',
-      rate: 4,
-      links: ['http://hoge.com'],
-      memos: ['hoge\nfuga\n', 'piyo']
+      registerdt: null,
+      readdt: null,
+      update: null,
+      rate: 0,
+      links: [],
+      memos: []
     }
   },
   head: () => ({
     title: '書籍情報'
-  })
+  }),
+  beforeMount () {
+    db.books.where('id').equals(Number(this.$route.query.index)).toArray()
+      .then((records) => {
+        this.title = records[0].title
+        this.isbn = records[0].isbn
+        this.authers = records[0].authers
+        this.publisher = records[0].publisher
+        this.publishdt = records[0].publishdt
+        this.tags = records[0].tags
+        this.status = records[0].status
+        this.registerdt = records[0].registerdt
+        this.readdt = records[0].readdt
+        this.update = records[0].update
+        this.rate = records[0].rate
+        this.links = records[0].links
+        this.memos = records[0].memos
+      })
+  }
 }
 </script>

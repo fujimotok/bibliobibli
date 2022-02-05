@@ -1,10 +1,8 @@
 <template>
   <v-list two-line>
-    <v-list-item-group
-      v-model="selected"
-    >
+    <v-list-item-group>
       <template v-for="(item, index) in items">
-        <v-list-item :key="item.name" @click="show(index)">
+        <v-list-item :key="item.title" @click="show(index+1)">
           <!-- <v-list-item-avatar> -->
           <!--   <v-img :src="item.img" /> -->
           <!-- </v-list-item-avatar> -->
@@ -45,41 +43,35 @@
     >
       <v-icon>mdi-plus</v-icon>
     </v-btn>
+    <div v-if="items.length == 0">
+      <p>空</p>
+    </div>
   </v-list>
 </template>
 
 <script>
+import { db } from '../js/db'
+
 export default {
   name: 'IndexPage',
   data: () => ({
     selected: [2],
     json: '',
-    items: [{ title: 'title', auther: 'auther', status: 0 }]
+    items: []
   }),
   head: () => ({
     title: '本棚'
   }),
   mounted () {
-    // this.items = JSON.parse(localStorage.getItem('items')) || []
+    db.books.toArray().then((records) => {
+      this.items = records
+    })
   },
   methods: {
-    addItem  () {
-      this.items.push('item_' + this.items.length)
-      this.setItems()
-    },
-    deleteAllItems  () {
-      this.items = []
-      this.setItems()
-    },
-    setItems  () {
-      localStorage.setItem('items', JSON.stringify(this.items))
-    },
     add () {
-      localStorage.setItem('code', '')
-      localStorage.setItem('format', 'CODE128')
       this.$router.push('/add-item')
     },
-    show  (index) {
+    show (index) {
       this.$router.push({ path: '/show-item', query: { index } })
     }
   }

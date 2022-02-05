@@ -60,7 +60,7 @@ export default {
       // 解析するワーカ数の設定
       numOfWorkers: navigator.hardwareConcurrency || 4,
       // バーコードの種類を設定
-      decoder: { readers: ['code_128_reader', 'i2of5_reader', 'upc_reader', 'ean_reader', 'ean_8_reader', 'codabar_reader', 'code_39_reader'], multiple: true }
+      decoder: { readers: ['ean_reader'] }
     }
     Quagga.init(this.config, this.onInitilize)
     Quagga.onDetected(this.onDetected)
@@ -117,9 +117,7 @@ export default {
       Quagga.init(this.config, this.onInitilize)
     },
     enter () {
-      localStorage.setItem('code', this.code)
-      localStorage.setItem('format', this.format.format)
-      this.$router.push({ path: '/add-item' })
+      this.$router.push({ path: '/add-item', query: { isbn: this.code } })
     }
   }
 }
