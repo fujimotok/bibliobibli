@@ -10,7 +10,7 @@
             <v-list-item-title v-text="item.title" />
             <v-list-item-subtitle
               class="text-caption"
-              v-text="item.auther"
+              v-text="item.authors.join(', ')"
             />
           </v-list-item-content>
           <v-list-item-action>

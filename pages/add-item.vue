@@ -17,7 +17,7 @@
               @change="onChangeISBN(isbn)"
             />
             <v-text-field v-model="title" label="title" />
-            <v-combobox v-model="authers" multiple label="authers" />
+            <v-combobox v-model="authors" multiple label="authors" />
             <v-text-field v-model="publisher" label="publisher" />
             <v-menu
               ref="menu"
@@ -112,7 +112,7 @@ export default {
       id: this.$route.params.id,
       title: '',
       isbn: '',
-      authers: [],
+      authors: [],
       publisher: '',
       publishdt: null,
       tags: [],
@@ -144,10 +144,9 @@ export default {
       if (isbn.length === 13) {
         axios.get('https://api.openbd.jp/v1/get?isbn=' + isbn)
           .then((res) => {
-            console.log(res)
             if (res.status === 200) {
               this.title = res.data[0].summary.title
-              this.authers = res.data[0].summary.author.split(' ')
+              this.authors = res.data[0].summary.author.split(' ')
               this.publisher = res.data[0].summary.publisher
               this.publishdt = res.data[0].summary.pubdate.substr(0, 4) + '-' + res.data[0].summary.pubdate.substr(4, 2) + '-' + res.data[0].summary.pubdate.substr(6, 2)
             }
@@ -164,7 +163,7 @@ export default {
       db.books.add(
         {
           title: this.title,
-          authers: this.authers,
+          authors: this.authors,
           isbn: this.isbn,
           publisher: this.publisher,
           publishdt: this.publishdt,

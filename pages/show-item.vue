@@ -10,7 +10,7 @@
           <v-expansion-panel-content>
             <v-text-field v-model="isbn" label="isbn13" />
             <v-text-field v-model="title" label="title" />
-            <v-combobox v-model="authers" multiple label="authers" />
+            <v-combobox v-model="authors" multiple label="authors" />
             <v-text-field v-model="publisher" label="publisher" />
             <v-menu
               ref="menu"
@@ -89,7 +89,7 @@ export default {
       id: null,
       title: null,
       isbn: null,
-      authers: [],
+      authors: [],
       publisher: null,
       publishdt: null,
       tags: [],
@@ -116,7 +116,7 @@ export default {
         this.id = records[0].id
         this.title = records[0].title
         this.isbn = records[0].isbn
-        this.authers = records[0].authers
+        this.authors = records[0].authors
         this.publisher = records[0].publisher
         this.publishdt = records[0].publishdt
         this.tags = records[0].tags
@@ -141,7 +141,7 @@ export default {
       db.books.update(this.id, {
         title: this.title,
         isbn: this.isbn,
-        authers: this.authers,
+        authors: this.authors,
         publisher: this.publisher,
         publishdt: this.publishdt,
         tags: this.tags,
