@@ -43,7 +43,7 @@
         <v-expansion-panel>
           <v-expansion-panel-header>User Info</v-expansion-panel-header>
           <v-expansion-panel-content>
-            <v-combobox v-model="tags" multiple label="tags" />
+            <v-combobox v-model="tags" multiple :items="tagItems" label="tags" />
             <v-combobox v-model="status" :items="states" label="status" />
             <div style="display: flex;align-items: center;">
               <label class="v-label">rate</label>
@@ -116,6 +116,7 @@ export default {
       activePicker: null,
       menu: false,
       states: [{ text: '読みたい', value: 0 }, { text: '未読', value: 1 }, { text: '読中', value: 2 }, { text: '読了', value: 3 }],
+      tagItems: [],
       id: null,
       cover: '',
       title: 'タイトル',
@@ -160,7 +161,12 @@ export default {
         this.links = records[0].links
         this.memos = records[0].memos
       })
+    db.books.orderBy('tags').uniqueKeys()
+      .then((keysArray) => {
+        this.tagItems = keysArray
+      })
   },
+
   methods: {
     save (date) {
       this.$refs.menu.save(date)
