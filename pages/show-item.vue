@@ -45,13 +45,29 @@
           <v-expansion-panel-content>
             <v-combobox v-model="tags" multiple label="tags" />
             <v-combobox v-model="status" :items="states" label="status" />
-            <v-rating v-model="rate" label="rate" />
-            <div v-for="(link, index) in links" :key="link">
+            <div style="display: flex;align-items: center;">
+              <label class="v-label">rate</label>
+              <v-spacer />
+              <v-rating v-model="rate" />
+            </div>
+            <div v-for="(link, index) in links" :key="`${index}-link`">
               <v-text-field v-model="links[index]" label="link" />
             </div>
-            <div v-for="(memo, index) in memos" :key="memo">
+            <v-btn text @click="addLink">
+              追加
+            </v-btn>
+            <v-btn text :disabled="links.length < 2" @click="delLink">
+              削除
+            </v-btn>
+            <div v-for="(memo, index) in memos" :key="`${index}-memo`">
               <v-textarea v-model="memos[index]" label="memo" />
             </div>
+            <v-btn text @click="addMemo">
+              追加
+            </v-btn>
+            <v-btn text :disabled="memos.length < 2" @click="delMemo">
+              削除
+            </v-btn>
           </v-expansion-panel-content>
         </v-expansion-panel>
         <v-expansion-panel>
@@ -136,6 +152,22 @@ export default {
   methods: {
     save (date) {
       this.$refs.menu.save(date)
+    },
+    addLink () {
+      this.links.push('')
+    },
+    delLink () {
+      if (confirm('linkを本当に削除しても良いですか？')) {
+        this.links.pop()
+      }
+    },
+    addMemo () {
+      this.memos.push('')
+    },
+    delMemo () {
+      if (confirm('memoを本当に削除しても良いですか？')) {
+        this.memos.pop()
+      }
     },
     put () {
       const dt = new Date()
