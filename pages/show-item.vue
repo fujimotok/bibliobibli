@@ -50,18 +50,26 @@
               <v-spacer />
               <v-rating v-model="rate" />
             </div>
-            <div v-for="(link, index) in links" :key="`${index}-link`">
-              <v-text-field v-model="links[index]" label="link" />
-            </div>
+            <draggable
+              v-model="links"
+            >
+              <div v-for="(link, index) in links" :key="`${index}-link`">
+                <v-text-field v-model="links[index]" label="link" />
+              </div>
+            </draggable>
             <v-btn text @click="addLink">
               追加
             </v-btn>
             <v-btn text :disabled="links.length < 2" @click="delLink">
               削除
             </v-btn>
-            <div v-for="(memo, index) in memos" :key="`${index}-memo`">
-              <v-textarea v-model="memos[index]" label="memo" />
-            </div>
+            <draggable
+              v-model="memos"
+            >
+              <div v-for="(memo, index) in memos" :key="`${index}-memo`">
+                <v-textarea v-model="memos[index]" label="memo" />
+              </div>
+            </draggable>
             <v-btn text @click="addMemo">
               追加
             </v-btn>
@@ -95,10 +103,14 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 import { db } from '../js/db'
 
 export default {
   name: 'BookInfo',
+  components: {
+    draggable
+  },
   data () {
     return {
       activePicker: null,
