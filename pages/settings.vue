@@ -15,6 +15,9 @@
 </template>
 
 <script>
+import IDBExportImport from 'indexeddb-export-import'
+import { db } from '../js/db'
+
 export default {
   name: 'SettingsPage',
   data () {
@@ -48,19 +51,30 @@ export default {
       }
     },
     dataExport () {
-      const jsonData = {
-        code: localStorage.getItem('code') ?? '',
-        format: localStorage.getItem('format') ?? '',
-        items: JSON.parse(localStorage.getItem('items')) || []
-      }
+      db.open().then(() => {
+        try {
+          const idbDatabase = db.backendDB() // get native IDBDatabase object from Dexie wrapper
 
-      const fileName = 'export.json'
-      const data = JSON.stringify(jsonData)
-      const link = document.createElement('a')
+          // export to JSON, clear database, and import from JSON
+          IDBExportImport.exportToJsonString(idbDatabase, function (err, jsonString) {
+            if (err) {
+              console.error(err)
+            } else {
+              console.log('Exported as JSON: ' + jsonString)
 
-      link.href = 'data:application/json,' + encodeURIComponent(data)
-      link.download = fileName
-      link.click()
+              const fileName = 'export.json'
+              const data = jsonString
+              const link = document.createElement('a')
+
+              link.href = 'data:application/json,' + encodeURIComponent(data)
+              link.download = fileName
+              link.click()
+            }
+          })
+        } catch (error) {
+          console.error('' + error)
+        }
+      })
     },
     // ファイルデータを非同期で読み込みます。
     readFileAsync (file) {
