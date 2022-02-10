@@ -3,6 +3,9 @@ PWA application which management reading-journals.
 All data save locally.  
 No login. No cloud data.
 
+## Demo Page 
+https://bibliobibli.herokuapp.com/
+
 ## Build Setup
 
 ```bash
