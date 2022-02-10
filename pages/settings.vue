@@ -30,22 +30,29 @@ export default {
   }),
   methods: {
     dataImport () {
-      if (window.File) {
-        // ファイルデータを非同期で読み込みます。
-        if (this.file) {
-          this.readFileAsync(this.file)
-            .then((result) => {
-              // this.fileData.data = result;
-              const json = JSON.parse(result)
-              localStorage.setItem('code', json.code)
-              localStorage.setItem('format', json.code)
-              localStorage.setItem('items', JSON.stringify(json.items))
-              alert('インポート完了')
+      if (window.File && this.file) {
+        this.readFileAsync(this.file)
+          .then((result) => {
+            db.open().then(() => {
+              const idbDatabase = db.backendDB() // get native IDBDatabase object from Dexie wrapper
+
+              // export to JSON, clear database, and import from JSON
+              IDBExportImport.clearDatabase(idbDatabase, function (err) {
+                if (!err) { // cleared data successfully
+                  IDBExportImport.importFromJsonString(idbDatabase, result, function (err) {
+                    if (!err) {
+                      alert('インポート完了')
+                    } else {
+                      alert('インポートに失敗しました')
+                    }
+                  })
+                }
+              })
             })
-            .catch((e) => {
-              alert(`エラー:${e}`)
-            })
-        }
+          })
+          .catch((e) => {
+            alert(`エラー:${e}`)
+          })
       } else {
         alert('お使いのブラウザは対応しておりません')
       }
@@ -53,9 +60,8 @@ export default {
     dataExport () {
       db.open().then(() => {
         try {
-          const idbDatabase = db.backendDB() // get native IDBDatabase object from Dexie wrapper
+          const idbDatabase = db.backendDB()
 
-          // export to JSON, clear database, and import from JSON
           IDBExportImport.exportToJsonString(idbDatabase, function (err, jsonString) {
             if (err) {
               console.error(err)
