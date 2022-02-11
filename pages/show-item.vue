@@ -192,6 +192,16 @@ export default {
       const tz = -dt.getTimezoneOffset() / 60
       const sign = Math.sign(tz) < 0 ? '-' : '+'
 
+      let beforState
+      db.books.where('id').equals(Number(this.$route.query.index)).toArray()
+        .then((records) => {
+          beforState = records[0].status
+        })
+
+      if (beforState !== 3 && this.status.value === 3) {
+        this.readdt = dt.toISOString().substr(0, 23) + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
+      }
+
       db.books.update(this.id, {
         title: this.title,
         isbn: this.isbn,
@@ -202,6 +212,7 @@ export default {
         tags: this.tags,
         status: this.status.value,
         update: dt.toISOString().substr(0, 23) + sign + Math.abs(tz).toString().padStart(2, '0') + ':00',
+        readdt: this.readdt,
         rate: this.rate,
         links: this.links,
         memos: this.memos
