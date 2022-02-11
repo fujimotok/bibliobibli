@@ -214,7 +214,10 @@ export default {
       const tz = -dt.getTimezoneOffset() / 60
       const sign = Math.sign(tz) < 0 ? '-' : '+'
       this.registerdt = dt.toISOString().substr(0, 23) + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
-      this.update = dt.toISOString().substr(0, 23) + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
+      this.update = this.registerdt
+      if (this.status.value === 3) {
+        this.readdt = this.registerdt
+      }
 
       db.books.add(
         {
@@ -227,8 +230,8 @@ export default {
           tags: this.tags,
           status: this.status.value,
           registerdt: this.registerdt,
-          readdt: null,
-          update: this.registerdt,
+          readdt: this.readdt,
+          update: this.update,
           rate: this.rate,
           links: this.links,
           memos: this.memos
