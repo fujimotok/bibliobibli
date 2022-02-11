@@ -1,7 +1,10 @@
 <template>
   <v-container>
     <v-card class="justify-center">
-      <v-img :src="cover" max-height="256" contain />
+      <div style="display: flex;align-items: start;">
+        <iconCombobox v-model="status" :items="states" />
+        <v-img :src="cover" max-height="256" contain />
+      </div>
       <v-card-title>
         {{ title }}
       </v-card-title>
@@ -44,7 +47,6 @@
           <v-expansion-panel-header>User Info</v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-combobox v-model="tags" multiple :items="tagItems" label="tags" />
-            <v-combobox v-model="status" :items="states" label="status" />
             <div style="display: flex;align-items: center;">
               <label class="v-label">rate</label>
               <v-spacer />
@@ -114,18 +116,20 @@
 
 <script>
 import draggable from 'vuedraggable'
+import iconCombobox from '../components/icon-combobox'
 import { db } from '../js/db'
 
 export default {
   name: 'BookInfo',
   components: {
-    draggable
+    draggable,
+    iconCombobox
   },
   data () {
     return {
       activePicker: null,
       menu: false,
-      states: [{ text: '読みたい', value: 0 }, { text: '未読', value: 1 }, { text: '読中', value: 2 }, { text: '読了', value: 3 }],
+      states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
       tagItems: [],
       id: null,
       cover: '',
@@ -135,7 +139,7 @@ export default {
       publisher: '',
       publishdt: null,
       tags: [],
-      status: { text: '未読', value: 1 },
+      status: { text: '未読', value: 1, icon: 'mdi-progress-clock' },
       registerdt: null,
       readdt: null,
       update: null,
