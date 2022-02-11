@@ -85,7 +85,7 @@ export default {
     },
     onDetected (success) {
       Quagga.stop()
-      success.forEach(elem => this.items.push({ code: elem.codeResult.code, format: this.QuaggaToJsBarcodeFormat(elem.codeResult.format) }))
+      this.items.push({ code: success.codeResult.code, format: this.QuaggaToJsBarcodeFormat(success.codeResult.format) })
       this.done = true
       this.code = this.items[0].code
       this.format = { format: this.items[0].format }
