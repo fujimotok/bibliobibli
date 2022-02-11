@@ -140,7 +140,6 @@ export default {
       menu: false,
       states: [{ text: '読みたい', value: 0 }, { text: '未読', value: 1 }, { text: '読中', value: 2 }, { text: '読了', value: 3 }],
       tagItems: [],
-      id: this.$route.params.id,
       title: 'タイトル',
       isbn: '',
       authors: [],
@@ -170,6 +169,8 @@ export default {
       .then((keysArray) => {
         this.tagItems = keysArray
       })
+    this.isbn = this.$route.query.isbn || ''
+    this.onChangeISBN(this.isbn)
   },
   methods: {
     barcodeReader () {
@@ -187,7 +188,7 @@ export default {
               this.authors = res.data[0].summary.author.split(' ')
               this.publisher = res.data[0].summary.publisher
               this.publishdt = res.data[0].summary.pubdate.substr(0, 4) + '-' + res.data[0].summary.pubdate.substr(4, 2) + '-' + res.data[0].summary.pubdate.substr(6, 2)
-              this.cover = res.data[0].summary.cover
+              this.cover = res.data[0].summary.cover || '/noimage.png'
             }
           })
       }
