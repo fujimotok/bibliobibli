@@ -52,9 +52,14 @@
             </div>
             <draggable
               v-model="links"
+              :options="{handle: '.item-handle'}"
             >
               <div v-for="(link, index) in links" :key="`${index}-link`">
-                <v-text-field v-model="links[index]" label="link" />
+                <v-text-field v-model="links[index]" label="link">
+                  <v-icon slot="prepend" class="item-handle">
+                    mdi-arrow-up-down-bold
+                  </v-icon>
+                </v-text-field>
               </div>
             </draggable>
             <v-btn text @click="addLink">
@@ -65,9 +70,14 @@
             </v-btn>
             <draggable
               v-model="memos"
+              :options="{handle: '.item-handle'}"
             >
               <div v-for="(memo, index) in memos" :key="`${index}-memo`">
-                <v-textarea v-model="memos[index]" label="memo" />
+                <v-textarea v-model="memos[index]" label="memo">
+                  <v-icon slot="prepend" class="item-handle">
+                    mdi-arrow-up-down-bold
+                  </v-icon>
+                </v-textarea>
               </div>
             </draggable>
             <v-btn text @click="addMemo">
