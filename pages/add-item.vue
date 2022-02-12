@@ -79,19 +79,26 @@
             <v-btn text :disabled="links.length < 2" @click="delLink">
               削除
             </v-btn>
-            <draggable
-              v-model="memos"
-              :options="{handle: '.item-handle'}"
-            >
-              <div v-for="(memo, index) in memos" :key="`${index}-memo`">
-                <div style="display: flex;align-items: start;">
-                  <v-icon slot="prepend" class="item-handle">
-                    mdi-arrow-up-down-bold
-                  </v-icon>
-                  <vue-simplemde ref="markdownEditor" v-model="memos[index]" />
-                </div>
-              </div>
-            </draggable>
+            <v-expansion-panels flat>
+              <draggable
+                v-model="memos"
+                :options="{handle: '.item-handle'}"
+              >
+                <v-expansion-panel v-for="(memo, index) in memos" :key="`${index}-memo`">
+                  <v-expansion-panel-header class="item-handle">
+                    <div>
+                      <v-icon>
+                        mdi-arrow-up-down-bold
+                      </v-icon>
+                      {{ memo.split(/\r\n|\n/)[0] }}
+                    </div>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <vue-simplemde ref="markdownEditor" v-model="memos[index]" />
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </draggable>
+            </v-expansion-panels>
             <v-btn text @click="addMemo">
               追加
             </v-btn>
