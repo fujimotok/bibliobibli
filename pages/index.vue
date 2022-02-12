@@ -31,16 +31,6 @@
         <v-divider :key="`${index}-divider`" />
       </template>
     </v-list-item-group>
-    <v-btn
-      color="secondary"
-      fab
-      fixed
-      right
-      bottom
-      @click="add"
-    >
-      <v-icon>mdi-plus</v-icon>
-    </v-btn>
     <div v-if="items.length == 0">
       <p>空</p>
     </div>
@@ -52,6 +42,7 @@ import { db } from '../js/db'
 
 export default {
   name: 'IndexPage',
+  layout: 'index',
   data: () => ({
     selected: [2],
     json: '',

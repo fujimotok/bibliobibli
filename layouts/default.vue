@@ -37,9 +37,11 @@
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
       <v-toolbar-title v-text="title" />
+      <v-spacer />
+      <slot />
     </v-app-bar>
     <v-main>
-      <Nuxt />
+      <Nuxt ref="page" />
     </v-main>
   </v-app>
 </template>
