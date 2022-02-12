@@ -99,17 +99,6 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
-      <v-card-actions>
-        <v-btn text @click="put">
-          更新
-        </v-btn>
-        <v-btn text @click="remove">
-          削除
-        </v-btn>
-        <v-btn text @click="cancel">
-          キャンセル
-        </v-btn>
-      </v-card-actions>
     </v-card>
   </v-container>
 </template>
@@ -125,6 +114,7 @@ export default {
     draggable,
     iconCombobox
   },
+  layout: 'show-item',
   data () {
     return {
       activePicker: null,

@@ -106,25 +106,7 @@
         <!--   </v-expansion-panel-content> -->
         <!-- </v-expansion-panel> -->
       </v-expansion-panels>
-      <v-card-actions>
-        <v-btn text @click="add">
-          登録
-        </v-btn>
-        <v-btn text @click="cancel">
-          キャンセル
-        </v-btn>
-      </v-card-actions>
     </v-card>
-    <v-btn
-      color="secondary"
-      fab
-      fixed
-      right
-      bottom
-      @click="barcodeReader"
-    >
-      <v-icon>mdi-camera</v-icon>
-    </v-btn>
   </v-container>
 </template>
 
@@ -140,6 +122,7 @@ export default {
     draggable,
     iconCombobox
   },
+  layout: 'add-item',
   data () {
     return {
       rules: {
