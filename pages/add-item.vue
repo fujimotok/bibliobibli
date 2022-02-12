@@ -1,122 +1,121 @@
 <template>
   <v-container>
-    <v-card class="justify-center">
-      <div style="display: flex;align-items: start;">
-        <iconCombobox v-model="status" :items="states" />
+    <div style="display: flex;align-items: center;">
+      <iconCombobox v-model="status" :items="states" />
+      <h2>{{ title }}</h2>
+    </div>
+    <v-tabs icons-and-text centered fixed-tabs height="48">
+      <v-tab href="#tab-1">
+        Book Info
+        <v-icon>mdi-information</v-icon>
+      </v-tab>
+      <v-tab href="#tab-2">
+        Note
+        <v-icon>mdi-note</v-icon>
+      </v-tab>
+
+      <v-tab-item value="tab-1" class="ma-2">
         <v-img :src="cover" max-height="256" contain />
-      </div>
-      <v-card-title>
-        {{ title }}
-      </v-card-title>
-      <v-expansion-panels accordion flat>
-        <v-expansion-panel>
-          <v-expansion-panel-header>Book Info</v-expansion-panel-header>
-          <v-expansion-panel-content>
+        <v-text-field
+          v-model="isbn"
+          :rules="[rules.counter]"
+          type="number"
+          counter="13"
+          label="isbn13"
+          @change="onChangeISBN(isbn)"
+        />
+        <v-text-field v-model="title" label="title" />
+        <v-combobox v-model="authors" multiple label="authors" />
+        <v-text-field v-model="publisher" label="publisher" />
+        <v-menu
+          ref="menu"
+          v-model="menu"
+          :close-on-content-click="false"
+          transition="scale-transition"
+          offset-y
+          min-width="auto"
+        >
+          <template #activator="{ on, attrs }">
             <v-text-field
-              v-model="isbn"
-              :rules="[rules.counter]"
-              type="number"
-              counter="13"
-              label="isbn13"
-              @change="onChangeISBN(isbn)"
+              v-model="publishdt"
+              label="publish date"
+              prepend-icon="mdi-calendar"
+              readonly
+              v-bind="attrs"
+              v-on="on"
             />
-            <v-text-field v-model="title" label="title" />
-            <v-combobox v-model="authors" multiple label="authors" />
-            <v-text-field v-model="publisher" label="publisher" />
-            <v-menu
-              ref="menu"
-              v-model="menu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template #activator="{ on, attrs }">
-                <v-text-field
-                  v-model="publishdt"
-                  label="publish date"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-              <v-date-picker
-                v-model="publishdt"
-                :active-picker.sync="activePicker"
-                :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
-                min="1950-01-01"
-                @change="save"
-              />
-            </v-menu>
-            <v-text-field v-model="cover" label="cover" />
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-        <v-expansion-panel>
-          <v-expansion-panel-header>User Info</v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-combobox v-model="tags" multiple :items="tagItems" label="tags" />
-            <div style="display: flex;align-items: center;">
-              <label class="v-label">rate</label>
-              <v-spacer />
-              <v-rating v-model="rate" />
-            </div>
-            <draggable
-              v-model="links"
-              :options="{handle: '.item-handle'}"
-            >
-              <div v-for="(link, index) in links" :key="`${index}-link`">
-                <v-text-field v-model="links[index]" label="link">
-                  <v-icon slot="prepend" class="item-handle">
+          </template>
+          <v-date-picker
+            v-model="publishdt"
+            :active-picker.sync="activePicker"
+            :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+            min="1950-01-01"
+            @change="save"
+          />
+        </v-menu>
+        <v-text-field v-model="cover" label="cover" />
+      </v-tab-item>
+      <v-tab-item value="tab-2" class="ma-2">
+        <v-combobox v-model="tags" multiple :items="tagItems" label="tags" />
+        <div style="display: flex;align-items: center;">
+          <label class="v-label">rate</label>
+          <v-spacer />
+          <v-rating v-model="rate" />
+        </div>
+        <draggable
+          v-model="links"
+          :options="{handle: '.item-handle'}"
+        >
+          <div v-for="(link, index) in links" :key="`${index}-link`">
+            <v-text-field v-model="links[index]" label="link">
+              <v-icon slot="prepend" class="item-handle">
+                mdi-arrow-up-down-bold
+              </v-icon>
+            </v-text-field>
+          </div>
+        </draggable>
+        <v-btn text @click="addLink">
+          追加
+        </v-btn>
+        <v-btn text :disabled="links.length < 2" @click="delLink">
+          削除
+        </v-btn>
+        <v-expansion-panels>
+          <draggable
+            v-model="memos"
+            :options="{handle: '.item-handle'}"
+          >
+            <v-expansion-panel v-for="(memo, index) in memos" :key="`${index}-memo`">
+              <v-expansion-panel-header class="item-handle" style="width: 100%;">
+                <div>
+                  <v-icon>
                     mdi-arrow-up-down-bold
                   </v-icon>
-                </v-text-field>
-              </div>
-            </draggable>
-            <v-btn text @click="addLink">
-              追加
-            </v-btn>
-            <v-btn text :disabled="links.length < 2" @click="delLink">
-              削除
-            </v-btn>
-            <v-expansion-panels flat>
-              <draggable
-                v-model="memos"
-                :options="{handle: '.item-handle'}"
-              >
-                <v-expansion-panel v-for="(memo, index) in memos" :key="`${index}-memo`">
-                  <v-expansion-panel-header class="item-handle">
-                    <div>
-                      <v-icon>
-                        mdi-arrow-up-down-bold
-                      </v-icon>
-                      {{ memo.split(/\r\n|\n/)[0] }}
-                    </div>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <vue-simplemde ref="markdownEditor" v-model="memos[index]" />
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </draggable>
-            </v-expansion-panels>
-            <v-btn text @click="addMemo">
-              追加
-            </v-btn>
-            <v-btn text :disabled="memos.length < 2" @click="delMemo">
-              削除
-            </v-btn>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-        <!-- <v-expansion-panel> -->
-        <!--   <v-expansion-panel-header>System Info</v-expansion-panel-header> -->
-        <!--   <v-expansion-panel-content> -->
-        <!--     <v-text-field v-model="registerdt" label="register date" /> -->
-        <!--     <v-text-field v-model="readdt" label="read date" /> -->
-        <!--     <v-text-field v-model="update" label="update" /> -->
-        <!--   </v-expansion-panel-content> -->
-        <!-- </v-expansion-panel> -->
-      </v-expansion-panels>
-    </v-card>
+                  {{ memo.split(/\r\n|\n/)[0] }}
+                </div>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <vue-simplemde ref="markdownEditor" v-model="memos[index]" />
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </draggable>
+        </v-expansion-panels>
+        <v-btn text @click="addMemo">
+          追加
+        </v-btn>
+        <v-btn text :disabled="memos.length < 2" @click="delMemo">
+          削除
+        </v-btn>
+      </v-tab-item>
+    </v-tabs>
+    <!-- <v-expansion-panel> -->
+    <!--   <v-expansion-panel-header>System Info</v-expansion-panel-header> -->
+    <!--   <v-expansion-panel-content> -->
+    <!--     <v-text-field v-model="registerdt" label="register date" /> -->
+    <!--     <v-text-field v-model="readdt" label="read date" /> -->
+    <!--     <v-text-field v-model="update" label="update" /> -->
+    <!--   </v-expansion-panel-content> -->
+    <!-- </v-expansion-panel> -->
   </v-container>
 </template>
 
