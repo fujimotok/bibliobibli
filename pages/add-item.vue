@@ -82,11 +82,12 @@
               :options="{handle: '.item-handle'}"
             >
               <div v-for="(memo, index) in memos" :key="`${index}-memo`">
-                <v-textarea v-model="memos[index]" label="memo">
+                <div style="display: flex;align-items: start;">
                   <v-icon slot="prepend" class="item-handle">
                     mdi-arrow-up-down-bold
                   </v-icon>
-                </v-textarea>
+                  <vue-simplemde ref="markdownEditor" v-model="memos[index]" />
+                </div>
               </div>
             </draggable>
             <v-btn text @click="addMemo">
