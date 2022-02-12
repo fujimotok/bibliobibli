@@ -37,6 +37,8 @@
               <v-date-picker
                 v-model="publishdt"
                 :active-picker.sync="activePicker"
+                :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+                min="1950-01-01"
                 @change="save"
               />
             </v-menu>

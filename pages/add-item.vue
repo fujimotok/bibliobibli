@@ -44,6 +44,8 @@
               <v-date-picker
                 v-model="publishdt"
                 :active-picker.sync="activePicker"
+                :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+                min="1950-01-01"
                 @change="save"
               />
             </v-menu>
@@ -184,7 +186,11 @@ export default {
               this.title = res.data[0].summary.title
               this.authors = res.data[0].summary.author.split(' ')
               this.publisher = res.data[0].summary.publisher
-              this.publishdt = res.data[0].summary.pubdate.substr(0, 4) + '-' + res.data[0].summary.pubdate.substr(4, 2) + '-' + res.data[0].summary.pubdate.substr(6, 2)
+              const date = res.data[0].summary.pubdate.split('-')
+              const year = date[0] || '2000'
+              const month = date[1] || '01'
+              const day = date[2] || '01'
+              this.publishdt = year + '-' + month + '-' + day
               this.cover = res.data[0].summary.cover || '/noimage.png'
             }
           })
