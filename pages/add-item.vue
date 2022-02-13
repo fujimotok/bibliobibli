@@ -193,11 +193,17 @@ export default {
               this.title = res.data[0].summary.title
               this.authors = res.data[0].summary.author.split(' ')
               this.publisher = res.data[0].summary.publisher
-              const date = res.data[0].summary.pubdate.split('-')
-              const year = date[0] || '2000'
-              const month = date[1] || '01'
-              const day = date[2] || '01'
-              this.publishdt = year + '-' + month + '-' + day
+
+              if (res.data[0].summary.pubdate.includes('-')) {
+                const date = res.data[0].summary.pubdate.split('-')
+                const year = date[0] || '2000'
+                const month = date[1] || '01'
+                const day = date[2] || '01'
+                this.publishdt = year + '-' + month + '-' + day
+              } else {
+                this.publishdt = res.data[0].summary.pubdate.substr(0, 4) + '-' + res.data[0].summary.pubdate.substr(4, 2) + '-' + res.data[0].summary.pubdate.substr(6, 2)
+              }
+
               this.cover = res.data[0].summary.cover || '/noimage.png'
             }
           })
