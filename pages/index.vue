@@ -62,7 +62,7 @@ export default {
     title: '本棚'
   }),
   mounted () {
-    db.books.toArray().then((records) => {
+    db.books.orderBy(':id').reverse().limit(100).toArray().then((records) => {
       this.items = records
     })
   },
@@ -72,6 +72,15 @@ export default {
     },
     show (index) {
       this.$router.push({ path: '/show-item', query: { index } })
+    },
+    search (query) {
+      const words = query.split(' ')
+      const regex = new RegExp(words.join('|'), 'i')
+      db.books.filter((book) => {
+        return regex.test(book.title)
+      }).limit(100).toArray().then((records) => {
+        this.items = records
+      })
     }
   }
 }
