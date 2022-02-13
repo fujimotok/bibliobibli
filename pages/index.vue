@@ -12,6 +12,16 @@
               class="text-caption"
               v-text="item.authors.join(', ')"
             />
+            <div>
+              <v-chip
+                v-for="tag in item.tags"
+                :key="tag"
+                small
+                class="mr-1 mt-1"
+              >
+                {{ tag }}
+              </v-chip>
+            </div>
           </v-list-item-content>
           <v-list-item-action>
             <v-icon v-if="item.status == 0">
