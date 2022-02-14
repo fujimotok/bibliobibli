@@ -1,6 +1,9 @@
 <template>
   <default-layout ref="base">
-    <v-btn color="white" icon @click="click()">
+    <v-btn color="white" icon @click="search()">
+      <v-icon>mdi-magnify</v-icon>
+    </v-btn>
+    <v-btn color="white" icon @click="add()">
       <v-icon>mdi-plus</v-icon>
     </v-btn>
   </default-layout>
@@ -17,8 +20,11 @@ export default {
     }
   },
   methods: {
-    click () {
+    add () {
       this.$refs.base.$refs.page.$children[0].add()
+    },
+    search () {
+      this.$refs.base.$refs.page.$children[0].showSearchDialog()
     }
   }
 }
