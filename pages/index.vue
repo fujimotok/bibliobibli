@@ -41,9 +41,41 @@
         <v-divider :key="`${index}-divider`" />
       </template>
     </v-list-item-group>
+
     <div v-if="items.length == 0">
       <p>空</p>
     </div>
+
+    <v-dialog v-model="dialog" max-width="400">
+      <v-card class="pa-4">
+        <v-card-title>
+          Search
+        </v-card-title>
+        <v-card-text>
+          <v-text-field
+            v-model="searchQuery"
+            hide-details
+            outlined
+            prepend-inner-icon="mdi-magnify"
+            single-line
+            placeholder="Search in Title"
+          />
+          <v-switch v-model="isUseStates" label="Filter States" />
+          <v-combobox v-model="searchStates" multiple :items="states" label="states" :disabled="!isUseStates" />
+          <v-switch v-model="isUseTags" label="Filter Tags" />
+          <v-combobox v-model="searchTags" multiple :items="tagItems" label="tags" :disabled="!isUseTags" />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn @click="dialog = false">
+            キャンセル
+          </v-btn>
+          <v-btn @click="search()">
+            検索
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-list>
 </template>
 
@@ -54,9 +86,15 @@ export default {
   name: 'IndexPage',
   layout: 'index',
   data: () => ({
-    selected: [2],
-    json: '',
-    items: []
+    items: [],
+    dialog: false,
+    searchQuery: '',
+    isUseTags: false,
+    tagItems: [],
+    searchTags: [],
+    isUseStates: false,
+    states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
+    searchStates: []
   }),
   head: () => ({
     title: '本棚'
@@ -65,6 +103,10 @@ export default {
     db.books.orderBy(':id').reverse().limit(100).toArray().then((records) => {
       this.items = records
     })
+    db.books.orderBy('tags').uniqueKeys()
+      .then((keysArray) => {
+        this.tagItems = keysArray
+      })
   },
   methods: {
     add () {
@@ -73,14 +115,22 @@ export default {
     show (index) {
       this.$router.push({ path: '/show-item', query: { index } })
     },
-    search (query) {
-      const words = query.split(' ')
+    showSearchDialog () {
+      this.dialog = true
+    },
+    search () {
+      const words = this.searchQuery.split(' ')
       const regex = new RegExp(words.join('|'), 'i')
       db.books.filter((book) => {
-        return regex.test(book.title)
+        const hitWord = regex.test(book.title)
+        const hitStatus = this.isUseStates ? this.searchStates.some(status => book.status === status.value) : true
+        const hitTags = this.isUseTags ? this.searchTags.every(tag => book.tags.includes(tag)) : true
+        return hitWord && hitStatus && hitTags
       }).limit(100).toArray().then((records) => {
         this.items = records
       })
+
+      this.dialog = false
     }
   }
 }

@@ -1,19 +1,9 @@
 <template>
   <default-layout ref="base">
-    <v-text-field
-      v-model="word"
-      dark
-      hide-details
-      outlined
-      prepend-inner-icon="mdi-magnify"
-      single-line
-      dense
-      rounded
-      style="width: 50%;"
-      placeholder="Search in Title"
-      @change="onChangeWord(word)"
-    />
-    <v-btn color="white" icon @click="click()">
+    <v-btn color="white" icon @click="search()">
+      <v-icon>mdi-magnify</v-icon>
+    </v-btn>
+    <v-btn color="white" icon @click="add()">
       <v-icon>mdi-plus</v-icon>
     </v-btn>
   </default-layout>
@@ -27,15 +17,14 @@ export default {
   components: { defaultLayout },
   data () {
     return {
-      word: ''
     }
   },
   methods: {
-    click () {
+    add () {
       this.$refs.base.$refs.page.$children[0].add()
     },
-    onChangeWord (word) {
-      this.$refs.base.$refs.page.$children[0].search(word)
+    search () {
+      this.$refs.base.$refs.page.$children[0].showSearchDialog()
     }
   }
 }
