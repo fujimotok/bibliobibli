@@ -226,12 +226,12 @@ export default {
         memos: this.memos
       })
 
-      this.$router.push('/')
+      this.$router.push({ path: '/', query: { update: this.id } })
     },
     remove () {
       if (confirm('本当に削除しても良いですか？')) {
         db.books.delete(this.id)
-        this.$router.push('/')
+        this.$router.push({ path: '/', query: { del: this.id } })
       }
     },
     cancel () {

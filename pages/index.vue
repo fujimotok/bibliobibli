@@ -120,9 +120,42 @@ export default {
     }
   },
   activated () {
-    if (!cacheData) {
+    if (!cacheData || this.$router.currentRoute.query.dbload) {
       this.search()
     }
+
+    if (cacheData && this.$router.currentRoute.query.add) {
+      db.books.where('id').equals(Number(this.$router.currentRoute.query.add)).toArray()
+        .then((records) => {
+          const words = this.searchQuery.split(' ')
+          const regex = new RegExp(words.join('|'), 'i')
+          const hitWord = regex.test(records[0].title)
+          const hitStatus = this.isUseStates ? this.searchStates.some(status => records[0].status === status.value) : true
+          const hitTags = this.isUseTags ? this.searchTags.every(tag => records[0].tags.includes(tag)) : true
+          if (hitWord && hitStatus && hitTags) {
+            this.items.unshift(records[0])
+          }
+        })
+    }
+
+    if (cacheData && this.$router.currentRoute.query.update) {
+      const index = this.items.findIndex(v => v.id === Number(this.$router.currentRoute.query.update))
+      if (index !== -1) {
+        db.books.where('id').equals(Number(this.$router.currentRoute.query.update)).toArray()
+          .then((records) => {
+            this.items[index] = records[0]
+          })
+      }
+    }
+
+    if (cacheData && this.$router.currentRoute.query.del) {
+      const index = this.items.findIndex(v => v.id === Number(this.$router.currentRoute.query.del))
+      if (index !== -1) {
+        this.items.splice(index, 1)
+      }
+    }
+
+    history.replaceState(null, null, '/')
   },
   mounted () {
     db.books.orderBy('tags').uniqueKeys()

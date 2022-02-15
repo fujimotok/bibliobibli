@@ -252,9 +252,9 @@ export default {
           links: this.links,
           memos: this.memos
         }
-      )
-
-      this.$router.push('/')
+      ).then((result) => {
+        this.$router.push({ path: '/', query: { add: result } })
+      })
     },
     cancel () {
       this.$router.push('/')
