@@ -41,7 +41,7 @@
       <slot />
     </v-app-bar>
     <v-main>
-      <Nuxt ref="page" />
+      <Nuxt ref="page" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
     </v-main>
   </v-app>
 </template>
@@ -54,6 +54,7 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
+      cachePageList: ['IndexPage'],
       items: [
         {
           icon: 'mdi-home',

@@ -84,36 +84,51 @@
 <script>
 import { db } from '../js/db'
 
+let cacheData = null
+
 export default {
   name: 'IndexPage',
   layout: 'index',
-  data: () => ({
-    items: [],
-    dialog: false,
-    searchQuery: '',
-    isUseTags: false,
-    tagItems: [],
-    searchTags: [],
-    isUseStates: false,
-    states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
-    searchStates: []
-  }),
+  data () {
+    if (cacheData) {
+      return cacheData
+    }
+    return {
+      items: [],
+      dialog: false,
+      searchQuery: '',
+      isUseTags: false,
+      tagItems: [],
+      searchTags: [],
+      isUseStates: false,
+      states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
+      searchStates: []
+    }
+  },
   head: () => ({
     title: '本棚'
   }),
+  beforeDestory () {
+    cacheData = null
+  },
+  created () {
+
+  },
+  deactivated () {
+    if (!cacheData) {
+      cacheData = JSON.parse(JSON.stringify(this._data))
+    }
+  },
+  activated () {
+    if (!cacheData) {
+      this.search()
+    }
+  },
   mounted () {
     db.books.orderBy('tags').uniqueKeys()
       .then((keysArray) => {
         this.tagItems = keysArray
       })
-
-    this.searchQuery = sessionStorage.getItem('searchQuery') || ''
-    this.isUseStates = JSON.parse(sessionStorage.getItem('isUseStates')) || false
-    this.searchStates = JSON.parse(sessionStorage.getItem('searchStates')) || []
-    this.isUseTags = JSON.parse(sessionStorage.getItem('isUseTags')) || false
-    this.searchTags = JSON.parse(sessionStorage.getItem('searchTags')) || []
-
-    this.search()
   },
   methods: {
     add () {
@@ -137,13 +152,8 @@ export default {
         this.items = records
       })
 
-      sessionStorage.setItem('searchQuery', this.searchQuery)
-      sessionStorage.setItem('isUseStates', JSON.stringify(this.isUseStates))
-      sessionStorage.setItem('searchStates', JSON.stringify(this.searchStates))
-      sessionStorage.setItem('isUseTags', JSON.stringify(this.isUseTags))
-      sessionStorage.setItem('searchTags', JSON.stringify(this.searchTags))
-
       this.dialog = false
+      cacheData = null
     },
     clear () {
       this.searchQuery = ''
@@ -152,13 +162,9 @@ export default {
       this.isUseTags = false
       this.searchTags = []
 
-      sessionStorage.setItem('searchQuery', this.searchQuery)
-      sessionStorage.setItem('isUseStates', JSON.stringify(this.isUseStates))
-      sessionStorage.setItem('searchStates', JSON.stringify(this.searchStates))
-      sessionStorage.setItem('isUseTags', JSON.stringify(this.isUseTags))
-      sessionStorage.setItem('searchTags', JSON.stringify(this.searchTags))
-
+      this.search()
       this.dialog = false
+      cacheData = null
     }
   }
 }
