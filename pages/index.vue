@@ -40,10 +40,12 @@
         </v-list-item>
         <v-divider :key="`${index}-divider`" />
       </template>
+      <v-progress-circular v-if="isLoading" indeterminate />
+      <div v-intersect.quite="onIntersect" />
     </v-list-item-group>
 
-    <div v-if="items.length == 0">
-      <p>空</p>
+    <div v-if="items.length == 0" style="position: absolute; top: 50%; left: 50%; margin-right: -50%; transform: translate(-50%, -50%) ">
+      <v-icon>mdi-magnify</v-icon>No Results
     </div>
 
     <v-dialog v-model="dialog" max-width="400">
@@ -84,36 +86,96 @@
 <script>
 import { db } from '../js/db'
 
+let cacheData = null
+let scrollPos = null
+
 export default {
   name: 'IndexPage',
   layout: 'index',
-  data: () => ({
-    items: [],
-    dialog: false,
-    searchQuery: '',
-    isUseTags: false,
-    tagItems: [],
-    searchTags: [],
-    isUseStates: false,
-    states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
-    searchStates: []
-  }),
+  data () {
+    if (cacheData) {
+      return cacheData
+    }
+    return {
+      items: [],
+      dialog: false,
+      isLoading: false,
+      searchQuery: '',
+      isUseTags: false,
+      tagItems: [],
+      searchTags: [],
+      isUseStates: false,
+      states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
+      searchStates: []
+    }
+  },
   head: () => ({
     title: '本棚'
   }),
+  beforeDestory () {
+    cacheData = null
+  },
+  created () {
+
+  },
+  deactivated () {
+    if (!cacheData) {
+      cacheData = JSON.parse(JSON.stringify(this._data))
+    }
+    scrollPos = window.pageYOffset
+  },
+  activated () {
+    if (!cacheData || sessionStorage.getItem('DBChangeEvent') === 'import') {
+      this.search()
+    }
+  },
   mounted () {
     db.books.orderBy('tags').uniqueKeys()
       .then((keysArray) => {
         this.tagItems = keysArray
       })
+    if (cacheData && sessionStorage.getItem('DBChangeEvent') === 'add') {
+      const id = Number(sessionStorage.getItem('DBChangeEventArg'))
+      db.books.where('id').equals(id).toArray()
+        .then((records) => {
+          const words = this.searchQuery.split(' ')
+          const regex = new RegExp(words.join('|'), 'i')
+          const hitWord = regex.test(records[0].title)
+          const hitStatus = this.isUseStates ? this.searchStates.some(status => records[0].status === status.value) : true
+          const hitTags = this.isUseTags ? this.searchTags.every(tag => records[0].tags.includes(tag)) : true
+          if (hitWord && hitStatus && hitTags) {
+            this.items.unshift(records[0])
+          }
+        })
+    }
 
-    this.searchQuery = sessionStorage.getItem('searchQuery') || ''
-    this.isUseStates = JSON.parse(sessionStorage.getItem('isUseStates')) || false
-    this.searchStates = JSON.parse(sessionStorage.getItem('searchStates')) || []
-    this.isUseTags = JSON.parse(sessionStorage.getItem('isUseTags')) || false
-    this.searchTags = JSON.parse(sessionStorage.getItem('searchTags')) || []
+    if (cacheData && sessionStorage.getItem('DBChangeEvent') === 'update') {
+      const id = Number(sessionStorage.getItem('DBChangeEventArg'))
+      const index = this.items.findIndex(v => v.id === id)
+      if (index !== -1) {
+        db.books.where('id').equals(id).toArray()
+          .then((records) => {
+            this.$set(this.items, index, records[0])
+            setTimeout(() => {
+              window.scrollTo(0, scrollPos)
+            })
+          })
+      }
+    }
 
-    this.search()
+    if (cacheData && sessionStorage.getItem('DBChangeEvent') === 'del') {
+      const id = Number(sessionStorage.getItem('DBChangeEventArg'))
+      const index = this.items.findIndex(v => v.id === id)
+      if (index !== -1) {
+        this.items.splice(index, 1)
+        setTimeout(() => {
+          window.scrollTo(0, scrollPos)
+        })
+      }
+    }
+
+    sessionStorage.removeItem('DBChangeEvent')
+    sessionStorage.removeItem('DBChangeEventArg')
   },
   methods: {
     add () {
@@ -125,7 +187,7 @@ export default {
     showSearchDialog () {
       this.dialog = true
     },
-    search () {
+    search (offset = 0) {
       const words = this.searchQuery.split(' ')
       const regex = new RegExp(words.join('|'), 'i')
       db.books.orderBy(':id').reverse().filter((book) => {
@@ -133,17 +195,15 @@ export default {
         const hitStatus = this.isUseStates ? this.searchStates.some(status => book.status === status.value) : true
         const hitTags = this.isUseTags ? this.searchTags.every(tag => book.tags.includes(tag)) : true
         return hitWord && hitStatus && hitTags
-      }).limit(100).toArray().then((records) => {
-        this.items = records
+      }).offset(offset).limit(20).toArray().then((records) => {
+        if (offset === 0) {
+          this.items = []
+        }
+        this.items = this.items.concat(records)
       })
 
-      sessionStorage.setItem('searchQuery', this.searchQuery)
-      sessionStorage.setItem('isUseStates', JSON.stringify(this.isUseStates))
-      sessionStorage.setItem('searchStates', JSON.stringify(this.searchStates))
-      sessionStorage.setItem('isUseTags', JSON.stringify(this.isUseTags))
-      sessionStorage.setItem('searchTags', JSON.stringify(this.searchTags))
-
       this.dialog = false
+      cacheData = null
     },
     clear () {
       this.searchQuery = ''
@@ -152,13 +212,14 @@ export default {
       this.isUseTags = false
       this.searchTags = []
 
-      sessionStorage.setItem('searchQuery', this.searchQuery)
-      sessionStorage.setItem('isUseStates', JSON.stringify(this.isUseStates))
-      sessionStorage.setItem('searchStates', JSON.stringify(this.searchStates))
-      sessionStorage.setItem('isUseTags', JSON.stringify(this.isUseTags))
-      sessionStorage.setItem('searchTags', JSON.stringify(this.searchTags))
-
+      this.search()
       this.dialog = false
+      cacheData = null
+    },
+    onIntersect () {
+      this.isLoading = true
+      this.search(this.items.length)
+      this.isLoading = false
     }
   }
 }

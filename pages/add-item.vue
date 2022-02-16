@@ -252,9 +252,11 @@ export default {
           links: this.links,
           memos: this.memos
         }
-      )
-
-      this.$router.push('/')
+      ).then((result) => {
+        sessionStorage.setItem('DBChangeEvent', 'add')
+        sessionStorage.setItem('DBChangeEventArg', result)
+        this.$router.push('/')
+      })
     },
     cancel () {
       this.$router.push('/')

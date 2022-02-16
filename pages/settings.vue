@@ -37,11 +37,13 @@ export default {
               const idbDatabase = db.backendDB() // get native IDBDatabase object from Dexie wrapper
 
               // export to JSON, clear database, and import from JSON
-              IDBExportImport.clearDatabase(idbDatabase, function (err) {
+              IDBExportImport.clearDatabase(idbDatabase, (err) => {
                 if (!err) { // cleared data successfully
-                  IDBExportImport.importFromJsonString(idbDatabase, result, function (err) {
+                  IDBExportImport.importFromJsonString(idbDatabase, result, (err) => {
                     if (!err) {
                       alert('インポート完了')
+                      sessionStorage.setItem('DBChangeEvent', 'import')
+                      this.$router.push('/')
                     } else {
                       alert('インポートに失敗しました')
                     }
