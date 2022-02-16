@@ -40,10 +40,12 @@
         </v-list-item>
         <v-divider :key="`${index}-divider`" />
       </template>
+      <v-progress-circular v-if="isLoading" indeterminate />
+      <div v-intersect.quite="onIntersect" />
     </v-list-item-group>
 
-    <div v-if="items.length == 0">
-      <p>空</p>
+    <div v-if="items.length == 0" style="position: absolute; top: 50%; left: 50%; margin-right: -50%; transform: translate(-50%, -50%) ">
+      <v-icon>mdi-magnify</v-icon>No Results
     </div>
 
     <v-dialog v-model="dialog" max-width="400">
@@ -97,6 +99,7 @@ export default {
     return {
       items: [],
       dialog: false,
+      isLoading: false,
       searchQuery: '',
       isUseTags: false,
       tagItems: [],
@@ -184,7 +187,7 @@ export default {
     showSearchDialog () {
       this.dialog = true
     },
-    search () {
+    search (offset = 0) {
       const words = this.searchQuery.split(' ')
       const regex = new RegExp(words.join('|'), 'i')
       db.books.orderBy(':id').reverse().filter((book) => {
@@ -192,8 +195,11 @@ export default {
         const hitStatus = this.isUseStates ? this.searchStates.some(status => book.status === status.value) : true
         const hitTags = this.isUseTags ? this.searchTags.every(tag => book.tags.includes(tag)) : true
         return hitWord && hitStatus && hitTags
-      }).limit(100).toArray().then((records) => {
-        this.items = records
+      }).offset(offset).limit(20).toArray().then((records) => {
+        if (offset === 0) {
+          this.items = []
+        }
+        this.items = this.items.concat(records)
       })
 
       this.dialog = false
@@ -209,6 +215,11 @@ export default {
       this.search()
       this.dialog = false
       cacheData = null
+    },
+    onIntersect () {
+      this.isLoading = true
+      this.search(this.items.length)
+      this.isLoading = false
     }
   }
 }
