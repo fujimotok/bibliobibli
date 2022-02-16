@@ -42,7 +42,8 @@ export default {
                   IDBExportImport.importFromJsonString(idbDatabase, result, (err) => {
                     if (!err) {
                       alert('インポート完了')
-                      this.$router.push({ path: '/', query: { dbload: 1 } })
+                      sessionStorage.setItem('DBChangeEvent', 'import')
+                      this.$router.push('/')
                     } else {
                       alert('インポートに失敗しました')
                     }

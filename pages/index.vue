@@ -85,6 +85,7 @@
 import { db } from '../js/db'
 
 let cacheData = null
+let scrollPos = null
 
 export default {
   name: 'IndexPage',
@@ -118,14 +119,21 @@ export default {
     if (!cacheData) {
       cacheData = JSON.parse(JSON.stringify(this._data))
     }
+    scrollPos = window.pageYOffset
   },
   activated () {
-    if (!cacheData || this.$router.currentRoute.query.dbload) {
+    if (!cacheData || sessionStorage.getItem('DBChangeEvent') === 'import') {
       this.search()
     }
-
-    if (cacheData && this.$router.currentRoute.query.add) {
-      db.books.where('id').equals(Number(this.$router.currentRoute.query.add)).toArray()
+  },
+  mounted () {
+    db.books.orderBy('tags').uniqueKeys()
+      .then((keysArray) => {
+        this.tagItems = keysArray
+      })
+    if (cacheData && sessionStorage.getItem('DBChangeEvent') === 'add') {
+      const id = Number(sessionStorage.getItem('DBChangeEventArg'))
+      db.books.where('id').equals(id).toArray()
         .then((records) => {
           const words = this.searchQuery.split(' ')
           const regex = new RegExp(words.join('|'), 'i')
@@ -138,30 +146,33 @@ export default {
         })
     }
 
-    if (cacheData && this.$router.currentRoute.query.update) {
-      const index = this.items.findIndex(v => v.id === Number(this.$router.currentRoute.query.update))
+    if (cacheData && sessionStorage.getItem('DBChangeEvent') === 'update') {
+      const id = Number(sessionStorage.getItem('DBChangeEventArg'))
+      const index = this.items.findIndex(v => v.id === id)
       if (index !== -1) {
-        db.books.where('id').equals(Number(this.$router.currentRoute.query.update)).toArray()
+        db.books.where('id').equals(id).toArray()
           .then((records) => {
-            this.items[index] = records[0]
+            this.$set(this.items, index, records[0])
+            setTimeout(() => {
+              window.scrollTo(0, scrollPos)
+            })
           })
       }
     }
 
-    if (cacheData && this.$router.currentRoute.query.del) {
-      const index = this.items.findIndex(v => v.id === Number(this.$router.currentRoute.query.del))
+    if (cacheData && sessionStorage.getItem('DBChangeEvent') === 'del') {
+      const id = Number(sessionStorage.getItem('DBChangeEventArg'))
+      const index = this.items.findIndex(v => v.id === id)
       if (index !== -1) {
         this.items.splice(index, 1)
+        setTimeout(() => {
+          window.scrollTo(0, scrollPos)
+        })
       }
     }
 
-    history.replaceState(null, null, '/')
-  },
-  mounted () {
-    db.books.orderBy('tags').uniqueKeys()
-      .then((keysArray) => {
-        this.tagItems = keysArray
-      })
+    sessionStorage.removeItem('DBChangeEvent')
+    sessionStorage.removeItem('DBChangeEventArg')
   },
   methods: {
     add () {

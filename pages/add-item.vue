@@ -253,7 +253,9 @@ export default {
           memos: this.memos
         }
       ).then((result) => {
-        this.$router.push({ path: '/', query: { add: result } })
+        sessionStorage.setItem('DBChangeEvent', 'add')
+        sessionStorage.setItem('DBChangeEventArg', result)
+        this.$router.push('/')
       })
     },
     cancel () {

@@ -226,12 +226,16 @@ export default {
         memos: this.memos
       })
 
-      this.$router.push({ path: '/', query: { update: this.id } })
+      sessionStorage.setItem('DBChangeEvent', 'update')
+      sessionStorage.setItem('DBChangeEventArg', this.id)
+      this.$router.push('/')
     },
     remove () {
       if (confirm('本当に削除しても良いですか？')) {
         db.books.delete(this.id)
-        this.$router.push({ path: '/', query: { del: this.id } })
+        sessionStorage.setItem('DBChangeEvent', 'del')
+        sessionStorage.setItem('DBChangeEventArg', this.id)
+        this.$router.push('/')
       }
     },
     cancel () {
