@@ -88,7 +88,7 @@
               <v-icon>mdi-delete</v-icon>
             </v-btn>
           </div>
-          <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" />
+          <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" :configs="config" />
         </v-tab-item>
       </v-tabs-items>
     </v-tabs>
@@ -109,6 +109,7 @@ export default {
   layout: 'show-item',
   data () {
     return {
+      config: { spellChecker: false },
       activePicker: null,
       menu: false,
       tab: 'tab-1',

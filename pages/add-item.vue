@@ -92,7 +92,7 @@
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </div>
-        <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" />
+        <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" :configs="config" />
       </v-tab-item>
     </v-tabs>
     <!-- <v-expansion-panel> -->
@@ -129,6 +129,7 @@ export default {
           return pattern.test(value) || 'Invalid e-mail.'
         }
       },
+      config: { spellChecker: false },
       activePicker: null,
       menu: false,
       selectedMemoIndex: 0,
