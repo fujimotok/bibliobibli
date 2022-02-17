@@ -4,7 +4,7 @@
       <iconCombobox v-model="status" :items="states" />
       <h2>{{ title }}</h2>
     </div>
-    <v-tabs icons-and-text centered fixed-tabs height="48">
+    <v-tabs v-model="tab" icons-and-text centered fixed-tabs height="48">
       <v-tab href="#tab-1">
         Book Info
         <v-icon>mdi-information</v-icon>
@@ -13,96 +13,84 @@
         Note
         <v-icon>mdi-note</v-icon>
       </v-tab>
-
-      <v-tab-item value="tab-1" class="ma-2">
-        <v-img :src="cover" max-height="256" contain />
-        <v-text-field v-model="isbn" label="isbn13" />
-        <v-text-field v-model="title" label="title" />
-        <v-combobox v-model="authors" multiple label="authors" />
-        <v-text-field v-model="publisher" label="publisher" />
-        <v-menu
-          ref="menu"
-          v-model="menu"
-          :close-on-content-click="false"
-          transition="scale-transition"
-          offset-y
-          min-width="auto"
-        >
-          <template #activator="{ on, attrs }">
-            <v-text-field
-              v-model="publishdt"
-              label="publish date"
-              prepend-icon="mdi-calendar"
-              readonly
-              v-bind="attrs"
-              v-on="on"
-            />
-          </template>
-          <v-date-picker
-            v-model="publishdt"
-            :active-picker.sync="activePicker"
-            :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
-            min="1950-01-01"
-            @change="save"
-          />
-        </v-menu>
-        <v-text-field v-model="cover" label="cover" />
-        <v-text-field v-model="registerdt" readonly label="register date" />
-        <v-text-field v-model="readdt" readonly label="read date" />
-        <v-text-field v-model="update" readonly label="update" />
-      </v-tab-item>
-      <v-tab-item value="tab-2" class="ma-2">
-        <v-combobox v-model="tags" multiple :items="tagItems" label="tags" />
-        <div style="display: flex;align-items: center;">
-          <label class="v-label">rate</label>
-          <v-spacer />
-          <v-rating v-model="rate" />
-        </div>
-        <draggable
-          v-model="links"
-          :options="{handle: '.item-handle'}"
-        >
-          <div v-for="(link, index) in links" :key="`${index}-link`">
-            <v-text-field v-model="links[index]" label="link">
-              <v-icon slot="prepend" class="item-handle">
-                mdi-arrow-up-down-bold
-              </v-icon>
-            </v-text-field>
+      <v-tabs-items v-model="tab" touchless>
+        <v-tab-item value="tab-1" class="ma-2">
+          <v-img :src="cover" max-height="256" contain />
+          <v-combobox v-model="tags" multiple :items="tagItems" label="tags" />
+          <div style="display: flex;align-items: center;">
+            <label class="v-label">rate</label>
+            <v-spacer />
+            <v-rating v-model="rate" />
           </div>
-        </draggable>
-        <v-btn text @click="addLink">
-          追加
-        </v-btn>
-        <v-btn text :disabled="links.length < 2" @click="delLink">
-          削除
-        </v-btn>
-        <v-expansion-panels flat>
           <draggable
-            v-model="memos"
+            v-model="links"
             :options="{handle: '.item-handle'}"
           >
-            <v-expansion-panel v-for="(memo, index) in memos" :key="`${index}-memo`">
-              <v-expansion-panel-header class="item-handle">
-                <div>
-                  <v-icon>
-                    mdi-arrow-up-down-bold
-                  </v-icon>
-                  {{ memo.split(/\r\n|\n/)[0] }}
-                </div>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <vue-simplemde ref="markdownEditor" v-model="memos[index]" />
-              </v-expansion-panel-content>
-            </v-expansion-panel>
+            <div v-for="(link, index) in links" :key="`${index}-link`">
+              <v-text-field v-model="links[index]" label="link">
+                <v-icon slot="prepend" class="item-handle">
+                  mdi-arrow-up-down-bold
+                </v-icon>
+              </v-text-field>
+            </div>
           </draggable>
-        </v-expansion-panels>
-        <v-btn text @click="addMemo">
-          追加
-        </v-btn>
-        <v-btn text :disabled="memos.length < 2" @click="delMemo">
-          削除
-        </v-btn>
-      </v-tab-item>
+          <div class="mb-2">
+            <v-btn text @click="addLink">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+            <v-btn text :disabled="links.length < 2" @click="delLink">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </div>
+
+          <v-text-field v-model="isbn" label="isbn13" />
+          <v-text-field v-model="title" label="title" />
+          <v-combobox v-model="authors" multiple label="authors" />
+          <v-text-field v-model="publisher" label="publisher" />
+          <v-menu
+            ref="menu"
+            v-model="menu"
+            :close-on-content-click="false"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template #activator="{ on, attrs }">
+              <v-text-field
+                v-model="publishdt"
+                label="publish date"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              />
+            </template>
+            <v-date-picker
+              v-model="publishdt"
+              :active-picker.sync="activePicker"
+              :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+              min="1950-01-01"
+              @change="save"
+            />
+          </v-menu>
+          <v-text-field v-model="cover" label="cover" />
+          <v-text-field v-model="registerdt" readonly label="register date" />
+          <v-text-field v-model="readdt" readonly label="read date" />
+          <v-text-field v-model="update" readonly label="update" />
+        </v-tab-item>
+        <v-tab-item value="tab-2" class="ma-2">
+          <div style="display: flex;align-items: center;">
+            <v-select v-model="selectedMemoIndex" :items="memoTitles" />
+            <v-btn text class="ml-2" @click="addMemo">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+            <v-btn text :disabled="memos.length < 2" @click="delMemo">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </div>
+          <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" :configs="config" />
+        </v-tab-item>
+      </v-tabs-items>
     </v-tabs>
   </v-container>
 </template>
@@ -121,8 +109,11 @@ export default {
   layout: 'show-item',
   data () {
     return {
+      config: { spellChecker: false },
       activePicker: null,
       menu: false,
+      tab: 'tab-1',
+      selectedMemoIndex: 0,
       states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
       tagItems: [],
       id: null,
@@ -145,6 +136,11 @@ export default {
   head: () => ({
     title: '書籍情報'
   }),
+  computed: {
+    memoTitles () {
+      return this.memos.map((memo, i) => { return { text: i + ': ' + memo.split(/\r\n|\n/)[0], value: i } })
+    }
+  },
   watch: {
     menu (val) {
       val && setTimeout(() => (this.activePicker = 'YEAR'))

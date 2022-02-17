@@ -16,6 +16,33 @@
 
       <v-tab-item value="tab-1" class="ma-2">
         <v-img :src="cover" max-height="256" contain />
+        <v-combobox v-model="tags" multiple :items="tagItems" label="tags" />
+        <div style="display: flex;align-items: center;">
+          <label class="v-label">rate</label>
+          <v-spacer />
+          <v-rating v-model="rate" />
+        </div>
+        <draggable
+          v-model="links"
+          :options="{handle: '.item-handle'}"
+        >
+          <div v-for="(link, index) in links" :key="`${index}-link`">
+            <v-text-field v-model="links[index]" label="link">
+              <v-icon slot="prepend" class="item-handle">
+                mdi-arrow-up-down-bold
+              </v-icon>
+            </v-text-field>
+          </div>
+        </draggable>
+        <div class="mb-2">
+          <v-btn text @click="addLink">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+          <v-btn text :disabled="links.length < 2" @click="delLink">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </div>
+
         <v-text-field
           v-model="isbn"
           :rules="[rules.counter]"
@@ -56,56 +83,16 @@
         <v-text-field v-model="cover" label="cover" />
       </v-tab-item>
       <v-tab-item value="tab-2" class="ma-2">
-        <v-combobox v-model="tags" multiple :items="tagItems" label="tags" />
         <div style="display: flex;align-items: center;">
-          <label class="v-label">rate</label>
-          <v-spacer />
-          <v-rating v-model="rate" />
+          <v-select v-model="selectedMemoIndex" :items="memoTitles" />
+          <v-btn text class="ml-2" @click="addMemo">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+          <v-btn text :disabled="memos.length < 2" @click="delMemo">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
         </div>
-        <draggable
-          v-model="links"
-          :options="{handle: '.item-handle'}"
-        >
-          <div v-for="(link, index) in links" :key="`${index}-link`">
-            <v-text-field v-model="links[index]" label="link">
-              <v-icon slot="prepend" class="item-handle">
-                mdi-arrow-up-down-bold
-              </v-icon>
-            </v-text-field>
-          </div>
-        </draggable>
-        <v-btn text @click="addLink">
-          追加
-        </v-btn>
-        <v-btn text :disabled="links.length < 2" @click="delLink">
-          削除
-        </v-btn>
-        <v-expansion-panels>
-          <draggable
-            v-model="memos"
-            :options="{handle: '.item-handle'}"
-          >
-            <v-expansion-panel v-for="(memo, index) in memos" :key="`${index}-memo`">
-              <v-expansion-panel-header class="item-handle" style="width: 100%;">
-                <div>
-                  <v-icon>
-                    mdi-arrow-up-down-bold
-                  </v-icon>
-                  {{ memo.split(/\r\n|\n/)[0] }}
-                </div>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <vue-simplemde ref="markdownEditor" v-model="memos[index]" />
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </draggable>
-        </v-expansion-panels>
-        <v-btn text @click="addMemo">
-          追加
-        </v-btn>
-        <v-btn text :disabled="memos.length < 2" @click="delMemo">
-          削除
-        </v-btn>
+        <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" :configs="config" />
       </v-tab-item>
     </v-tabs>
     <!-- <v-expansion-panel> -->
@@ -142,8 +129,10 @@ export default {
           return pattern.test(value) || 'Invalid e-mail.'
         }
       },
+      config: { spellChecker: false },
       activePicker: null,
       menu: false,
+      selectedMemoIndex: 0,
       states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
       tagItems: [],
       title: 'タイトル',
@@ -165,6 +154,11 @@ export default {
   head: () => ({
     title: '新規登録'
   }),
+  computed: {
+    memoTitles () {
+      return this.memos.map((memo, i) => { return { text: i + ': ' + memo.split(/\r\n|\n/)[0], value: i } })
+    }
+  },
   watch: {
     menu (val) {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
