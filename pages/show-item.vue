@@ -27,11 +27,11 @@
             :options="{handle: '.item-handle'}"
           >
             <div v-for="(link, index) in links" :key="`${index}-link`">
-              <v-text-field v-model="links[index]" label="link">
+              <editable-link v-model="links[index]" label="link">
                 <v-icon slot="prepend" class="item-handle">
                   mdi-arrow-up-down-bold
                 </v-icon>
-              </v-text-field>
+              </editable-link>
             </div>
           </draggable>
           <div class="mb-2">
@@ -98,13 +98,15 @@
 <script>
 import draggable from 'vuedraggable'
 import iconCombobox from '../components/icon-combobox'
+import editableLink from '../components/editable-link'
 import { db } from '../js/db'
 
 export default {
   name: 'BookInfo',
   components: {
     draggable,
-    iconCombobox
+    iconCombobox,
+    editableLink
   },
   layout: 'show-item',
   data () {
