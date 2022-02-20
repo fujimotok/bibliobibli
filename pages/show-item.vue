@@ -22,18 +22,9 @@
             <v-spacer />
             <v-rating v-model="rate" />
           </div>
-          <draggable
-            v-model="links"
-            :options="{handle: '.item-handle'}"
-          >
-            <div v-for="(link, index) in links" :key="`${index}-link`">
-              <editable-link v-model="links[index]" label="link">
-                <v-icon slot="prepend" class="item-handle">
-                  mdi-arrow-up-down-bold
-                </v-icon>
-              </editable-link>
-            </div>
-          </draggable>
+          <div v-for="(link, index) in links" :key="`${index}-link`">
+            <editable-link v-model="links[index]" label="link" />
+          </div>
           <div class="mb-2">
             <v-btn text @click="addLink">
               <v-icon>mdi-plus</v-icon>
@@ -43,7 +34,12 @@
             </v-btn>
           </div>
 
-          <v-text-field v-model="isbn" label="isbn13" />
+          <v-text-field
+            v-model="isbn"
+            label="isbn13"
+            @change="onChangeISBN(isbn)"
+          />
+
           <v-text-field v-model="title" label="title" />
           <v-combobox v-model="authors" multiple label="authors" />
           <v-text-field v-model="publisher" label="publisher" />
@@ -96,7 +92,7 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable'
+import axios from 'axios'
 import iconCombobox from '../components/icon-combobox'
 import editableLink from '../components/editable-link'
 import { db } from '../js/db'
@@ -104,7 +100,6 @@ import { db } from '../js/db'
 export default {
   name: 'BookInfo',
   components: {
-    draggable,
     iconCombobox,
     editableLink
   },
@@ -172,10 +167,39 @@ export default {
         this.tagItems = keysArray
       })
   },
-
   methods: {
     save (date) {
       this.$refs.menu.save(date)
+    },
+    onChangeISBN (value) {
+      const isbn = value.replace(/[^0-9]/g, '')
+      this.$nextTick(() => {
+        this.isbn = isbn
+      })
+      if (isbn.length === 13) {
+        axios.get('https://api.openbd.jp/v1/get?isbn=' + isbn)
+          .then((res) => {
+            if (res.status === 200) {
+              this.title = res.data[0].summary.title
+              this.authors = res.data[0].summary.author.split(' ')
+              this.publisher = res.data[0].summary.publisher
+
+              if (res.data[0].summary.pubdate.includes('-')) {
+                const date = res.data[0].summary.pubdate.split('-')
+                const year = date[0] || '2000'
+                const month = date[1] || '01'
+                const day = date[2] || '01'
+                this.publishdt = year + '-' + month + '-' + day
+              } else {
+                this.publishdt = res.data[0].summary.pubdate.substr(0, 4) +
+                  '-' + res.data[0].summary.pubdate.substr(4, 2) +
+                  '-' + res.data[0].summary.pubdate.substr(6, 2)
+              }
+
+              this.cover = res.data[0].summary.cover || '/noimage.png'
+            }
+          })
+      }
     },
     addLink () {
       this.links.push('')

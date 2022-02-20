@@ -22,18 +22,9 @@
           <v-spacer />
           <v-rating v-model="rate" />
         </div>
-        <draggable
-          v-model="links"
-          :options="{handle: '.item-handle'}"
-        >
-          <div v-for="(link, index) in links" :key="`${index}-link`">
-            <editable-link v-model="links[index]" label="link">
-              <v-icon slot="prepend" class="item-handle">
-                mdi-arrow-up-down-bold
-              </v-icon>
-            </editable-link>
-          </div>
-        </draggable>
+        <div v-for="(link, index) in links" :key="`${index}-link`">
+          <editable-link v-model="links[index]" label="link" />
+        </div>
         <div class="mb-2">
           <v-btn text @click="addLink">
             <v-icon>mdi-plus</v-icon>
@@ -45,9 +36,6 @@
 
         <v-text-field
           v-model="isbn"
-          :rules="[rules.counter]"
-          type="number"
-          counter="13"
           label="isbn13"
           @change="onChangeISBN(isbn)"
         />
@@ -108,7 +96,6 @@
 
 <script>
 import axios from 'axios'
-import draggable from 'vuedraggable'
 import iconCombobox from '../components/icon-combobox'
 import editableLink from '../components/editable-link'
 import { db } from '../js/db'
@@ -116,26 +103,22 @@ import { db } from '../js/db'
 export default {
   name: 'AddItem',
   components: {
-    draggable,
     iconCombobox,
     editableLink
   },
   layout: 'add-item',
   data () {
     return {
-      rules: {
-        required: value => !!value || 'Required.',
-        counter: value => value.length <= 13 || 'Max 13 characters',
-        email: (value) => {
-          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          return pattern.test(value) || 'Invalid e-mail.'
-        }
-      },
       config: { spellChecker: false },
       activePicker: null,
       menu: false,
       selectedMemoIndex: 0,
-      states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
+      states: [
+        { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
+        { text: '未読', value: 1, icon: 'mdi-progress-clock' },
+        { text: '読中', value: 2, icon: 'mdi-progress-check' },
+        { text: '読了', value: 3, icon: 'mdi-check' }
+      ],
       tagItems: [],
       title: 'タイトル',
       isbn: '',
@@ -181,7 +164,11 @@ export default {
     save (date) {
       this.$refs.menu.save(date)
     },
-    onChangeISBN (isbn) {
+    onChangeISBN (value) {
+      const isbn = value.replace(/[^0-9]/g, '')
+      this.$nextTick(() => {
+        this.isbn = isbn
+      })
       if (isbn.length === 13) {
         axios.get('https://api.openbd.jp/v1/get?isbn=' + isbn)
           .then((res) => {
@@ -197,7 +184,9 @@ export default {
                 const day = date[2] || '01'
                 this.publishdt = year + '-' + month + '-' + day
               } else {
-                this.publishdt = res.data[0].summary.pubdate.substr(0, 4) + '-' + res.data[0].summary.pubdate.substr(4, 2) + '-' + res.data[0].summary.pubdate.substr(6, 2)
+                this.publishdt = res.data[0].summary.pubdate.substr(0, 4) +
+                  '-' + res.data[0].summary.pubdate.substr(4, 2) +
+                  '-' + res.data[0].summary.pubdate.substr(6, 2)
               }
 
               this.cover = res.data[0].summary.cover || '/noimage.png'
