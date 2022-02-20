@@ -61,25 +61,63 @@
             prepend-inner-icon="mdi-magnify"
             single-line
             placeholder="Search in Title"
+            class="mb-4"
           />
-          <v-switch v-model="isUseStates" label="Filter States" />
           <v-select
             v-model="searchStates"
             multiple
+            return-object
             :items="states"
             label="states"
-            :disabled="!isUseStates"
             :menu-props="{ offsetY: true }"
-          />
-          <v-switch v-model="isUseTags" label="Filter Tags" />
+          >
+            <template #prepend-item>
+              <v-list-item
+                ripple
+                @mousedown.prevent
+                @click="selectAllStates"
+              >
+                <v-list-item-action>
+                  <v-icon :color="searchStates.length > 0 ? 'primary' : ''">
+                    {{ searchStatesIcon }}
+                  </v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    Select All
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-divider class="mt-2" />
+            </template>
+          </v-select>
           <v-select
             v-model="searchTags"
             multiple
             :items="tagItems"
             label="tags"
-            :disabled="!isUseTags"
             :menu-props="{ offsetY: true }"
-          />
+          >
+            <template #prepend-item>
+              <v-list-item
+                ripple
+                @mousedown.prevent
+                @click="selectAllTags"
+              >
+                <v-list-item-action>
+                  <v-icon :color="searchTags.length > 0 ? 'primary' : ''">
+                    {{ searchTagsIcon }}
+                  </v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    Select All
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-divider class="mt-2" />
+            </template>
+          </v-select>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -115,17 +153,49 @@ export default {
       dialog: false,
       isLoading: false,
       searchQuery: '',
-      isUseTags: false,
       tagItems: [],
       searchTags: [],
-      isUseStates: false,
-      states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
-      searchStates: []
+      states: [
+        { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
+        { text: '未読', value: 1, icon: 'mdi-progress-clock' },
+        { text: '読中', value: 2, icon: 'mdi-progress-check' },
+        { text: '読了', value: 3, icon: 'mdi-check' }
+      ],
+      searchStates: [
+        { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
+        { text: '未読', value: 1, icon: 'mdi-progress-clock' },
+        { text: '読中', value: 2, icon: 'mdi-progress-check' },
+        { text: '読了', value: 3, icon: 'mdi-check' }
+      ]
     }
   },
   head: () => ({
     title: '本棚'
   }),
+  computed: {
+    searchAllTags () {
+      return this.searchTags.length === this.tagItems.length
+    },
+    searchSomeTags () {
+      return this.searchTags.length > 0 && !this.searchAllTags
+    },
+    searchTagsIcon () {
+      if (this.searchAllTags) { return 'mdi-close-box' }
+      if (this.searchSomeTags) { return 'mdi-minus-box' }
+      return 'mdi-checkbox-blank-outline'
+    },
+    searchAllStates () {
+      return this.searchStates.length === this.states.length
+    },
+    searchSomeStates () {
+      return this.searchStates.length > 0 && !this.searchAllStates
+    },
+    searchStatesIcon () {
+      if (this.searchAllStates) { return 'mdi-close-box' }
+      if (this.searchSomeStates) { return 'mdi-minus-box' }
+      return 'mdi-checkbox-blank-outline'
+    }
+  },
   beforeDestory () {
     cacheData = null
   },
@@ -155,8 +225,8 @@ export default {
           const words = this.searchQuery.split(' ')
           const regex = new RegExp(words.join('|'), 'i')
           const hitWord = regex.test(records[0].title)
-          const hitStatus = this.isUseStates ? this.searchStates.some(status => records[0].status === status.value) : true
-          const hitTags = this.isUseTags ? this.searchTags.every(tag => records[0].tags.includes(tag)) : true
+          const hitStatus = this.searchStates.some(status => records[0].status === status.value)
+          const hitTags = this.searchTags.length !== 0 ? this.searchTags.every(tag => records[0].tags.includes(tag)) : true
           if (hitWord && hitStatus && hitTags) {
             this.items.unshift(records[0])
           }
@@ -205,13 +275,31 @@ export default {
     showSearchDialog () {
       this.dialog = true
     },
+    selectAllStates () {
+      this.$nextTick(() => {
+        if (this.searchAllStates) {
+          this.searchStates = []
+        } else {
+          this.searchStates = this.states
+        }
+      })
+    },
+    selectAllTags () {
+      this.$nextTick(() => {
+        if (this.searchAllTags) {
+          this.searchTags = []
+        } else {
+          this.searchTags = this.tagItems.slice()
+        }
+      })
+    },
     search (offset = 0) {
       const words = this.searchQuery.split(' ')
       const regex = new RegExp(words.join('|'), 'i')
       db.books.orderBy(':id').reverse().filter((book) => {
         const hitWord = regex.test(book.title)
-        const hitStatus = this.isUseStates ? this.searchStates.some(status => book.status === status.value) : true
-        const hitTags = this.isUseTags ? this.searchTags.every(tag => book.tags.includes(tag)) : true
+        const hitStatus = this.searchStates.some(status => book.status === status.value)
+        const hitTags = this.searchTags.length !== 0 ? this.searchTags.every(tag => book.tags.includes(tag)) : true
         return hitWord && hitStatus && hitTags
       }).offset(offset).limit(20).toArray().then((records) => {
         if (offset === 0) {
@@ -226,7 +314,12 @@ export default {
     clear () {
       this.searchQuery = ''
       this.isUseStates = false
-      this.searchStates = []
+      this.searchStates = [
+        { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
+        { text: '未読', value: 1, icon: 'mdi-progress-clock' },
+        { text: '読中', value: 2, icon: 'mdi-progress-check' },
+        { text: '読了', value: 3, icon: 'mdi-check' }
+      ]
       this.isUseTags = false
       this.searchTags = []
 
