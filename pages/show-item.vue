@@ -16,7 +16,7 @@
       <v-tabs-items v-model="tab" touchless>
         <v-tab-item value="tab-1" class="ma-2">
           <v-img :src="cover" max-height="256" contain />
-          <v-combobox v-model="tags" multiple :items="tagItems" label="tags" />
+          <v-select v-model="tags" multiple :items="tagItems" label="tags" :menu-props="{ offsetY: true }" />
           <div style="display: flex;align-items: center;">
             <label class="v-label">rate</label>
             <v-spacer />
@@ -167,7 +167,7 @@ export default {
         this.links = records[0].links
         this.memos = records[0].memos
       })
-    db.books.orderBy('tags').uniqueKeys()
+    db.tags.orderBy('tag').uniqueKeys()
       .then((keysArray) => {
         this.tagItems = keysArray
       })

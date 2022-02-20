@@ -62,6 +62,11 @@ export default {
           to: '/'
         },
         {
+          icon: 'mdi-tag-multiple',
+          title: 'タグ管理',
+          to: '/tags'
+        },
+        {
           icon: 'mdi-cog',
           title: 'Settings',
           to: '/settings'

@@ -63,9 +63,23 @@
             placeholder="Search in Title"
           />
           <v-switch v-model="isUseStates" label="Filter States" />
-          <v-combobox v-model="searchStates" multiple :items="states" label="states" :disabled="!isUseStates" />
+          <v-select
+            v-model="searchStates"
+            multiple
+            :items="states"
+            label="states"
+            :disabled="!isUseStates"
+            :menu-props="{ offsetY: true }"
+          />
           <v-switch v-model="isUseTags" label="Filter Tags" />
-          <v-combobox v-model="searchTags" multiple :items="tagItems" label="tags" :disabled="!isUseTags" />
+          <v-select
+            v-model="searchTags"
+            multiple
+            :items="tagItems"
+            label="tags"
+            :disabled="!isUseTags"
+            :menu-props="{ offsetY: true }"
+          />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -125,7 +139,7 @@ export default {
     scrollPos = window.pageYOffset
   },
   activated () {
-    if (!cacheData || sessionStorage.getItem('DBChangeEvent') === 'import') {
+    if (!cacheData) {
       this.search()
     }
   },
@@ -172,6 +186,10 @@ export default {
           window.scrollTo(0, scrollPos)
         })
       }
+    }
+
+    if (cacheData && sessionStorage.getItem('DBChangeEvent') === 'import') {
+      this.search()
     }
 
     sessionStorage.removeItem('DBChangeEvent')
