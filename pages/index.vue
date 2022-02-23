@@ -55,6 +55,7 @@
         </v-card-title>
         <v-card-text>
           <v-text-field
+            ref="input"
             v-model="searchQuery"
             hide-details
             outlined
@@ -62,6 +63,7 @@
             single-line
             placeholder="Search in Title"
             class="mb-4"
+            @keydown.enter="onEnter"
           />
           <v-select
             v-model="searchStates"
@@ -307,7 +309,7 @@ export default {
         }
         this.items = this.items.concat(records)
       })
-
+      window.scrollTo({ top: 0 })
       this.dialog = false
       cacheData = null
     },
@@ -324,13 +326,18 @@ export default {
       this.searchTags = []
 
       this.search()
-      this.dialog = false
-      cacheData = null
     },
     onIntersect () {
       this.isLoading = true
       this.search(this.items.length)
       this.isLoading = false
+    },
+    onEnter (event) {
+      if (event.keyCode !== 13) {
+        return
+      }
+      this.$refs.input.blur() // hide software keyboard
+      this.search()
     }
   }
 }
