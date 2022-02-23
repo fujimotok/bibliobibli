@@ -153,9 +153,24 @@ export default {
     db.tags.orderBy('tag').uniqueKeys()
       .then((keysArray) => {
         this.tagItems = keysArray
+
+        this.isbn = this.$route.query.isbn || ''
+        if (this.$route.query.status) {
+          const i = Number(this.$route.query.status)
+          if (i >= 0 && i < this.states.length) {
+            this.status = this.states[i]
+          }
+        }
+        if (this.$route.query.tags) {
+          for (const tag of this.$route.query.tags) {
+            const i = Number(tag)
+            if (i >= 0 && i < this.tagItems.length) {
+              this.tags.push(this.tagItems[i])
+            }
+          }
+        }
+        this.onChangeISBN(this.isbn)
       })
-    this.isbn = this.$route.query.isbn || ''
-    this.onChangeISBN(this.isbn)
   },
   methods: {
     barcodeReader () {
