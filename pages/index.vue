@@ -309,7 +309,7 @@ export default {
         }
         this.items = this.items.concat(records)
       })
-      window.scrollTo({ top: 0 })
+
       this.dialog = false
       cacheData = null
     },
@@ -326,6 +326,7 @@ export default {
       this.searchTags = []
 
       this.search()
+      window.scrollTo({ top: 0 })
     },
     onIntersect () {
       this.isLoading = true
@@ -338,6 +339,7 @@ export default {
       }
       this.$refs.input.blur() // hide software keyboard
       this.search()
+      window.scrollTo({ top: 0 })
     }
   }
 }
