@@ -71,15 +71,16 @@
         <v-text-field v-model="cover" label="cover" />
       </v-tab-item>
       <v-tab-item value="tab-2" class="ma-2">
-        <div style="display: flex;align-items: center;">
-          <v-select v-model="selectedMemoIndex" :items="memoTitles" />
-          <v-btn text class="ml-2" @click="addMemo">
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
-          <v-btn text :disabled="memos.length < 2" @click="delMemo">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </div>
+        <v-select v-model="selectedMemoIndex" :items="memoTitles">
+          <template #append-outer>
+            <v-btn text class="ml-2" @click="addMemo">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+            <v-btn text :disabled="memos.length < 2" @click="delMemo">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </template>
+        </v-select>
         <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" :configs="config" />
       </v-tab-item>
     </v-tabs>
