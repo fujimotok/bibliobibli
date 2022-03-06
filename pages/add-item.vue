@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <global-events
+      :filter="(event, handler, eventName) => event.altKey || event.ctrlKey"
       @keydown.prevent.ctrl.s="add()"
       @keydown.prevent.alt.t="tab = tab === 'tab-1' ? 'tab-2' : 'tab-1'"
     />

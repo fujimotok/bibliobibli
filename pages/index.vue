@@ -1,6 +1,7 @@
 <template>
   <v-list two-line>
     <global-events
+      :filter="(event, handler, eventName) => event.target.tagName !== 'INPUT'"
       @keydown.prevent.ctrl.f="showSearchDialog()"
       @keydown.prevent.ctrl.a="add()"
     />

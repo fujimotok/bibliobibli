@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <global-events
+      :filter="(event, handler, eventName) => event.altKey || event.ctrlKey"
       @keydown.prevent.ctrl.s="put()"
       @keydown.prevent.ctrl.d="remove()"
       @keydown.prevent.alt.t="tab = tab === 'tab-1' ? 'tab-2' : 'tab-1'"
@@ -282,7 +283,6 @@ export default {
       dt.setHours(dt.getHours() + tz)
       return dt.toLocaleString()
     }
-
   }
 }
 </script>
