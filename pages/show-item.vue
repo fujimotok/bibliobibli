@@ -3,6 +3,7 @@
     <global-events
       @keydown.prevent.ctrl.s="put()"
       @keydown.prevent.ctrl.d="remove()"
+      @keydown.prevent.alt.t="tab = tab === 'tab-1' ? 'tab-2' : 'tab-1'"
     />
     <div style="display: flex;align-items: center;">
       <iconCombobox v-model="status" :items="states" />

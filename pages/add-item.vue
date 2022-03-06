@@ -2,12 +2,13 @@
   <v-container>
     <global-events
       @keydown.prevent.ctrl.s="add()"
+      @keydown.prevent.alt.t="tab = tab === 'tab-1' ? 'tab-2' : 'tab-1'"
     />
     <div style="display: flex;align-items: center;">
       <iconCombobox v-model="status" :items="states" />
       <h2>{{ title }}</h2>
     </div>
-    <v-tabs icons-and-text centered fixed-tabs height="48">
+    <v-tabs v-model="tab" icons-and-text centered fixed-tabs height="48">
       <v-tab href="#tab-1">
         Book Info
         <v-icon>mdi-information</v-icon>
@@ -119,6 +120,7 @@ export default {
       config: { spellChecker: false },
       activePicker: null,
       menu: false,
+      tab: 'tab-1',
       selectedMemoIndex: 0,
       states: [
         { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
