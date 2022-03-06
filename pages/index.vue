@@ -310,12 +310,16 @@ export default {
     search (offset = 0) {
       const words = this.searchQuery.split(' ')
       const regex = new RegExp(words.join('|'), 'i')
-      db.books.orderBy(':id').reverse().filter((book) => {
+      const collection = db.books.orderBy(':id').reverse().filter((book) => {
         const hitWord = regex.test(book.title) || regex.test(book.isbn)
         const hitStatus = this.searchStates.some(status => book.status === status.value)
         const hitTags = this.searchTags.length !== 0 ? this.searchTags.every(tag => book.tags.includes(tag)) : true
         return hitWord && hitStatus && hitTags
-      }).offset(offset).limit(20).toArray().then((records) => {
+      })
+      collection.count((value) => {
+        this.$store.commit('CHANGE_SEARCH_COUNT', value)
+      })
+      collection.offset(offset).limit(20).toArray().then((records) => {
         if (offset === 0) {
           this.items = []
         }

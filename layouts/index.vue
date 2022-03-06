@@ -1,5 +1,6 @@
 <template>
   <default-layout ref="base">
+    {{ count }} hit
     <v-btn color="white" icon @click="search()">
       <v-icon>mdi-magnify</v-icon>
     </v-btn>
@@ -17,6 +18,11 @@ export default {
   components: { defaultLayout },
   data () {
     return {
+    }
+  },
+  computed: {
+    count () {
+      return this.$store.state.searchCount
     }
   },
   methods: {
