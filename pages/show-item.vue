@@ -1,5 +1,9 @@
 <template>
   <v-container>
+    <global-events
+      @keydown.prevent.s="put()"
+      @keydown.prevent.d="remove()"
+    />
     <div style="display: flex;align-items: center;">
       <iconCombobox v-model="status" :items="states" />
       <h2>{{ title }}</h2>
@@ -94,6 +98,7 @@
 
 <script>
 import axios from 'axios'
+import GlobalEvents from 'vue-global-events'
 import iconCombobox from '../components/icon-combobox'
 import editableLink from '../components/editable-link'
 import { db } from '../js/db'
@@ -102,7 +107,8 @@ export default {
   name: 'BookInfo',
   components: {
     iconCombobox,
-    editableLink
+    editableLink,
+    GlobalEvents
   },
   layout: 'show-item',
   data () {

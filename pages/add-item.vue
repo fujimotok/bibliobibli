@@ -1,5 +1,9 @@
 <template>
   <v-container>
+    <global-events
+      @keydown.prevent.s="save()"
+      @keydown.prevent.c="barcodeReader()"
+    />
     <div style="display: flex;align-items: center;">
       <iconCombobox v-model="status" :items="states" />
       <h2>{{ title }}</h2>
@@ -14,7 +18,7 @@
         <v-icon>mdi-note</v-icon>
       </v-tab>
 
-      <v-tab-item value="tab-1" class="ma-2">
+      <v-tab-item value="tab-1" class="ma-2" eager>
         <v-img :src="cover" max-height="256" contain />
         <v-select v-model="tags" multiple :items="tagItems" label="tags" :menu-props="{ offsetY: true }" />
         <div style="display: flex;align-items: center;">
@@ -35,6 +39,7 @@
         </div>
 
         <v-text-field
+          ref="isbn"
           v-model="isbn"
           label="isbn13"
           @change="onChangeISBN(isbn)"
@@ -97,6 +102,7 @@
 
 <script>
 import axios from 'axios'
+import GlobalEvents from 'vue-global-events'
 import iconCombobox from '../components/icon-combobox'
 import editableLink from '../components/editable-link'
 import { db } from '../js/db'
@@ -105,7 +111,8 @@ export default {
   name: 'AddItem',
   components: {
     iconCombobox,
-    editableLink
+    editableLink,
+    GlobalEvents
   },
   layout: 'add-item',
   data () {
@@ -149,6 +156,11 @@ export default {
     menu (val) {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
     }
+  },
+  mounted () {
+    setTimeout(() => {
+      this.$refs.isbn.focus()
+    })
   },
   beforeMount () {
     db.tags.orderBy('tag').uniqueKeys()

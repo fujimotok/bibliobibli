@@ -1,5 +1,9 @@
 <template>
   <v-list two-line>
+    <global-events
+      @keydown.prevent.s="showSearchDialog()"
+      @keydown.prevent.a="add()"
+    />
     <v-list-item-group>
       <template v-for="(item, index) in items">
         <v-list-item :key="index" @click="show(item.id)">
@@ -138,6 +142,7 @@
 </template>
 
 <script>
+import GlobalEvents from 'vue-global-events'
 import { db } from '../js/db'
 
 let cacheData = null
@@ -145,6 +150,9 @@ let scrollPos = null
 
 export default {
   name: 'IndexPage',
+  components: {
+    GlobalEvents
+  },
   layout: 'index',
   data () {
     if (cacheData) {
