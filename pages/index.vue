@@ -65,7 +65,7 @@
             outlined
             prepend-inner-icon="mdi-magnify"
             single-line
-            placeholder="Search in Title"
+            placeholder="Search in Title or ISBN"
             class="mb-4"
             @keydown.enter="onEnter"
           />
@@ -284,6 +284,9 @@ export default {
     },
     showSearchDialog () {
       this.dialog = true
+      setTimeout(() => {
+        this.$refs.input.focus()
+      })
     },
     selectAllStates () {
       this.$nextTick(() => {
@@ -307,7 +310,7 @@ export default {
       const words = this.searchQuery.split(' ')
       const regex = new RegExp(words.join('|'), 'i')
       db.books.orderBy(':id').reverse().filter((book) => {
-        const hitWord = regex.test(book.title)
+        const hitWord = regex.test(book.title) || regex.test(book.isbn)
         const hitStatus = this.searchStates.some(status => book.status === status.value)
         const hitTags = this.searchTags.length !== 0 ? this.searchTags.every(tag => book.tags.includes(tag)) : true
         return hitWord && hitStatus && hitTags
