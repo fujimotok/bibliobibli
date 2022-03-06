@@ -1,8 +1,7 @@
 <template>
   <v-container>
     <global-events
-      @keydown.prevent.s="save()"
-      @keydown.prevent.c="barcodeReader()"
+      @keydown.prevent.ctrl.s="add()"
     />
     <div style="display: flex;align-items: center;">
       <iconCombobox v-model="status" :items="states" />

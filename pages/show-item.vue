@@ -1,8 +1,8 @@
 <template>
   <v-container>
     <global-events
-      @keydown.prevent.s="put()"
-      @keydown.prevent.d="remove()"
+      @keydown.prevent.ctrl.s="put()"
+      @keydown.prevent.ctrl.d="remove()"
     />
     <div style="display: flex;align-items: center;">
       <iconCombobox v-model="status" :items="states" />

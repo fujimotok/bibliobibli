@@ -1,8 +1,8 @@
 <template>
   <v-list two-line>
     <global-events
-      @keydown.prevent.s="showSearchDialog()"
-      @keydown.prevent.a="add()"
+      @keydown.prevent.ctrl.f="showSearchDialog()"
+      @keydown.prevent.ctrl.a="add()"
     />
     <v-list-item-group>
       <template v-for="(item, index) in items">
