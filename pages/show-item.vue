@@ -286,3 +286,30 @@ export default {
   }
 }
 </script>
+
+<style>
+.CodeMirror .CodeMirror-code .cm-header-1 {
+    font-size: 110%;
+    line-height: 110%;
+}
+
+.CodeMirror .CodeMirror-code .cm-header-2 {
+    font-size: 110%;
+    line-height: 110%;
+}
+
+.CodeMirror .CodeMirror-code .cm-header-3 {
+    font-size: 110%;
+    line-height: 110%;
+}
+
+.CodeMirror .CodeMirror-code .cm-header-4 {
+    font-size: 110%;
+    line-height: 110%;
+}
+
+.CodeMirror .CodeMirror-code .cm-comment {
+    background: rgba(0, 0, 255, .1);
+    border-radius: 2px;
+}
+</style>
