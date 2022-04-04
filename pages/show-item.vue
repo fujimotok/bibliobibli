@@ -4,97 +4,87 @@
       :filter="(event, handler, eventName) => event.altKey || event.ctrlKey"
       @keydown.prevent.ctrl.s="put()"
       @keydown.prevent.ctrl.d="remove()"
-      @keydown.prevent.alt.t="tab = tab === 'tab-1' ? 'tab-2' : 'tab-1'"
     />
-    <div style="display: flex;align-items: center;">
-      <iconCombobox v-model="status" :items="states" />
-      <h2>{{ title }}</h2>
+    <div v-if="editNote">
+      <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" :configs="config" />
     </div>
-    <v-tabs v-model="tab" icons-and-text centered fixed-tabs height="48">
-      <v-tab href="#tab-1">
-        Book Info
-        <v-icon>mdi-information</v-icon>
-      </v-tab>
-      <v-tab href="#tab-2">
-        Note
-        <v-icon>mdi-note</v-icon>
-      </v-tab>
-      <v-tabs-items v-model="tab" touchless>
-        <v-tab-item value="tab-1" class="ma-2">
-          <v-img :src="cover" max-height="256" contain />
-          <v-select v-model="tags" multiple :items="tagItems" label="tags" :menu-props="{ offsetY: true }" />
-          <div style="display: flex;align-items: center;">
-            <label class="v-label">rate</label>
-            <v-spacer />
-            <v-rating v-model="rate" />
-          </div>
-          <div v-for="(link, index) in links" :key="`${index}-link`">
-            <editable-link v-model="links[index]" label="link" />
-          </div>
-          <div class="mb-2">
-            <v-btn text @click="addLink">
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-            <v-btn text :disabled="links.length < 2" @click="delLink">
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </div>
+    <div v-else>
+      <div style="display: flex;align-items: center;">
+        <iconCombobox v-model="status" :items="states" />
+        <h2>{{ title }}</h2>
+      </div>
+      <v-img :src="cover" max-height="256" contain />
+      <v-select v-model="selectedMemoIndex" :items="memoTitles">
+        <template #append-outer>
+          <v-btn icon @click="editNote = true">
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+          <v-btn icon @click="addMemo">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+          <v-btn icon :disabled="memos.length < 2" @click="delMemo">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </template>
+      </v-select>
+      <v-select v-model="tags" multiple :items="tagItems" label="tags" :menu-props="{ offsetY: true }" />
+      <div style="display: flex;align-items: center;">
+        <label class="v-label">rate</label>
+        <v-spacer />
+        <v-rating v-model="rate" />
+      </div>
+      <div v-for="(link, index) in links" :key="`${index}-link`">
+        <editable-link v-model="links[index]" label="link" />
+      </div>
+      <div class="mb-2">
+        <v-btn icon @click="addLink">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+        <v-btn icon :disabled="links.length < 2" @click="delLink">
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </div>
 
+      <v-text-field
+        v-model="isbn"
+        label="isbn13"
+        @change="onChangeISBN(isbn)"
+      />
+
+      <v-text-field v-model="title" label="title" />
+      <v-combobox v-model="authors" multiple label="authors" />
+      <v-text-field v-model="publisher" label="publisher" />
+      <v-menu
+        ref="menu"
+        v-model="menu"
+        :close-on-content-click="false"
+        transition="scale-transition"
+        offset-y
+        min-width="auto"
+      >
+        <template #activator="{ on, attrs }">
           <v-text-field
-            v-model="isbn"
-            label="isbn13"
-            @change="onChangeISBN(isbn)"
+            v-model="publishdt"
+            label="publish date"
+            prepend-icon="mdi-calendar"
+            readonly
+            v-bind="attrs"
+            v-on="on"
           />
-
-          <v-text-field v-model="title" label="title" />
-          <v-combobox v-model="authors" multiple label="authors" />
-          <v-text-field v-model="publisher" label="publisher" />
-          <v-menu
-            ref="menu"
-            v-model="menu"
-            :close-on-content-click="false"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
-            <template #activator="{ on, attrs }">
-              <v-text-field
-                v-model="publishdt"
-                label="publish date"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              />
-            </template>
-            <v-date-picker
-              v-model="publishdt"
-              :active-picker.sync="activePicker"
-              :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
-              min="1950-01-01"
-              @change="save"
-            />
-          </v-menu>
-          <v-text-field v-model="cover" label="cover" />
-          <v-text-field v-model="registerdt" readonly label="register date" />
-          <v-text-field v-model="readdt" readonly label="read date" />
-          <v-text-field v-model="update" readonly label="update" />
-        </v-tab-item>
-        <v-tab-item value="tab-2" class="ma-2">
-          <v-select v-model="selectedMemoIndex" :items="memoTitles">
-            <template #append-outer>
-              <v-btn text @click="addMemo">
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
-              <v-btn text :disabled="memos.length < 2" @click="delMemo">
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </template>
-          </v-select>
-          <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" :configs="config" />
-        </v-tab-item>
-      </v-tabs-items>
-    </v-tabs>
+        </template>
+        <v-date-picker
+          v-model="publishdt"
+          :active-picker.sync="activePicker"
+          :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+          min="1950-01-01"
+          @change="save"
+        />
+      </v-menu>
+      <v-text-field v-model="cover" label="cover" />
+      <v-text-field v-model="registerdt" readonly label="register date" />
+      <v-text-field v-model="readdt" readonly label="read date" />
+      <v-text-field v-model="update" readonly label="update" />
+    </div>
   </v-container>
 </template>
 
@@ -115,10 +105,38 @@ export default {
   layout: 'show-item',
   data () {
     return {
-      config: { spellChecker: false },
+      config: {
+        spellChecker: false,
+        forceSync: true,
+        indentWithTabs: false,
+        toolbar: [
+          {
+            name: 'custom',
+            action: () => { this.editNote = false },
+            className: 'fa fa-close',
+            title: 'Custom Button'
+          },
+          '|',
+          'bold',
+          'italic',
+          'strikethrough',
+          '|',
+          'heading',
+          'unordered-list',
+          'ordered-list',
+          '|',
+          'code',
+          'quote',
+          '|',
+          'link',
+          'image',
+          '|',
+          'preview'
+        ]
+      },
       activePicker: null,
       menu: false,
-      tab: 'tab-1',
+      editNote: false,
       selectedMemoIndex: 0,
       states: [{ text: '読みたい', value: 0, icon: 'mdi-progress-star' }, { text: '未読', value: 1, icon: 'mdi-progress-clock' }, { text: '読中', value: 2, icon: 'mdi-progress-check' }, { text: '読了', value: 3, icon: 'mdi-check' }],
       tagItems: [],
