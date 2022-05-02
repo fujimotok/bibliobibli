@@ -5,6 +5,7 @@
       @keydown.prevent.ctrl.s="put()"
       @keydown.prevent.ctrl.d="remove()"
     />
+    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" />
     <div v-if="editNote">
       <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" :configs="config" />
     </div>
@@ -129,11 +130,33 @@ export default {
           'quote',
           '|',
           'link',
-          'image',
+          {
+            name: 'image',
+            action: (editor) => {
+              const self = this
+              this.$refs.fileInput.$refs.input.addEventListener('change', function onChange (e) {
+                self.$refs.fileInput.$refs.input.removeEventListener('change', onChange)
+                const fileReader = new FileReader()
+                fileReader.onload = function () {
+                  const dataURI = this.result
+                  const cm = editor.codemirror
+                  const pos = cm.getCursor('start')
+                  cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
+                }
+                if (self.file) {
+                  fileReader.readAsDataURL(self.file)
+                }
+              })
+              this.$refs.fileInput.$refs.input.click()
+            },
+            className: 'fa fa-image',
+            title: 'image'
+          },
           '|',
           'preview'
         ]
       },
+      file: null,
       activePicker: null,
       menu: false,
       editNote: false,
