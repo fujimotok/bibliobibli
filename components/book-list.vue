@@ -5,8 +5,36 @@
     <template v-for="(item, index) in items">
       <v-list-item :key="index" @click="show(item.link)">
         <v-list-item-content>
-          <v-list-item-title v-text="item.id" />
+          <v-list-item-title v-text="item.title" />
+          <v-list-item-subtitle
+            class="text-caption"
+            v-text="item.authors.join(', ')"
+          />
+          <div>
+            <v-chip
+              v-for="tag in item.tags"
+              :key="tag"
+              small
+              class="mr-1 mt-1"
+            >
+              {{ tag }}
+            </v-chip>
+          </div>
         </v-list-item-content>
+        <v-list-item-action>
+          <v-icon v-if="item.status == 0">
+            mdi-progress-star
+          </v-icon>
+          <v-icon v-else-if="item.status == 1">
+            mdi-progress-clock
+          </v-icon>
+          <v-icon v-else-if="item.status == 2">
+            mdi-progress-check
+          </v-icon>
+          <v-icon v-else>
+            mdi-check
+          </v-icon>
+        </v-list-item-action>
       </v-list-item>
       <v-divider :key="`${index}-divider`" />
     </template>
@@ -20,7 +48,15 @@ export default {
   },
   data () {
     return {
-      items: []
+      items: [],
+      tagItems: [],
+      searchTags: [],
+      states: [
+        { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
+        { text: '未読', value: 1, icon: 'mdi-progress-clock' },
+        { text: '読中', value: 2, icon: 'mdi-progress-check' },
+        { text: '読了', value: 3, icon: 'mdi-check' }
+      ]
     }
   },
   computed: {
@@ -35,25 +71,18 @@ export default {
   },
   mounted () {
     this.items = [
-      { id: 0, link: '/books/0' },
-      { id: 1, link: '/books/1' },
-      { id: 2, link: '/books/2' },
-      { id: 3, link: '/books/3' },
-      { id: 4, link: '/books/4' },
-      { id: 5, link: '/books/5' },
-      { id: 6, link: '/books/6' },
-      { id: 7, link: '/books/7' },
-      { id: 8, link: '/books/8' },
-      { id: 9, link: '/books/9' },
-      { id: 10, link: '/books/10' },
-      { id: 11, link: '/books/11' },
-      { id: 12, link: '/books/12' },
-      { id: 13, link: '/books/13' },
-      { id: 14, link: '/books/14' },
-      { id: 15, link: '/books/15' },
-      { id: 16, link: '/books/16' },
-      { id: 17, link: '/books/17' },
-      { id: 18, link: '/books/18' }
+      { id: 0, link: '/books/0', title: 'title1', authors: ['Jon Smith'], tags: ['tag'], status: 0 },
+      { id: 1, link: '/books/1', title: 'title2', authors: ['Jon Smith'], tags: ['tag'], status: 1 },
+      { id: 2, link: '/books/2', title: 'title3', authors: ['Jon Smith'], tags: ['tag'], status: 2 },
+      { id: 3, link: '/books/3', title: 'title4', authors: ['Jon Smith'], tags: ['tag'], status: 3 },
+      { id: 4, link: '/books/4', title: 'title5', authors: ['Jon Smith'], tags: ['tag'], status: 0 },
+      { id: 5, link: '/books/5', title: 'title6', authors: ['Jon Smith'], tags: ['tag'], status: 0 },
+      { id: 6, link: '/books/5', title: 'title6', authors: ['Jon Smith'], tags: ['tag'], status: 0 },
+      { id: 7, link: '/books/5', title: 'title6', authors: ['Jon Smith'], tags: ['tag'], status: 0 },
+      { id: 8, link: '/books/5', title: 'title6', authors: ['Jon Smith'], tags: ['tag'], status: 0 },
+      { id: 9, link: '/books/5', title: 'title6', authors: ['Jon Smith'], tags: ['tag'], status: 0 },
+      { id: 10, link: '/books/5', title: 'title6', authors: ['Jon Smith'], tags: ['tag'], status: 0 }
+
     ]
   },
   methods: {
