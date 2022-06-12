@@ -16,7 +16,7 @@
 
 <script>
 import IDBExportImport from 'indexeddb-export-import'
-import { db } from '../js/db'
+import { db } from '../../js/db'
 
 export default {
   name: 'SettingsPage',

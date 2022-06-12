@@ -1,30 +1,5 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      fixed
-      app
-    >
-      <v-list>
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
-          router
-          exact
-        >
-          <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-
     <v-app-bar
       :clipped-left="clipped"
       color="primary"
@@ -33,8 +8,7 @@
       fixed
       app
     >
-      <v-app-bar-nav-icon v-if="$router.history.current['path'] =='/'" color="white" @click.stop="drawer = !drawer" />
-      <v-btn v-else color="white" icon @click.stop="$router.go(-1)">
+      <v-btn v-show="$router.history.current['path'] !=='/'" color="white" icon @click.stop="$router.go(-1)">
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
       <v-toolbar-title v-text="title" />
@@ -56,28 +30,6 @@ export default {
       drawer: false,
       fixed: false,
       cachePageList: ['IndexPage'],
-      items: [
-        {
-          icon: 'mdi-home',
-          title: 'Home',
-          to: '/'
-        },
-        {
-          icon: 'mdi-tag-multiple',
-          title: 'タグ管理',
-          to: '/tags'
-        },
-        {
-          icon: 'mdi-cog',
-          title: 'Settings',
-          to: '/settings'
-        },
-        {
-          icon: 'mdi-information',
-          title: 'About',
-          to: '/about'
-        }
-      ],
       miniVariant: false,
       right: true,
       rightDrawer: false
