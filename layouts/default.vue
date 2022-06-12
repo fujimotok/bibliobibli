@@ -29,6 +29,7 @@
       :clipped-left="clipped"
       color="primary"
       class="white--text text--lighten-1"
+      dense
       fixed
       app
     >
