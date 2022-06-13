@@ -35,14 +35,14 @@ export default {
   },
   mounted () {
     this.items = [
-      { id: 0, link: '/books/0' },
-      { id: 1, link: '/books/0' },
-      { id: 2, link: '/books/0' },
-      { id: 3, link: '/books/0' },
-      { id: 4, link: '/books/0' },
-      { id: 5, link: '/books/0' },
-      { id: 6, link: '/books/0' },
-      { id: 7, link: '/books/0' }
+      { id: 0, link: '/notes/0' },
+      { id: 1, link: '/notes/1' },
+      { id: 2, link: '/notes/2' },
+      { id: 3, link: '/notes/hoge' },
+      { id: 4, link: '/notes/hoge/fuga' },
+      { id: 5, link: '/notes/hoge/piyo' },
+      { id: 6, link: '/notes/fuga' },
+      { id: 7, link: '/notes/piyo' }
     ]
   },
   methods: {

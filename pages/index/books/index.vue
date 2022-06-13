@@ -9,7 +9,7 @@
     </div>
     <div v-else>
       <div style="display: flex;align-items: center;">
-        <iconCombobox v-model="status" :items="states" />
+        <icon-combobox v-model="status" :items="states" />
         <h2>{{ title }}</h2>
       </div>
 
@@ -90,15 +90,11 @@
 <script>
 import axios from 'axios'
 import GlobalEvents from 'vue-global-events'
-import iconCombobox from '../components/icon-combobox'
-import editableLink from '../components/editable-link'
-import { db } from '../js/db'
+import { db } from '../../../js/db'
 
 export default {
-  name: 'AddItem',
+  name: 'BooksIndexPage',
   components: {
-    iconCombobox,
-    editableLink,
     GlobalEvents
   },
   layout: 'add-item',

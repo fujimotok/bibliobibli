@@ -35,16 +35,16 @@ export default {
   },
   mounted () {
     this.items = [
-      { id: 0, link: '/books/0' },
-      { id: 1, link: '/books/0' },
-      { id: 2, link: '/books/0' },
-      { id: 3, link: '/books/0' },
-      { id: 4, link: '/books/0' },
-      { id: 5, link: '/books/0' },
-      { id: 6, link: '/books/0' },
-      { id: 7, link: '/books/0' },
-      { id: 8, link: '/books/0' },
-      { id: 9, link: '/books/0' }
+      { id: 0, link: '/scraps/0' },
+      { id: 1, link: '/scraps/1' },
+      { id: 2, link: '/scraps/2' },
+      { id: 3, link: '/scraps/3' },
+      { id: 4, link: '/scraps/4' },
+      { id: 5, link: '/scraps/5' },
+      { id: 6, link: '/scraps/6' },
+      { id: 7, link: '/scraps/7' },
+      { id: 8, link: '/scraps/8' },
+      { id: 9, link: '/scraps/9' }
     ]
   },
   methods: {
