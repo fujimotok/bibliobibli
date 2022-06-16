@@ -44,6 +44,7 @@ const config = {
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
+    '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/vuetify
@@ -62,7 +63,8 @@ const config = {
       name: 'BIBLIoBIBLI',
       lang: 'ja',
       description: '説明',
-      orientation: 'portrait', scope: '/',
+      orientation: 'portrait',
+      scope: '/',
       display: 'standalone',
       id: '/',
       start_url: '/',
