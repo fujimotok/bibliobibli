@@ -17,7 +17,7 @@ class BIBLIoBIBLIDatabase extends Dexie {
   constructor () {
     super('BIBLIoBIBLI')
     this.version(1).stores({
-      books: '++id, createdAt, updatedAt, isbn, title, *authors, publisher, publishedAt, cover, status, readAt, *links, *notes, *tags',
+      books: '++id, createdAt, updatedAt, isbn, title, *authors, publisher, publishedAt, cover, status, readAt, *links, *tags',
       notes: '++id, createdAt, updatedAt, path, content',
       scraps: '++id, createdAt, updatedAt, *tags, content',
       tags: '++id, createdAt, updatedAt, name',

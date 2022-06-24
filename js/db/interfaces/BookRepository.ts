@@ -1,19 +1,26 @@
 export type Book = {
-  readonly id: number
-  readonly createdAt: Date
-  readonly updatedAt: Date
+  id?: number
+  createdAt?: string // ISO8601 "2022-02-13T02:56:56.188+09:00"
+  updatedAt?: string // ISO8601 "2022-02-13T02:56:56.188+09:00"
   isbn: string
   title: string
   authors: string[]
   publisher: string
-  publishedAt: Date
+  publishedAt: string // ISO8601 "2022-02-13T02:56:56.188+09:00"
   cover: string
   status: number
-  readonly readAt: Date
+  readAt: string // ISO8601 "2022-02-13T02:56:56.188+09:00"
   links: string[]
-  notes: number[]
   tags: number[]
 }
+
+export const Status =
+{
+  want: 0,
+  unread: 1,
+  reading: 2,
+  read: 3
+} as const
 
 export interface BookRepository
 {

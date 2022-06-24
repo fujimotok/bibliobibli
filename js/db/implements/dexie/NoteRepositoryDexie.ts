@@ -1,5 +1,5 @@
-import {db} from "./BIBLIoBIBLIDatabase"
 import {Note, NoteRepository} from "../../interfaces/NoteRepository"
+import {db} from "./BIBLIoBIBLIDatabase"
 
 export class NoteRepositoryDexie implements NoteRepository
 {
@@ -9,10 +9,13 @@ export class NoteRepositoryDexie implements NoteRepository
    */
   async findById(id: number): Promise<Note | undefined>
   {
-    return db.notes
+    return await db.notes
       .get(id)
-      .then(async (note: Note | undefined) => {
+      .then((note: Note | undefined) => {
         return note
+      })
+      .catch(() => {
+        return undefined
       })
   }
 
@@ -23,18 +26,26 @@ export class NoteRepositoryDexie implements NoteRepository
    */
   async store(note: Note): Promise<Note | undefined>
   {
-    const isExist = await this.findById(note.id)
+    const dt = new Date()
+    const tz = -dt.getTimezoneOffset() / 60
+    const sign = Math.sign(tz) < 0 ? '-' : '+'
+    const now = dt.toISOString().substr(0, 23)
+                + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
 
-    if (isExist)
+    if (note.id && await this.findById(note.id))
     {
+      note.updatedAt = now
       await db.notes.update(note.id, note)
+      return await this.findById(note.id)
     }
     else
     {
-      await db.notes.add(note)
+      note.createdAt = now
+      note.updatedAt = now
+      delete note.id // To set id automatically.
+      const addedId = await db.notes.add(note)
+      return await this.findById(addedId)
     }
-
-    return await this.findById(note.id)
   }
 
   /**
@@ -43,7 +54,7 @@ export class NoteRepositoryDexie implements NoteRepository
    */
   async remove(id: number): Promise<void>
   {
-    return db.notes.delete(id)
+    return await db.notes.delete(id)
   }
 
   /**
@@ -53,7 +64,7 @@ export class NoteRepositoryDexie implements NoteRepository
    * @param {number} limit number of notes per page (optional)
    * @return {Note[], number} notes and find count
    */
-  async find(word: string, offset: number, limit: number): Promise<[Note[], number] | undefined>
+  async find(word: string, offset: number = 0, limit: number = 0): Promise<[Note[], number] | undefined>
   {
     const words = word.split(' ')
     const regex = new RegExp(words.join('|'), 'i')
@@ -61,7 +72,10 @@ export class NoteRepositoryDexie implements NoteRepository
       return regex.test(note.content)
     })
     const count = await collection.count()
-    const items = await collection.offset(offset).limit(limit).toArray()
+    const items = (limit > 0)
+      ? await collection.offset(offset).limit(limit).toArray()
+      : await collection.offset(offset).toArray()
+
     return [items, count]
   }
 }

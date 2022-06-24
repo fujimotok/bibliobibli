@@ -1,5 +1,5 @@
+import {Book, Status, BookRepository} from "../../interfaces/BookRepository"
 import {db} from "./BIBLIoBIBLIDatabase"
-import {Book, BookRepository} from "../../interfaces/BookRepository"
 
 export class BookRepositoryDexie implements BookRepository
 {
@@ -9,10 +9,13 @@ export class BookRepositoryDexie implements BookRepository
    */
   async findById(id: number): Promise<Book | undefined>
   {
-    return db.books
+    return await db.books
       .get(id)
-      .then(async (book: Book | undefined) => {
+      .then((book: Book | undefined) => {
         return book
+      })
+      .catch(() => {
+        return undefined
       })
   }
 
@@ -23,18 +26,32 @@ export class BookRepositoryDexie implements BookRepository
    */
   async store(book: Book): Promise<Book | undefined>
   {
-    const isExist = await this.findById(book.id)
+    const dt = new Date()
+    const tz = -dt.getTimezoneOffset() / 60
+    const sign = Math.sign(tz) < 0 ? '-' : '+'
+    const now = dt.toISOString().substr(0, 23)
+                + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
 
-    if (isExist)
+    let before: Book | undefined
+    if (book.id && (before = await this.findById(book.id)))
     {
+      if (before.status !== Status.read
+          && book.status === Status.read)
+      {
+        book.readAt = now
+      }
+      book.updatedAt = now
       await db.books.update(book.id, book)
+      return await this.findById(book.id)
     }
     else
     {
-      await db.books.add(book)
+      book.createdAt = now
+      book.updatedAt = now
+      delete book.id // To set id automatically.
+      const addedId = await db.books.add(book)
+      return await this.findById(addedId)
     }
-
-    return await this.findById(book.id)
   }
 
   /**
@@ -43,7 +60,7 @@ export class BookRepositoryDexie implements BookRepository
    */
   async remove(id: number): Promise<void>
   {
-    return db.books.delete(id)
+    return await db.books.delete(id)
   }
 
   /**
@@ -55,7 +72,7 @@ export class BookRepositoryDexie implements BookRepository
    * @param {number} limit number of books per page (optional)
    * @return {Book[], number} books and find count
    */
-  async find(word: string, states: number[], tags: number[], offset: number, limit: number = 20): Promise<[Book[], number] | undefined>
+  async find(word: string, states: number[], tags: number[], offset: number = 0, limit: number = 0): Promise<[Book[], number] | undefined>
   {
     const words = word.split(' ')
     const regex = new RegExp(words.join('|'), 'i')
@@ -63,12 +80,16 @@ export class BookRepositoryDexie implements BookRepository
       const hitWord = regex.test(book.title)
         || regex.test(book.isbn)
         || book.authors.some((author) => regex.test(author))
-      const hitStatus = states.some(status => book.status === status)
+      const hitStatus = states.includes(book.status)
       const hitTags = tags.length !== 0 ? tags.every(tag => book.tags.includes(tag)) : true
       return hitWord && hitStatus && hitTags
     })
     const count = await collection.count()
-    const items = await collection.offset(offset).limit(limit).toArray()
+
+    const items = (limit > 0)
+      ? await collection.offset(offset).limit(limit).toArray()
+      : await collection.offset(offset).toArray()
+
     return [items, count]
   }
 }

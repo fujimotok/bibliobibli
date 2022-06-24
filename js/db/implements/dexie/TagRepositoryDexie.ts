@@ -1,5 +1,5 @@
-import {db} from "./BIBLIoBIBLIDatabase"
 import {Tag, TagRepository} from "../../interfaces/TagRepository"
+import {db} from "./BIBLIoBIBLIDatabase"
 
 export class TagRepositoryDexie implements TagRepository
 {
@@ -9,10 +9,13 @@ export class TagRepositoryDexie implements TagRepository
    */
   async findById(id: number): Promise<Tag | undefined>
   {
-    return db.tags
+    return await db.tags
       .get(id)
-      .then(async (tag: Tag | undefined) => {
+      .then((tag: Tag | undefined) => {
         return tag
+      })
+      .catch(() => {
+        return undefined
       })
   }
 
@@ -23,18 +26,26 @@ export class TagRepositoryDexie implements TagRepository
    */
   async store(tag: Tag): Promise<Tag | undefined>
   {
-    const isExist = await this.findById(tag.id)
+    const dt = new Date()
+    const tz = -dt.getTimezoneOffset() / 60
+    const sign = Math.sign(tz) < 0 ? '-' : '+'
+    const now = dt.toISOString().substr(0, 23)
+                + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
 
-    if (isExist)
+    if (tag.id && await this.findById(tag.id))
     {
+      tag.updatedAt = now
       await db.tags.update(tag.id, tag)
+      return await this.findById(tag.id)
     }
     else
     {
-      await db.tags.add(tag)
+      tag.createdAt = now
+      tag.updatedAt = now
+      delete tag.id // To set id automatically.
+      const addedId = await db.tags.add(tag)
+      return await this.findById(addedId)
     }
-
-    return await this.findById(tag.id)
   }
 
   /**
@@ -43,7 +54,7 @@ export class TagRepositoryDexie implements TagRepository
    */
   async remove(id: number): Promise<void>
   {
-    return db.tags.delete(id)
+    return await db.tags.delete(id)
   }
 
   /**
@@ -53,7 +64,7 @@ export class TagRepositoryDexie implements TagRepository
    * @param {number} limit number of tags per page (optional)
    * @return {Tag[], number} tags and find count
    */
-  async find(word: string, offset: number, limit: number): Promise<[Tag[], number] | undefined>
+  async find(word: string, offset: number = 0, limit: number = 0): Promise<[Tag[], number] | undefined>
   {
     const words = word.split(' ')
     const regex = new RegExp(words.join('|'), 'i')
@@ -61,7 +72,10 @@ export class TagRepositoryDexie implements TagRepository
       return regex.test(tag.name)
     })
     const count = await collection.count()
-    const items = await collection.offset(offset).limit(limit).toArray()
+    const items = (limit > 0)
+      ? await collection.offset(offset).limit(limit).toArray()
+      : await collection.offset(offset).toArray()
+
     return [items, count]
   }
 }

@@ -1,5 +1,5 @@
-import {db} from "./BIBLIoBIBLIDatabase"
 import {Scrap, ScrapRepository} from "../../interfaces/ScrapRepository"
+import {db} from "./BIBLIoBIBLIDatabase"
 
 export class ScrapRepositoryDexie implements ScrapRepository
 {
@@ -9,10 +9,13 @@ export class ScrapRepositoryDexie implements ScrapRepository
    */
   async findById(id: number): Promise<Scrap | undefined>
   {
-    return db.scraps
+    return await db.scraps
       .get(id)
-      .then(async (scrap: Scrap | undefined) => {
+      .then((scrap: Scrap | undefined) => {
         return scrap
+      })
+      .catch(() => {
+        return undefined
       })
   }
 
@@ -23,18 +26,26 @@ export class ScrapRepositoryDexie implements ScrapRepository
    */
   async store(scrap: Scrap): Promise<Scrap | undefined>
   {
-    const isExist = await this.findById(scrap.id)
+    const dt = new Date()
+    const tz = -dt.getTimezoneOffset() / 60
+    const sign = Math.sign(tz) < 0 ? '-' : '+'
+    const now = dt.toISOString().substr(0, 23)
+                + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
 
-    if (isExist)
+    if (scrap.id && await this.findById(scrap.id))
     {
+      scrap.updatedAt = now
       await db.scraps.update(scrap.id, scrap)
+      return await this.findById(scrap.id)
     }
     else
     {
-      await db.scraps.add(scrap)
+      scrap.createdAt = now
+      scrap.updatedAt = now
+      delete scrap.id // To set id automatically.
+      const addedId = await db.scraps.add(scrap)
+      return await this.findById(addedId)
     }
-
-    return await this.findById(scrap.id)
   }
 
   /**
@@ -43,7 +54,7 @@ export class ScrapRepositoryDexie implements ScrapRepository
    */
   async remove(id: number): Promise<void>
   {
-    return db.scraps.delete(id)
+    return await db.scraps.delete(id)
   }
 
   /**
@@ -54,7 +65,7 @@ export class ScrapRepositoryDexie implements ScrapRepository
    * @param {number} limit number of scraps per page (optional)
    * @return {Scrap[], number} scraps and find count
    */
-  async find(word: string, tags: number[], offset: number, limit: number): Promise<[Scrap[], number] | undefined>
+  async find(word: string, tags: number[], offset: number = 0, limit: number = 0): Promise<[Scrap[], number] | undefined>
   {
     const words = word.split(' ')
     const regex = new RegExp(words.join('|'), 'i')
@@ -64,7 +75,10 @@ export class ScrapRepositoryDexie implements ScrapRepository
       return hitWord && hitTags
     })
     const count = await collection.count()
-    const items = await collection.offset(offset).limit(limit).toArray()
+    const items = (limit > 0)
+      ? await collection.offset(offset).limit(limit).toArray()
+      : await collection.offset(offset).toArray()
+
     return [items, count]
   }
 }

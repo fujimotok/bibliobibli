@@ -1,5 +1,5 @@
-import {db} from "./BIBLIoBIBLIDatabase"
 import {Todo, TodoRepository} from "../../interfaces/TodoRepository"
+import {db} from "./BIBLIoBIBLIDatabase"
 
 export class TodoRepositoryDexie implements TodoRepository
 {
@@ -9,10 +9,13 @@ export class TodoRepositoryDexie implements TodoRepository
    */
   async findById(id: number): Promise<Todo | undefined>
   {
-    return db.todos
+    return await db.todos
       .get(id)
-      .then(async (todo: Todo | undefined) => {
+      .then((todo: Todo | undefined) => {
         return todo
+      })
+      .catch(() => {
+        return undefined
       })
   }
 
@@ -23,18 +26,26 @@ export class TodoRepositoryDexie implements TodoRepository
    */
   async store(todo: Todo): Promise<Todo | undefined>
   {
-    const isExist = await this.findById(todo.id)
+    const dt = new Date()
+    const tz = -dt.getTimezoneOffset() / 60
+    const sign = Math.sign(tz) < 0 ? '-' : '+'
+    const now = dt.toISOString().substr(0, 23)
+                + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
 
-    if (isExist)
+    if (todo.id && await this.findById(todo.id))
     {
+      todo.updatedAt = now
       await db.todos.update(todo.id, todo)
+      return await this.findById(todo.id)
     }
     else
     {
-      await db.todos.add(todo)
+      todo.createdAt = now
+      todo.updatedAt = now
+      delete todo.id // To set id automatically.
+      const addedId = await db.todos.add(todo)
+      return await this.findById(addedId)
     }
-
-    return await this.findById(todo.id)
   }
 
   /**
@@ -43,7 +54,7 @@ export class TodoRepositoryDexie implements TodoRepository
    */
   async remove(id: number): Promise<void>
   {
-    return db.todos.delete(id)
+    return await db.todos.delete(id)
   }
 
   /**
@@ -54,7 +65,7 @@ export class TodoRepositoryDexie implements TodoRepository
    * @param {number} limit number of todos per page (optional)
    * @return {Todo[], number} todos and find count
    */
-  async find(word: string, offset: number, limit: number): Promise<[Todo[], number] | undefined>
+  async find(word: string, offset: number = 0, limit: number = 0): Promise<[Todo[], number] | undefined>
   {
     const words = word.split(' ')
     const regex = new RegExp(words.join('|'), 'i')
@@ -62,7 +73,10 @@ export class TodoRepositoryDexie implements TodoRepository
       return regex.test(todo.content)
     })
     const count = await collection.count()
-    const items = await collection.offset(offset).limit(limit).toArray()
+    const items = (limit > 0)
+      ? await collection.offset(offset).limit(limit).toArray()
+      : await collection.offset(offset).toArray()
+
     return [items, count]
   }
 }

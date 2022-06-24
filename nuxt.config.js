@@ -37,6 +37,7 @@ const config = {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     { src: '~plugins/nuxt-simplemde-plugin.js', mode: 'client' },
+    { src: '~plugins/dependencies.ts', mode: 'client' },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
