@@ -31,7 +31,7 @@
 export default {
   name: 'IndexPage',
   head: () => ({
-    title: '本棚'
+    title: 'index'
   }),
   computed: {
     hasList () {

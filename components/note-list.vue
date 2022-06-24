@@ -1,26 +1,37 @@
 <template>
-  <v-list-item-group
-    v-model="internalValue"
+<v-list-item-group
+  v-model="internalValue"
   >
-    <template v-for="(item, index) in items">
-      <v-list-item :key="index" @click="show(item.link)">
-        <v-list-item-content>
-          <v-list-item-title v-text="item.id" />
-        </v-list-item-content>
+  <template v-for="(item, index) in items">
+    <v-list-item :key="index" @click="show(item.link)">
+      <v-list-item-content>
+        <v-list-item-title v-text="item.header" />
+        <v-list-item-subtitle
+          class="text-caption"
+          v-text="item.path"
+          />        
+        
+      </v-list-item-content>
       </v-list-item>
       <v-divider :key="`${index}-divider`" />
-    </template>
+  </template>
+  <div v-intersect.quite="onIntersect" />
   </v-list-item-group>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+import { NoteRepository } from '~/js/db/interfaces/NoteRepository'
+
+export default Vue.extend({
   props: {
     value: Number
   },
   data () {
     return {
-      items: []
+      items: [],
+      searchTags: [],
+      isLoading: false
     }
   },
   computed: {
@@ -34,21 +45,29 @@ export default {
     }
   },
   mounted () {
-    this.items = [
-      { id: 0, link: '/notes/0' },
-      { id: 1, link: '/notes/1' },
-      { id: 2, link: '/notes/2' },
-      { id: 3, link: '/notes/hoge' },
-      { id: 4, link: '/notes/hoge/fuga' },
-      { id: 5, link: '/notes/hoge/piyo' },
-      { id: 6, link: '/notes/fuga' },
-      { id: 7, link: '/notes/piyo' }
-    ]
+    this.search()
   },
   methods: {
-    show (link) {
-      this.$router.push({ path: link })
+    show (id: number) {
+      this.$router.push({ path: '/notes/' + id })
+    },
+    async search (offset = 0) {
+      const noteRepo: NoteRepository = this.$noteRepository
+      const notes = await noteRepo.find('', offset, 20)
+      
+      notes[0].forEach((note) => {
+        this.items.push({
+          id: note.id,
+          header: note.content.slice(0, note.content.search(/\r\n|\r|\n/)),
+          path: note.path,
+        })
+      })
+    },
+    onIntersect () {
+      this.isLoading = true
+      this.search(this.items.length)
+      this.isLoading = false
     }
   }
-}
+})
 </script>

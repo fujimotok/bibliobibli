@@ -12,6 +12,9 @@
 
 <script>
 export default {
-  name: 'BooksPage'
+  name: 'BooksPage',
+  head: () => ({
+    title: 'book'
+  }),
 }
 </script>

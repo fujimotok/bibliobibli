@@ -1,6 +1,6 @@
 <template>
   <div ref="list">
-    <v-list class="overflow-y-auto" :height="listHeight">
+    <v-list class="overflow-y-auto" :height="listHeight" two-line>
       <activity-list
         v-show="selectedNaviItem=='activity'"
         v-model="selectedActivity"
