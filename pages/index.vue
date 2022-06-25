@@ -1,8 +1,11 @@
 <template>
-  <v-container class="ma-0 pa-0 fill-height" fluid>
+  <div v-if="isMobile"> 
+    <main-list v-if="isRoot" class="ma-0 pa-0 fill-height" />
+    <nuxt-child v-else/>
+  </div>
+  <v-container v-else class="ma-0 pa-0 fill-height" fluid>
     <v-row class="ma-0 pa-0 fill-height" no-gutters>
       <v-col
-        v-show="hasList"
         xs="12"
         sm="12"
         md="4"
@@ -13,7 +16,6 @@
         <main-list class="ma-0 pa-0 fill-height" />
       </v-col>
       <v-col
-        v-show="hasDetail"
         xs="12"
         sm="12"
         md="8"
@@ -34,17 +36,13 @@ export default {
     title: 'index'
   }),
   computed: {
-    hasList () {
+    isMobile (){
       const xs = this.$vuetify.breakpoint.xs
       const sm = this.$vuetify.breakpoint.sm
-      const root = this.$route.path === '/'
-      return root ? true : !(xs || sm)
+      return xs || sm
     },
-    hasDetail () {
-      const xs = this.$vuetify.breakpoint.xs
-      const sm = this.$vuetify.breakpoint.sm
-      const root = this.$route.path === '/'
-      return root ? !(xs || sm) : true
+    isRoot (){
+      return this.$route.path === '/'
     }
   }
 }
