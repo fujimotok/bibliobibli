@@ -1,28 +1,28 @@
 <template>
   <div ref="list">
-    <v-list class="overflow-y-auto" :height="listHeight" two-line>
+    <v-list class="overflow-y-auto" :height="listHeight">
       <activity-list
-        v-show="selectedNaviItem=='Activity'"
+        v-show="value=='Activity'"
         v-model="selectedActivity"
       />
 
       <book-list
-        v-show="selectedNaviItem=='Books'"
+        v-show="value=='Books'"
         v-model="selectedBook"
       />
 
       <note-list
-        v-show="selectedNaviItem=='Notes'"
+        v-show="value=='Notes'"
         v-model="selectedNote"
       />
 
       <scrap-list
-        v-show="selectedNaviItem=='Scraps'"
+        v-show="value=='Scraps'"
         v-model="selectedScrap"
       />
 
       <others-list
-        v-show="selectedNaviItem=='Etc'"
+        v-show="value=='Etc'"
         v-model="selectedOther"
       />
     </v-list>
@@ -64,23 +64,24 @@
 
 <script>
 export default {
+  props: {
+    value: String
+  },
   data: () => ({
     selectedActivity: null,
     selectedBook: null,
     selectedNote: null,
     selectedScrap: null,
     selectedOther: null,
-    selectedNaviItem: 'Activity',
     listHeight: 0
   }),
   computed: {
     SelectedNaviItem: {
       get(){
-        return this.selectedNaviItem
+        return this.value
       },
       set(value){
-        this.selectedNaviItem = value
-        this.$store.commit('CHANGE_TITLE', value)
+        this.$emit('input', value)
       }
     }
   },
@@ -92,6 +93,9 @@ export default {
   methods: {
     resize () {
       this.listHeight = window.innerHeight - (56 + 48 + 24)
+    },
+    search(){
+      console.log('search')
     }
   }
 }

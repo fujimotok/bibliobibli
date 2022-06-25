@@ -1,7 +1,8 @@
 export const state = () => ({
   title: "",
   searchCount: 0,
-  isShowLeftMenu: true,
+  isShowSearch: true,
+  isShowAdd: true,
   isShowSave: false,
   isShowDel: false,
   isShowBack: false,
@@ -14,8 +15,11 @@ export const mutations = {
   CHANGE_SEARCH_COUNT (state, value) {
     state.searchCount = value
   },
-  CHANGE_IS_SHOW_LEFT_MENU (state, value) {
-    state.isShowLeftMenu = value
+  CHANGE_IS_SHOW_SEARCH (state, value) {
+    state.isShowSearch = value
+  },
+  CHANGE_IS_SHOW_ADD (state, value) {
+    state.isShowAdd = value
   },
   CHANGE_IS_SHOW_SAVE (state, value) {
     state.isShowSave = value

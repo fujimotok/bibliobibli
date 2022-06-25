@@ -12,20 +12,20 @@
       <v-icon>mdi-chevron-left</v-icon>
     </v-btn>
     <v-toolbar-title class="mx-4 pa-0" v-text="title" />
-    <v-btn v-show="isShowLeftMenu" color="white" icon small @click="add()">
+    <v-btn v-show="isShowAdd" color="white" icon small class="mx-2" @click="add()">
       <v-icon>mdi-plus</v-icon>
     </v-btn>
-    <v-btn v-show="isShowLeftMenu" color="white" icon small @click="search()">
+    <v-btn v-show="isShowSearch" color="white" icon small class="mx-2" @click="search()">
       <v-icon>mdi-magnify</v-icon>
     </v-btn>
-    <div v-show="isShowLeftMenu">
+    <div v-show="isShowSearch">
       {{ count }} hit
     </div>
     <v-spacer />
-    <v-btn v-show="isShowSave" color="white" icon small @click="save()">
+    <v-btn v-show="isShowSave" color="white" icon small class="mx-2" @click="save()">
       <v-icon>mdi-content-save</v-icon>
     </v-btn>
-    <v-btn v-show="isShowDel" color="white" icon small @click="del()">
+    <v-btn v-show="isShowDel" color="white" icon small class="mx-2" @click="del()">
       <v-icon>mdi-delete</v-icon>
     </v-btn>
   </v-app-bar>
@@ -56,8 +56,11 @@ export default {
     count () {
       return this.$store.state.searchCount
     },
-    isShowLeftMenu () {
-      return this.$store.state.isShowLeftMenu
+    isShowAdd () {
+      return this.$store.state.isShowAdd
+    },
+    isShowSearch () {
+      return this.$store.state.isShowSearch
     },
     isShowSave () {
       return this.$store.state.isShowSave
@@ -74,7 +77,7 @@ export default {
       this.$refs.page.$children[0].add()
     },
     search () {
-      this.$refs.page.$children[0].showSearchDialog()
+      this.$refs.page.$children[0].search()
     },
     save () {
       this.$refs.page.$children[0].put()

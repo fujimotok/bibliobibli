@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div>
     <global-events
       :filter="(event, handler, eventName) => event.altKey || event.ctrlKey"
       @keydown.prevent.ctrl.s="add()"
@@ -84,7 +84,7 @@
       </v-menu>
       <v-text-field v-model="cover" label="cover" />
     </div>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -130,6 +130,7 @@ export default {
         ]
       },
       activePicker: null,
+      cardHeight: 0,
       menu: false,
       editNote: false,
       selectedMemoIndex: 0,
@@ -173,6 +174,8 @@ export default {
     setTimeout(() => {
       this.$refs.isbn.focus()
     })
+    window.addEventListener('resize', this.resize)
+    this.resize()
   },
   beforeMount () {
     db.tags.orderBy('tag').uniqueKeys()
@@ -276,7 +279,10 @@ export default {
     },
     cancel () {
       this.$router.push('/')
-    }
+    },
+    resize () {
+      this.cardHeight = window.innerHeight - 48
+    },
   }
 }
 </script>
