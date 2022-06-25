@@ -16,5 +16,13 @@ export default {
   head: () => ({
     title: 'book'
   }),
+  mounted () {
+    this.$store.commit('CHANGE_IS_SHOW_SAVE', true)
+    this.$store.commit('CHANGE_IS_SHOW_DEL', true)
+    if (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm)
+    {
+      this.$store.commit('CHANGE_IS_SHOW_LEFT_MENU', false)
+    }
+  }
 }
 </script>

@@ -53,6 +53,7 @@ export default Vue.extend({
     return {
       items: [],
       tagItems: [],
+      searchWord: '',
       searchTags: [],
       status: Status,
       isLoading: false
@@ -81,7 +82,7 @@ export default Vue.extend({
     },
     async search (offset = 0) {
       const bookRepo: BookRepository = this.$bookRepository
-      const books = await bookRepo.find('', [0,1,2,3], [], offset, 20)
+      const books = await bookRepo.find(this.searchWord, [0,1,2,3], [], offset, 20)
       
       books[0].forEach((book) => {
         this.items.push({

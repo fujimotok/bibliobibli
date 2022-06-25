@@ -13,7 +13,7 @@
         lx="4"
         class="ma-0 pa-0 fill-height"
       >
-        <main-list class="ma-0 pa-0 fill-height" />
+        <main-list class="ma-0 pa-0 fill-height"/>
       </v-col>
       <v-col
         xs="12"
@@ -32,6 +32,18 @@
 
 export default {
   name: 'IndexPage',
+  beforeRouteUpdate(to, from, next) {
+    console.log(to, from, next)
+    this.$store.commit('CHANGE_IS_SHOW_BACK', to.path !== '/')
+    this.$store.commit('CHANGE_IS_SHOW_LEFT_MENU', true)
+    if (this.isMobile)
+    {
+      this.$store.commit('CHANGE_IS_SHOW_SAVE', false)
+      this.$store.commit('CHANGE_IS_SHOW_DEL', false)
+    }
+    next()
+  },
+  layout: 'default',
   head: () => ({
     title: 'index'
   }),
