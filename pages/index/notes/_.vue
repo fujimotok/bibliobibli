@@ -68,7 +68,7 @@ export default Vue.extend({
       const noteRepo: NoteRepository = this.$noteRepository
       const id = Number(to.params.pathMatch)
       if (id) {
-        noteRepo.findById(Number(to.params.id)).then((note) =>{
+        noteRepo.findById(id).then((note) =>{
           this.note = note
         })
       }
