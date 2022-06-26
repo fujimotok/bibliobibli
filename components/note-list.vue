@@ -3,7 +3,7 @@
   v-model="internalValue"
   >
   <template v-for="(item, index) in items">
-    <v-list-item :key="index" @click="show(item.link)">
+    <v-list-item :key="index" @click="show(item.id)">
       <v-list-item-content>
         <v-list-item-title v-text="item.header" />
         <v-list-item-subtitle

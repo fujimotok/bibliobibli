@@ -2,9 +2,9 @@
   <div v-if="isMobile"> 
     <main-list v-if="isRoot" ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged"/>
     <v-card v-else>
-      <v-card-text>
+      <div style="padding: 16px;">
         <nuxt-child ref="content" class="ma-0 pa-0 fill-height"/>
-      </v-card-text>
+      </div>
     </v-card>
   </div>
   <v-container v-else class="ma-0 pa-0 fill-height" fluid>
@@ -28,9 +28,9 @@
         class="ma-0 pa-0 fill-height"
         >
         <v-card class="overflow-y-auto" :height="cardHeight">
-          <v-card-text>
+          <div style="padding: 16px;">
             <nuxt-child ref="content" class="ma-0 pa-0 fill-height"/>
-          </v-card-text>
+          </div>
         </v-card>
       </v-col>
     </v-row>

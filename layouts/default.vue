@@ -5,7 +5,6 @@
     color="primary"
     class="white--text text--lighten-1"
     dense
-    fixed
     app
     >
     <v-btn v-show="isShowBack" color="white" icon small @click.stop="$router.go(-1)">
