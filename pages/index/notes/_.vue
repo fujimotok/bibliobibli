@@ -1,5 +1,8 @@
 <template>
-  <vue-simplemde ref="markdownEditor" v-model="note.content" :configs="config"/>
+  <div>
+    <v-text-field v-model="note.path" label="path" />
+    <vue-simplemde ref="markdownEditor" v-model="note.content" :configs="config"/>
+  </div>
 </template>
 
 <script lang="ts">
@@ -9,22 +12,13 @@ import { NoteRepository } from '../../../js/db/interfaces/NoteRepository'
 export default Vue.extend({
   name: 'NotesIndexPage',
   data: () => ({
-    height: '600px',
     config: {
       spellChecker: false,
       forceSync: true,
       indentWithTabs: false,
       status: false,
       toolbar: [
-        {
-          name: 'custom',
-          action: () => { this.editNote = false },
-          className: 'fa fa-close',
-          title: 'Custom Button'
-        },
-        '|',
         'bold',
-        'italic',
         'strikethrough',
         '|',
         'heading',
@@ -75,7 +69,7 @@ export default Vue.extend({
       const id = Number(to.params.pathMatch)
       if (id) {
         noteRepo.findById(Number(to.params.id)).then((note) =>{
-        this.note = note
+          this.note = note
         })
       }
     }
@@ -92,14 +86,20 @@ export default Vue.extend({
   },
   mounted () {
     window.addEventListener('resize', this.resize)
+    window.visualViewport.addEventListener('resize', this.resize)
     this.resize()
   },
   methods: {
     resize () {
-      const height = window.innerHeight - 200
+      const toolbarHeight = document.querySelector('.editor-toolbar').clientHeight
+      const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
       document.querySelector('.CodeMirror').style.height = height + 'px'
-      // document.querySelector('.CodeMirror-scroll').style.height = height+ 'px'
+      window.scroll(0, 0)
     },
+    save () {
+      const noteRepo: NoteRepository = this.$noteRepository
+      noteRepo.store(this.note)
+    }
   }
 })
 </script>
@@ -128,27 +128,5 @@ export default Vue.extend({
 .CodeMirror .CodeMirror-code .cm-comment {
     background: rgba(0, 0, 255, .1);
     border-radius: 2px;
-}
-
-.editor-toolbar {
-    position: -webkit-sticky;  /* Safari fallback */
-    position: sticky; /* other browsers */
-    top: 0px; /* become fixed/sticky when toolbar goes against the top of the viewport */
-    
-    /* Make toolbar useable/visible when it becomes sticky */
-    z-index: 100;
-    opacity: initial; 
-    background-color: white;
-    border-bottom: 1px solid #bbb;
-}
-
- /* Hovering would otherwise cause the text to become visible 'behind' the toolbar */
-.editor-toolbar:hover {
-    opacity: initial;
-}
-
-input {
-  font-size: 16px;
-  transform: scale(0.8);
 }
 </style>
