@@ -8,14 +8,14 @@
           icon
           v-on="on"
         >
-          <v-icon>{{ value.icon }}</v-icon>
+          <v-icon>{{ items.find(v => v.value == value).icon  }}</v-icon>
         </v-btn>
       </template>
       <v-list>
         <v-list-item
           v-for="(item, index) in items"
           :key="index"
-          @click="updateValue(item)"
+          @click="updateValue(index)"
         >
           <v-list-item-icon>
             <v-icon v-text="item.icon" />
@@ -31,7 +31,7 @@
 export default {
   props: {
     items: Array,
-    value: Object
+    value: Number
   },
   methods: {
     updateValue (newValue) {

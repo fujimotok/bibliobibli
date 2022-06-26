@@ -2,60 +2,24 @@
   <div>
     <global-events
       :filter="(event, handler, eventName) => event.altKey || event.ctrlKey"
-      @keydown.prevent.ctrl.s="add()"
+      @keydown.prevent.ctrl.s="save()"
     />
-    <div v-if="editNote">
-      <vue-simplemde ref="markdownEditor" v-model="memos[selectedMemoIndex]" :configs="config" />
-    </div>
-    <div v-else>
+    <div>
       <div style="display: flex;align-items: center;">
-        <icon-combobox v-model="status" :items="states" />
-        <h2>{{ title }}</h2>
+        <icon-combobox v-model="book.status" :items="states" item-value="id" item-text="status"/>
+        <h2>{{ book.title }}</h2>
       </div>
-
-      <v-img :src="cover" max-height="256" contain />
-      <v-select v-model="selectedMemoIndex" :items="memoTitles">
-        <template #append-outer>
-          <v-btn icon @click="editNote = true">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-
-          <v-btn icon class="ml-2" @click="addMemo">
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
-          <v-btn icon :disabled="memos.length < 2" @click="delMemo">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </template>
-      </v-select>
-
-      <v-select v-model="tags" multiple :items="tagItems" label="tags" :menu-props="{ offsetY: true }" />
-      <div style="display: flex;align-items: center;">
-        <label class="v-label">rate</label>
-        <v-spacer />
-        <v-rating v-model="rate" />
-      </div>
-      <div v-for="(link, index) in links" :key="`${index}-link`">
-        <editable-link v-model="links[index]" label="link" />
-      </div>
-      <div class="mb-2">
-        <v-btn icon @click="addLink">
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-        <v-btn icon :disabled="links.length < 2" @click="delLink">
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </div>
+      <v-img :src="book.cover" max-height="256" contain />
 
       <v-text-field
         ref="isbn"
-        v-model="isbn"
+        v-model="book.isbn"
         label="isbn13"
         @change="onChangeISBN(isbn)"
       />
-      <v-text-field v-model="title" label="title" />
-      <v-combobox v-model="authors" multiple label="authors" />
-      <v-text-field v-model="publisher" label="publisher" />
+      <v-text-field v-model="book.title" label="title" />
+      <v-combobox v-model="book.authors" multiple label="authors" />
+      <v-text-field v-model="book.publisher" label="publisher" />
       <v-menu
         ref="menu"
         v-model="menu"
@@ -66,7 +30,7 @@
       >
         <template #activator="{ on, attrs }">
           <v-text-field
-            v-model="publishdt"
+            v-model="book.publishedAt"
             label="publish date"
             prepend-icon="mdi-calendar"
             readonly
@@ -75,96 +39,67 @@
           />
         </template>
         <v-date-picker
-          v-model="publishdt"
+          v-model="book.publishedAt"
           :active-picker.sync="activePicker"
           :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
           min="1950-01-01"
-          @change="save"
+          @change="dateChanged"
         />
       </v-menu>
-      <v-text-field v-model="cover" label="cover" />
+      <v-text-field v-model="book.cover" label="cover" />
+      <v-select v-model="book.tags" multiple :items="tagItems" item-value="id" item-text="name" label="tags" :menu-props="{ offsetY: true }" />
+      <div v-for="(link, index) in book.links" :key="`${index}-link`">
+        <editable-link v-model="book.links[index]" label="link" />
+      </div>
+      <div class="mb-2">
+        <v-btn icon @click="addLink">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+        <v-btn icon :disabled="book.links.length < 2" @click="delLink">
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </div>
     </div>
   </div>
 </template>
 
-<script>
-import axios from 'axios'
+<script lang="ts">
+import Vue from 'vue'
 import GlobalEvents from 'vue-global-events'
-import { db } from '../../../js/db'
+import { BookRepository } from '../../../js/db/interfaces/BookRepository'
+import { TagRepository } from '../../../js/db/interfaces/TagRepository'
 
-export default {
+export default Vue.extend({
   name: 'BooksIndexPage',
   components: {
     GlobalEvents
   },
-  layout: 'add-item',
-  data () {
-    return {
-      config: {
-        spellChecker: false,
-        forceSync: true,
-        indentWithTabs: false,
-        toolbar: [
-          {
-            name: 'custom',
-            action: () => { this.editNote = false },
-            className: 'fa fa-close',
-            title: 'Custom Button'
-          },
-          '|',
-          'bold',
-          'italic',
-          'strikethrough',
-          '|',
-          'heading',
-          'unordered-list',
-          'ordered-list',
-          '|',
-          'code',
-          'quote',
-          '|',
-          'link',
-          'image',
-          '|',
-          'preview'
-        ]
-      },
-      activePicker: null,
-      cardHeight: 0,
-      menu: false,
-      editNote: false,
-      selectedMemoIndex: 0,
-      states: [
-        { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
-        { text: '未読', value: 1, icon: 'mdi-progress-clock' },
-        { text: '読中', value: 2, icon: 'mdi-progress-check' },
-        { text: '読了', value: 3, icon: 'mdi-check' }
-      ],
-      tagItems: [],
-      title: 'タイトル',
+  data: () => ({
+    activePicker: null,
+    menu: false,
+    states: [
+      { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
+      { text: '未読', value: 1, icon: 'mdi-progress-clock' },
+      { text: '読中', value: 2, icon: 'mdi-progress-check' },
+      { text: '読了', value: 3, icon: 'mdi-check' }
+    ],
+    tagItems: [],
+    book: {
+      id: 0,
+      createdAt: '',
+      updatedAt: '',
       isbn: '',
-      authors: [],
+      title: 'title',
+      authors: [''],
       publisher: '',
-      publishdt: null,
+      publishedAt: '',
       cover: '/noimage.png',
-      tags: [],
-      status: { text: '未読', value: 1, icon: 'mdi-progress-clock' },
-      registerdt: null,
-      readdt: null,
-      update: null,
-      rate: 0,
+      status: 0,
+      readAt: '',
       links: [''],
-      memos: ['']
+      tags: [],
     }
-  },
-  head: () => ({
-    title: '新規登録'
   }),
-  computed: {
-    memoTitles () {
-      return this.memos.map((memo, i) => { return { text: i + ': ' + memo.split(/\r\n|\n/)[0], value: i } })
-    }
-  },
   watch: {
     menu (val) {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
@@ -174,26 +109,19 @@ export default {
     setTimeout(() => {
       this.$refs.isbn.focus()
     })
-    window.addEventListener('resize', this.resize)
-    this.resize()
   },
-  beforeMount () {
-    db.tags.orderBy('tag').uniqueKeys()
-      .then((keysArray) => {
-        this.tagItems = keysArray
+  async beforeMount () {
+    const tagRepo: TagRepository = this.$tagRepository
+    const tags = await tagRepo.find('')
+    this.tagItems = tags[0]
 
-        this.isbn = this.$route.query.isbn || ''
-        const i = sessionStorage.getItem('LastStatus') || 1
-        this.status = this.states[i]
-        this.tags = JSON.parse(sessionStorage.getItem('LastTags')) || []
-        this.onChangeISBN(this.isbn)
-      })
+    this.$store.commit('CHANGE_IS_SHOW_SAVE', true)
   },
   methods: {
     barcodeReader () {
       this.$router.push('/barcode-reader')
     },
-    save (date) {
+    dateChanged (date) {
       this.$refs.menu.save(date)
     },
     onChangeISBN (value) {
@@ -227,64 +155,19 @@ export default {
       }
     },
     addLink () {
-      this.links.push('')
+      this.book.links.push('')
     },
     delLink () {
       if (confirm('linkを本当に削除しても良いですか？')) {
-        this.links.pop()
-      }
-    },
-    addMemo () {
-      this.memos.push('')
-    },
-    delMemo () {
-      if (confirm('memoを本当に削除しても良いですか？')) {
-        this.memos.pop()
+        this.book.links.pop()
       }
     },
     add () {
-      const dt = new Date()
-      const tz = -dt.getTimezoneOffset() / 60
-      const sign = Math.sign(tz) < 0 ? '-' : '+'
-      this.registerdt = dt.toISOString().substr(0, 23) + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
-      this.update = this.registerdt
-      if (this.status.value === 3) {
-        this.readdt = this.registerdt
-      }
-
-      db.books.add(
-        {
-          title: this.title,
-          authors: this.authors,
-          isbn: this.isbn,
-          publisher: this.publisher,
-          publishdt: this.publishdt,
-          cover: this.cover,
-          tags: this.tags,
-          status: this.status.value,
-          registerdt: this.registerdt,
-          readdt: this.readdt,
-          update: this.update,
-          rate: this.rate,
-          links: this.links,
-          memos: this.memos
-        }
-      ).then((result) => {
-        sessionStorage.setItem('LastStatus', this.status.value)
-        sessionStorage.setItem('LastTags', JSON.stringify(this.tags))
-        sessionStorage.setItem('DBChangeEvent', 'add')
-        sessionStorage.setItem('DBChangeEventArg', result)
-        this.$router.push('/')
-      })
-    },
-    cancel () {
-      this.$router.push('/')
-    },
-    resize () {
-      this.cardHeight = window.innerHeight - 48
-    },
+      const bookRepo: BookRepository = this.$bookRepository
+      bookRepo.store(this.book)
+    }
   }
-}
+})
 </script>
 
 <style>
