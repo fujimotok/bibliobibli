@@ -163,7 +163,7 @@ export default Vue.extend({
         this.book.links.pop()
       }
     },
-    add () {
+    save () {
       const bookRepo: BookRepository = this.$bookRepository
       bookRepo.store(this.book)
     }

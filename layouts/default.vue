@@ -79,10 +79,10 @@ export default {
       this.$refs.page.$children[0].search()
     },
     save () {
-      this.$refs.page.$children[0].put()
+      this.$refs.page.$children[0].save()
     },
     del () {
-      this.$refs.page.$children[0].remove()
+      this.$refs.page.$children[0].del()
     }
   }
 }

@@ -94,7 +94,7 @@ export default {
     resize () {
       this.listHeight = window.innerHeight - (56 + 48 + 24)
     },
-    search(){
+    search () {
       console.log('search')
     }
   }

@@ -3,7 +3,7 @@
     <main-list v-if="isRoot" ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged"/>
     <v-card v-else>
       <div style="padding: 16px;">
-        <nuxt-child ref="content" class="ma-0 pa-0 fill-height"/>
+        <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height"/>
       </div>
     </v-card>
   </div>
@@ -29,7 +29,7 @@
         >
         <v-card class="overflow-y-auto" :height="cardHeight">
           <div style="padding: 16px;">
-            <nuxt-child ref="content" class="ma-0 pa-0 fill-height"/>
+            <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height"/>
           </div>
         </v-card>
       </v-col>
@@ -126,6 +126,16 @@ export default {
       } else {
         this.$refs.listDesktop.search()
       }
+    },
+    save () {
+      if (this.isMobile) {
+        this.$refs.contentMobile.save()
+      } else {
+        this.$refs.contentDesktop.save()
+      }
+    },
+    del () {
+      console.log('del')
     }
   }
 }
