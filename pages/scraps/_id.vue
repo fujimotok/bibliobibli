@@ -1,16 +1,15 @@
 <template>
   <div>
-    <v-text-field v-model="note.path" label="path" />
-    <vue-simplemde ref="markdownEditor" v-model="note.content" :configs="config"/>
+    <vue-simplemde ref="markdownEditor" v-model="scrap.content" :configs="config"/>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { NoteRepository } from '../../../js/db/interfaces/NoteRepository'
+import { ScrapRepository } from '../../js/db/interfaces/ScrapRepository'
 
 export default Vue.extend({
-  name: 'NotesIndexPage',
+  name: 'ScrapsPage',
   data: () => ({
     config: {
       spellChecker: false,
@@ -55,31 +54,24 @@ export default Vue.extend({
         'preview'
       ]
     },
-    note: {
+    scrap: {
       id: null,
       createdAt: '',
       updatedAt: '',
       content: '',
-      path: '',
     }
   }),
   watch: {
     '$route' (to) {
-      const noteRepo: NoteRepository = this.$noteRepository
-      const id = Number(to.params.pathMatch)
-      if (id) {
-        noteRepo.findById(id).then((note) =>{
-          this.note = note
-        })
-      }
+      const scrapRepo: ScrapRepository = this.$scrapRepository
+      scrapRepo.findById(Number(to.params.id)).then((scrap) =>{
+        this.scrap = scrap
+      })
     }
   },
   async beforeMount () {
-    const noteRepo: NoteRepository = this.$noteRepository
-    const id = Number(this.$route.params.pathMatch)
-    if (id) {
-      this.note = await noteRepo.findById(id)
-    }
+    const scrapRepo: ScrapRepository = this.$scrapRepository
+    this.scrap = await scrapRepo.findById(Number(this.$route.params.id))
     
     this.$store.commit('CHANGE_IS_SHOW_SAVE', true)
     this.$store.commit('CHANGE_IS_SHOW_DEL', false)
@@ -92,13 +84,13 @@ export default Vue.extend({
   methods: {
     resize () {
       const toolbarHeight = document.querySelector('.editor-toolbar').clientHeight
-      const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
+      const height = window.visualViewport.height - (48 + 16 * 2 + toolbarHeight)
       document.querySelector('.CodeMirror').style.height = height + 'px'
       window.scroll(0, 0)
     },
     save () {
-      const noteRepo: NoteRepository = this.$noteRepository
-      noteRepo.store(this.note)
+      const scrapRepo: ScrapRepository = this.$scrapRepository
+      scrapRepo.store(this.scrap)
     }
   }
 })

@@ -1,7 +1,8 @@
 <template>
+<v-list class="overflow-y-auto" :height="listHeight">
   <v-list-item-group
     v-model="internalValue"
-  >
+    >
     <template v-for="(item, index) in items">
       <v-list-item :key="index" @click="show(item.link)">
         <v-list-item-content>
@@ -11,6 +12,7 @@
       <v-divider :key="`${index}-divider`" />
     </template>
   </v-list-item-group>
+</v-list>
 </template>
 
 <script>
@@ -20,6 +22,7 @@ export default {
   },
   data () {
     return {
+      listHeight: 0,
       items: []
     }
   },
@@ -34,6 +37,9 @@ export default {
     }
   },
   mounted () {
+    window.addEventListener('resize', this.resize)
+    this.resize()
+
     this.items = [
       { id: 0, link: '/scraps/0' },
       { id: 1, link: '/scraps/1' },
@@ -48,6 +54,9 @@ export default {
     ]
   },
   methods: {
+    resize () {
+      this.listHeight = window.innerHeight - (48 + 2)
+    },
     show (link) {
       this.$router.push({ path: link })
     }

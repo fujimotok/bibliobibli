@@ -1,15 +1,16 @@
 <template>
   <div>
-    <vue-simplemde ref="markdownEditor" v-model="scrap.content" :configs="config"/>
+    <v-text-field v-model="note.path" label="path" />
+    <vue-simplemde ref="markdownEditor" v-model="note.content" :configs="config"/>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { ScrapRepository } from '../../../js/db/interfaces/ScrapRepository'
+import { NoteRepository } from '../../js/db/interfaces/NoteRepository'
 
 export default Vue.extend({
-  name: 'ScrapsIndexPage',
+  name: 'NotesIndexPage',
   data: () => ({
     config: {
       spellChecker: false,
@@ -54,7 +55,7 @@ export default Vue.extend({
         'preview'
       ]
     },
-    scrap: {
+    note: {
       id: null,
       createdAt: '',
       updatedAt: '',
@@ -73,13 +74,13 @@ export default Vue.extend({
   methods: {
     resize () {
       const toolbarHeight = document.querySelector('.editor-toolbar').clientHeight
-      const height = window.visualViewport.height - (48 + 16 * 2 + toolbarHeight)
+      const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
       document.querySelector('.CodeMirror').style.height = height + 'px'
       window.scroll(0, 0)
     },
     save () {
-      const scrapRepo: ScrapRepository = this.$scrapRepository
-      scrapRepo.store(this.scrap)
+      const noteRepo: NoteRepository = this.$noteRepository
+      noteRepo.store(this.note)
     }
   }
 })

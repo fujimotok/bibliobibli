@@ -59,9 +59,6 @@
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </div>
-
-      <v-text-field v-model="book.createdAt" label="created at" readonly />
-      <v-text-field v-model="book.updatedAt" label="updated at" readonly />
     </div>
   </div>
 </template>
@@ -69,11 +66,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import GlobalEvents from 'vue-global-events'
-import { BookRepository } from '../../../js/db/interfaces/BookRepository'
-import { TagRepository } from '../../../js/db/interfaces/TagRepository'
+import { BookRepository } from '../../js/db/interfaces/BookRepository'
+import { TagRepository } from '../../js/db/interfaces/TagRepository'
 
 export default Vue.extend({
-  name: 'BooksPage',
+  name: 'BooksIndexPage',
   components: {
     GlobalEvents
   },
@@ -92,11 +89,11 @@ export default Vue.extend({
       createdAt: '',
       updatedAt: '',
       isbn: '',
-      title: '',
+      title: 'title',
       authors: [''],
       publisher: '',
       publishedAt: '',
-      cover: '',
+      cover: '/noimage.png',
       status: 0,
       readAt: '',
       links: [''],
@@ -106,29 +103,20 @@ export default Vue.extend({
   watch: {
     menu (val) {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
-    },
-    '$route' (to) {
-      const tagRepo: TagRepository = this.$tagRepository
-      tagRepo.find('').then((tags) =>{
-        this.tagItems = tags[0]
-      })
-
-      const bookRepo: BookRepository = this.$bookRepository
-      bookRepo.findById(Number(to.params.id)).then((book) =>{
-        this.book = book
-      })
     }
+  },
+  mounted () {
+    setTimeout(() => {
+      this.$refs.isbn.focus()
+    })
   },
   async beforeMount () {
     const tagRepo: TagRepository = this.$tagRepository
     const tags = await tagRepo.find('')
     this.tagItems = tags[0]
 
-    const bookRepo: BookRepository = this.$bookRepository
-    this.book = await bookRepo.findById(Number(this.$route.params.id))
-
     this.$store.commit('CHANGE_IS_SHOW_SAVE', true)
-    this.$store.commit('CHANGE_IS_SHOW_DEL', true)
+    this.$store.commit('CHANGE_IS_SHOW_DEL', false)
   },
   methods: {
     barcodeReader () {

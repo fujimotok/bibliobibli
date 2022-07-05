@@ -1,34 +1,35 @@
 <template>
-<v-list-item-group
-  v-model="internalValue"
-  >
-  <template v-for="(item, index) in items">
-    <v-list-item :key="index" @click="show(item.id)">
-      <v-list-item-content>
-        <v-list-item-title v-text="item.title" />
-        <v-list-item-subtitle
-          class="text-caption"
-          v-text="item.authors ? item.authors.join(', ') : '' "
-          />        
-        <div>
-          <v-icon v-if="item.status == status.want">
-            mdi-progress-star
-          </v-icon>
-          <v-icon v-else-if="item.status == status.unread">
-            mdi-progress-clock
-          </v-icon>
-          <v-icon v-else-if="item.status == status.reading">
-            mdi-progress-check
-          </v-icon>
-          <v-icon v-else>
-            mdi-check
-          </v-icon>
-          <v-chip
-            v-for="tag in item.tags"
+<v-list class="overflow-y-auto" :height="listHeight">
+  <v-list-item-group
+    v-model="internalValue"
+    >
+    <template v-for="(item, index) in items">
+      <v-list-item :key="index" @click="show(item.id)">
+        <v-list-item-content>
+          <v-list-item-title v-text="item.title" />
+          <v-list-item-subtitle
+            class="text-caption"
+            v-text="item.authors ? item.authors.join(', ') : '' "
+            />        
+          <div>
+            <v-icon v-if="item.status == status.want">
+              mdi-progress-star
+            </v-icon>
+            <v-icon v-else-if="item.status == status.unread">
+              mdi-progress-clock
+            </v-icon>
+            <v-icon v-else-if="item.status == status.reading">
+              mdi-progress-check
+            </v-icon>
+            <v-icon v-else>
+              mdi-check
+            </v-icon>
+            <v-chip
+              v-for="tag in item.tags"
               :key="tag"
               small
               class="mr-1 mt-1"
-            >
+              >
               {{ tag }}
             </v-chip>
           </div>
@@ -36,8 +37,9 @@
       </v-list-item>
       <v-divider :key="`${index}-divider`" />
     </template>
-    <div v-intersect.quite="onIntersect" />
+    <div v-intersect.quite="onIntersect" /> 
   </v-list-item-group>
+</v-list>
 </template>
 
 <script lang="ts">
@@ -51,6 +53,7 @@ export default Vue.extend({
   },
   data () {
     return {
+      listHeight: 0,
       items: [],
       tagItems: [],
       searchWord: '',
@@ -70,6 +73,9 @@ export default Vue.extend({
     }
   },
   async mounted () {
+    window.addEventListener('resize', this.resize)
+    this.resize()
+
     const tagRepo: TagRepository = this.$tagRepository
     const tags = await tagRepo.find('')
     this.tagItems = tags[0]
@@ -77,6 +83,9 @@ export default Vue.extend({
     this.search()
   },
   methods: {
+    resize () {
+      this.listHeight = window.innerHeight - (48 + 2)
+    },
     show (id: number) {
       this.$router.push({ path: '/books/' + id })
     },
@@ -101,6 +110,7 @@ export default Vue.extend({
       this.isLoading = true
       this.search(this.items.length)
       this.isLoading = false
+      console.log('onIntersect')
     }
   }
 })

@@ -7,26 +7,59 @@
     dense
     app
     >
-    <v-btn v-show="isShowBack" color="white" icon small @click.stop="$router.go(-1)">
-      <v-icon>mdi-chevron-left</v-icon>
-    </v-btn>
-    <v-toolbar-title class="mx-4 pa-0" v-text="title" />
-    <v-btn v-show="isShowAdd" color="white" icon small class="mx-2" @click="add()">
-      <v-icon>mdi-plus</v-icon>
-    </v-btn>
-    <v-btn v-show="isShowSearch" color="white" icon small class="mx-2" @click="search()">
-      <v-icon>mdi-magnify</v-icon>
-    </v-btn>
-    <div v-show="isShowSearch">
-      {{ count }} hit
-    </div>
-    <v-spacer />
-    <v-btn v-show="isShowSave" color="white" icon small class="mx-2" @click="save()">
-      <v-icon>mdi-content-save</v-icon>
-    </v-btn>
-    <v-btn v-show="isShowDel" color="white" icon small class="mx-2" @click="del()">
-      <v-icon>mdi-delete</v-icon>
-    </v-btn>
+    <v-container class="ma-0 pa-0 fill-height" fluid>
+      <v-row>
+        <v-col
+          xs="12"
+          sm="12"
+          md="4"
+          lg="4"
+          lx="4"
+          >
+          <v-row>
+            <v-toolbar-title  v-text="title" />
+          </v-row>
+        </v-col>
+        <v-col
+          xs="12"
+          sm="12"
+          md="8"
+          lg="8"
+          lx="8"
+          >
+          <div>
+            <v-row>
+              <v-toolbar-title v-text="title" />
+              <v-spacer />
+              <v-btn color="white" icon small class="mx-2" @click="add()">
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </v-row>
+        </div>
+      </v-col>
+      </v-row>
+    </v-container>
+    <!-- <v-btn v-show="isShowBack" color="white" icon small @click.stop="$router.go(-1)"> -->
+    <!--   <v-icon>mdi-chevron-left</v-icon> -->
+    <!-- </v-btn> -->
+    <!-- <v-toolbar-title class="mx-4 pa-0" v-text="title" /> -->
+    <!-- <v-btn v-show="isShowAdd" color="white" icon small class="mx-2" @click="add()"> -->
+    <!--   <v-icon>mdi-plus</v-icon> -->
+    <!-- </v-btn> -->
+    <!-- <v-btn v-show="isShowSearch" color="white" icon small class="mx-2" @click="search()"> -->
+    <!--   <v-icon>mdi-magnify</v-icon> -->
+    <!-- </v-btn> -->
+    <!-- <div v-show="isShowSearch"> -->
+    <!--   {{ count }} hit -->
+    <!-- </div> -->
+    <!-- <v-spacer /> -->
+    <!-- <v-btn v-show="isShowSave" color="white" icon small class="mx-2" @click="save()"> -->
+    <!--   <v-icon>mdi-content-save</v-icon> -->
+    <!-- </v-btn> -->
+    <!-- <v-btn v-show="isShowDel" color="white" icon small class="mx-2" @click="del()"> -->
+    <!--   <v-icon>mdi-delete</v-icon> -->
+    <!-- </v-btn> -->
+    
   </v-app-bar>
     <v-main>
       <Nuxt ref="page" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />

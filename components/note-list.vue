@@ -1,4 +1,5 @@
 <template>
+<v-list class="overflow-y-auto" :height="listHeight">
 <v-list-item-group
   v-model="internalValue"
   >
@@ -16,7 +17,8 @@
       <v-divider :key="`${index}-divider`" />
   </template>
   <div v-intersect.quite="onIntersect" />
-  </v-list-item-group>
+</v-list-item-group>
+</v-list>
 </template>
 
 <script lang="ts">
@@ -29,6 +31,7 @@ export default Vue.extend({
   },
   data () {
     return {
+      listHeight: 0,
       items: [],
       searchTags: [],
       isLoading: false
@@ -45,9 +48,15 @@ export default Vue.extend({
     }
   },
   mounted () {
+    window.addEventListener('resize', this.resize)
+    this.resize()
+
     this.search()
   },
   methods: {
+    resize () {
+      this.listHeight = window.innerHeight - (48 + 2)
+    },
     show (id: number) {
       this.$router.push({ path: '/notes/' + id })
     },
