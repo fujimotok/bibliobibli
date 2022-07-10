@@ -23,6 +23,7 @@
       ]
     },
     "types": [
+      "@nuxtjs/vuetify",
       "@types/node",
       "@nuxt/types"
     ]
