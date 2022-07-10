@@ -107,8 +107,9 @@ const config = {
           info: '#03a9f4',
           success: '#8bc34a'
         }
-      }
-    }
+      },
+      options: { customProperties: true }
+    },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
