@@ -108,7 +108,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+  import Vue from 'vue'
 
 export default Vue.extend({
   name: 'DefaultLayout',
@@ -131,23 +131,26 @@ export default Vue.extend({
       },
       set (value) {
         const self:any = this
-        self.innerSelectedNaviItem = value
+        if (self.innerSelectedNaviItem !== value)
+        {
+          self.innerSelectedNaviItem = value
+        }
         switch (value) {
-        case "Activity":
-          this.$router.push("/")
-          break;
-        case "Books":
-          this.$router.push("/books/")
-          break;
-        case "Notes":
-          this.$router.push("/notes/")
-          break;
-        case "Scraps":
-          this.$router.push("/scraps/")
-          break;
-        case "Etc":
-          this.$router.push("/etc/")
-          break;
+          case "Activity":
+            this.$router.push("/")
+            break;
+          case "Books":
+            this.$router.push("/books/")
+            break;
+          case "Notes":
+            this.$router.push("/notes/")
+            break;
+          case "Scraps":
+            this.$router.push("/scraps/")
+            break;
+          case "Etc":
+            this.$router.push("/etc/")
+            break;
         }
       }
     },
@@ -160,39 +163,58 @@ export default Vue.extend({
     count () {
       return this.$store.state.searchCount
     },
-    isShowAdd () {
-      return this.$store.state.isShowAdd
-    },
-    isShowSearch () {
-      return this.$store.state.isShowSearch
-    },
-    isShowSave () {
-      return this.$store.state.isShowSave
-    },
-    isShowDel () {
-      return this.$store.state.isShowDel
-    },
-    isShowBack () {
-      return this.$store.state.isShowBack
-    },
+  },
+  watch:{
+    $route (to, _){
+      const self:any = this
+      switch(to.path.split('/')[1])
+      {
+        case 'books':
+          self.selectedNaviItem = "Books"
+          break
+        case 'notes':
+          self.selectedNaviItem = "Notes"
+          break
+        case 'scraps':
+          self.selectedNaviItem = "Scrapss"
+          break
+        case 'etc':
+          self.selectedNaviItem = "Etc"
+          break
+        default:
+          self.selectedNaviItem = "Activity"
+      }
+    }
+  },
+  mounted () {
+    const self:any = this
+      switch(self.$route.path.split('/')[1])
+      {
+        case 'books':
+          self.selectedNaviItem = "Books"
+          break
+        case 'notes':
+          self.selectedNaviItem = "Notes"
+          break
+        case 'scraps':
+          self.selectedNaviItem = "Scrapss"
+          break
+        case 'etc':
+          self.selectedNaviItem = "Etc"
+          break
+        default:
+          self.selectedNaviItem = "Activity"
+      }
   },
   methods: {
-    add () {
-      const self:any = this
-      self.$refs.page.$children[0].add()
-    },
     search () {
       const self:any = this
       self.$refs.page.$children[0].search()
     },
-    save () {
+    menu () {
       const self:any = this
-      self.$refs.page.$children[0].save()
+      self.$refs.page.$children[0].menu()
     },
-    del () {
-      const self:any = this
-      self.$refs.page.$children[0].del()
-    }
   }
 })
 </script>
