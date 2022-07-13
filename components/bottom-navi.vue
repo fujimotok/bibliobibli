@@ -4,7 +4,6 @@
     color="primary"
     :height="80"
     fixed
-    app
   >
     <v-btn value="Activity">
       <span>Activity</span>
@@ -60,8 +59,19 @@ export default Vue.extend({
 </script>
 
 <style>
+.v-bottom-navigation
+{
+    border-top: solid 1px;
+    border-color: #E0E0E0;
+}
+
 .v-bottom-navigation .v-btn__content
 {
   padding-bottom: 16px;
+}
+
+.v-bottom-navigation .v-btn--active
+{
+    border-top: solid;
 }
 </style>

@@ -6,16 +6,41 @@
       dense
       app
     >
+      <v-btn
+        v-show="!isRoot"
+        color="white"
+        icon
+        small
+      >
+        <v-icon>mdi-chevron-left</v-icon>
+      </v-btn>
       <v-toolbar-title class="mx-2" v-text="title" />
       <v-spacer />
-      <v-btn color="white" icon small class="mx-2" @click="add()">
-        <v-icon>mdi-plus</v-icon>
+      <v-btn
+        v-show="isRoot"
+        color="white"
+        icon
+        small
+        class="mx-2"
+        @click="add()"
+      >
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
+      <v-btn
+        v-show="!isRoot"
+        color="white"
+        icon
+        small
+        class="mx-2"
+        @click="add()"
+      >
+        <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
     </v-app-bar>
     <v-main>
       <Nuxt ref="page" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
     </v-main>
-    <bottom-navi v-model="selectedNaviItem" />
+    <bottom-navi v-model="selectedNaviItem" app />
   </v-app>
   <v-app v-else ref="app">
     <v-app-bar
@@ -44,7 +69,7 @@
               <v-toolbar-title class="mx-2" v-text="title" />
               <v-spacer />
               <v-btn color="white" icon small class="mx-2" @click="add()">
-                <v-icon>mdi-plus</v-icon>
+                <v-icon>mdi-magnify</v-icon>
               </v-btn>
             </v-row>
           </v-col>
@@ -60,7 +85,7 @@
               <v-toolbar-title class="mx-2" v-text="title" />
               <v-spacer />
               <v-btn color="white" icon small class="mx-2" @click="add()">
-                <v-icon>mdi-plus</v-icon>
+                <v-icon>mdi-dots-vertical</v-icon>
               </v-btn>
             </v-row>
           </v-col>
@@ -127,7 +152,7 @@ export default Vue.extend({
       }
     },
     isRoot (){
-      return this.$route.path === '/'
+      return this.$route.path === '/books' || this.$route.path === '/notes' || this.$route.path === '/scraps'
     },
     title () {
       return this.$store.state.title

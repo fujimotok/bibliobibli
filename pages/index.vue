@@ -1,9 +1,9 @@
 <template>
   <div v-if="isMobile"> 
-    <main-list v-if="isRoot" ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged"/>
+    <activity-list v-if="isRoot" ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged" />
     <v-card v-else>
       <div style="padding: 16px;">
-        <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height"/>
+        <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height" />
       </div>
     </v-card>
   </div>
@@ -16,8 +16,8 @@
         lg="4"
         lx="4"
         class="ma-0 pa-0 fill-height"
-        >
-        <main-list ref="listDesktop" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged"/>
+      >
+        <activity-list ref="listDesktop" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged" />
       </v-col>
       <v-col
         xs="12"
@@ -26,10 +26,10 @@
         lg="8"
         lx="8"
         class="ma-0 pa-0 fill-height"
-        >
+      >
         <v-card class="overflow-y-auto" :height="cardHeight">
           <div style="padding: 16px;">
-            <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height"/>
+            <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height" />
           </div>
         </v-card>
       </v-col>

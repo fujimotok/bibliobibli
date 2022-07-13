@@ -74,26 +74,31 @@ export default Vue.extend({
 <style scoped>
 .text-primary
 {
-  color: var(--v-primary-base);
+    color: var(--v-primary-base);
 }
 
 .v-list-item
 {
-  justify-content: center;
-  margin: 0px;
-  padding: 0px;
+    justify-content: center;
+    margin: 0px;
+    padding: 0px;
 }
-  
+
+.v-list-item--active
+{
+    border-right: solid;
+}
+
 .icon-with-text
 {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .icon-text
 {
-  display: block;
-  font-size: 12px;
+    display: block;
+    font-size: 12px;
 }
 </style>
