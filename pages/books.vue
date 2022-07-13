@@ -5,7 +5,7 @@
       <v-list style="padding-bottom: 80px;">
         <book-list ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" />
       </v-list>
-      <div style="position: fixed; bottom: 100px; right: 32px;">
+      <div style="position: fixed; bottom: 100px; right: 16px;">
         <v-btn
           elevation="2"
           fab

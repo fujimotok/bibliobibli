@@ -68,7 +68,7 @@ export default {
   destroyed () {
     Quagga.stop()
   },
-  errorCaptured (err, vm, info) {
+  errorCaptured (err) {
     console.log('catched by `CHILD errorCaptured`', err.toString())
     this.isError = true
     return false

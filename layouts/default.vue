@@ -134,7 +134,7 @@ export default Vue.extend({
         self.innerSelectedNaviItem = value
         switch (value) {
         case "Activity":
-          this.$router.push("/activity/")
+          this.$router.push("/")
           break;
         case "Books":
           this.$router.push("/books/")
@@ -152,7 +152,7 @@ export default Vue.extend({
       }
     },
     isRoot (){
-      return this.$route.path === '/books' || this.$route.path === '/notes' || this.$route.path === '/scraps'
+      return this.$route.path === '/' || this.$route.path === '/books/' || this.$route.path === '/notes/' || this.$route.path === '/scraps/' || this.$route.path === '/etc/'
     },
     title () {
       return this.$store.state.title

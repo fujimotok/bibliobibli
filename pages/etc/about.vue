@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-card>
+  <v-container class="fill-height" fluid>
+    <v-card style="width: 100%">
       <v-card-title>
         アプリ情報
       </v-card-title>
@@ -19,7 +19,7 @@
         </v-container>
       </v-card-text>
     </v-card>
-    <v-card class="mt-4">
+    <v-card style="width: 100%" class="mt-4">
       <v-card-title>
         使い方
       </v-card-title>

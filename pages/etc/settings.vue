@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-card>
+  <v-container class="fill-height" fluid>
+    <v-card style="width: 100%;">
       <v-card-title>
         データインポート/エクスポート
       </v-card-title>

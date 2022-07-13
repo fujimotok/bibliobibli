@@ -43,9 +43,9 @@ export default {
   },
   mounted () {
     this.items = [
-      { id: 0, link: '/about', name: 'about', icon: 'mdi-information' },
-      { id: 1, link: '/tags', name: 'tags', icon: 'mdi-tag' },
-      { id: 2, link: '/settings', name: 'settings', icon: 'mdi-cog' }
+      { id: 0, link: '/etc/about', name: 'about', icon: 'mdi-information' },
+      { id: 1, link: '/etc/tags', name: 'tags', icon: 'mdi-tag' },
+      { id: 2, link: '/etc/settings', name: 'settings', icon: 'mdi-cog' }
     ]
   },
   methods: {

@@ -1,13 +1,27 @@
 <template>
-  <div v-if="isMobile"> 
-    <scrap-list v-if="isRoot" ref="leistMobile" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged"/>
+  <div v-if="isMobile">
+    <!-- mobileの時はlistにoverflow指定しないようにしてwindowのスクロールに任せる -->
+    <div v-if="isRoot">
+      <v-list style="padding-bottom: 80px;">
+        <scrap-list ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" />
+      </v-list>
+      <div style="position: fixed; bottom: 100px; right: 16px;">
+        <v-btn
+          elevation="2"
+          fab
+          color="secondary"
+        >
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </div>
+    </div>
     <v-card v-else>
       <div style="padding: 16px;">
-        <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height"/>
+        <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height" />
       </div>
     </v-card>
   </div>
-  <v-container v-else class="ma-0 pa-0 fill-height" fluid>
+  <v-container v-else class="ma-0 pa-0 fill-height" fluid style="position: relative;">
     <v-row class="ma-0 pa-0 fill-height" no-gutters>
       <v-col
         xs="12"
@@ -16,8 +30,22 @@
         lg="4"
         lx="4"
         class="ma-0 pa-0 fill-height"
-        >
-        <scrap-list ref="listDesktop" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged"/>
+        style="position: relative;"
+      >
+        <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
+        <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
+          <scrap-list ref="listDesktop" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged" />
+        </v-list>
+        <div style="position: absolute; bottom: 32px; right: 32px;">
+          <v-btn
+            elevation="2"
+            fab
+            small
+            color="secondary"
+          >
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </div>
       </v-col>
       <v-col
         xs="12"
@@ -26,10 +54,12 @@
         lg="8"
         lx="8"
         class="ma-0 pa-0 fill-height"
-        >
-        <v-card class="overflow-y-auto" :height="cardHeight">
+        style="position: relative;"
+      >
+        <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
+        <v-card class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
           <div style="padding: 16px;">
-            <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height"/>
+            <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height" />
           </div>
         </v-card>
       </v-col>
@@ -91,7 +121,7 @@ export default {
       return xs || sm
     },
     isRoot (){
-      return this.$route.path === '/books/'
+      return this.$route.path === '/scraps/'
     }
   },
   mounted () {

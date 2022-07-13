@@ -3,17 +3,8 @@
     <!-- mobileの時はlistにoverflow指定しないようにしてwindowのスクロールに任せる -->
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
-        <note-list ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" />
+        <others-list ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" />
       </v-list>
-      <div style="position: fixed; bottom: 100px; right: 16px;">
-        <v-btn
-          elevation="2"
-          fab
-          color="secondary"
-        >
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-      </div>
     </div>
     <v-card v-else>
       <div style="padding: 16px;">
@@ -21,7 +12,7 @@
       </div>
     </v-card>
   </div>
-  <v-container v-else class="ma-0 pa-0 fill-height" fluid>
+  <v-container v-else class="ma-0 pa-0 fill-height" fluid style="position: relative;">
     <v-row class="ma-0 pa-0 fill-height" no-gutters>
       <v-col
         xs="12"
@@ -34,18 +25,8 @@
       >
         <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
-          <note-list ref="listDesktop" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged" />
+          <others-list ref="listDesktop" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged" />
         </v-list>
-        <div style="position: absolute; bottom: 32px; right: 32px;">
-          <v-btn
-            elevation="2"
-            fab
-            small
-            color="secondary"
-          >
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
-        </div>
       </v-col>
       <v-col
         xs="12"
@@ -121,7 +102,7 @@ export default {
       return xs || sm
     },
     isRoot (){
-      return this.$route.path === '/notes/'
+      return this.$route.path === '/etc/'
     }
   },
   mounted () {
@@ -132,23 +113,8 @@ export default {
     resize () {
       this.cardHeight = window.innerHeight - 48
     },
-    naviChanged (value) {
-      this.$store.commit('CHANGE_TITLE', value)
-      this.$store.commit('CHANGE_IS_SHOW_SEARCH', value === 'Books' || value === 'Notes' || value === 'Scraps')
-      this.$store.commit('CHANGE_IS_SHOW_ADD', value === 'Books' || value === 'Notes' || value === 'Scraps')
-    },
     add () {
-      switch (this.navi) {
-      case 'Books':
-        this.$router.push({ path: '/books/'})
-        break;
-      case 'Notes':
-        this.$router.push({ path: '/notes/'})
-        break;
-      case 'Scraps':
-        this.$router.push({ path: '/scraps/'})
-        break;
-      }
+      this.$router.push({ path: '/books/new'})
     },
     search () {
       if (this.isMobile) {
@@ -158,11 +124,6 @@ export default {
       }
     },
     save () {
-      if (this.isMobile) {
-        this.$refs.contentMobile.save()
-      } else {
-        this.$refs.contentDesktop.save()
-      }
     },
     del () {
       console.log('del')
