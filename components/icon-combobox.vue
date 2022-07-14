@@ -8,7 +8,7 @@
           icon
           v-on="on"
         >
-          <v-icon>{{ items.find(v => v.value == value).icon  }}</v-icon>
+          <v-icon>{{ items.find(v => v.value == value).icon }}</v-icon>
         </v-btn>
       </template>
       <v-list>
@@ -27,8 +27,10 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+
+export default Vue.extend({
   props: {
     items: Array,
     value: Number
@@ -38,5 +40,5 @@ export default {
       this.$emit('input', newValue)
     }
   }
-}
+})
 </script>

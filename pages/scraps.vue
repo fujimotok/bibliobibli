@@ -67,9 +67,10 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 
-export default {
+export default Vue.extend({
   name: 'IndexPage',
   beforeRouteUpdate(to, from, next) {
     console.log(from)
@@ -148,5 +149,5 @@ export default {
       console.log('del')
     }
   }
-}
+})
 </script>

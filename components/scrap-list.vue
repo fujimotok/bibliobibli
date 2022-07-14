@@ -13,8 +13,10 @@
   </v-list-item-group>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+
+export default Vue.extend({
   props: {
     value: Number
   },
@@ -59,5 +61,5 @@ export default {
       this.$router.push({ path: link })
     }
   }
-}
+})
 </script>

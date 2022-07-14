@@ -44,10 +44,11 @@
   </v-list>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 import { db } from '../../js/db'
 
-export default {
+export default Vue.extend({
   name: 'TagsPage',
   layout: 'tags',
   data () {
@@ -131,5 +132,5 @@ export default {
       this.dialog = false
     }
   }
-}
+})
 </script>

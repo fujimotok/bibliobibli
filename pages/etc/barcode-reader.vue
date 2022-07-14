@@ -33,9 +33,11 @@
   </v-list>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 import Quagga from 'quagga'
-export default {
+
+export default Vue.extend({
   name: 'BarcodeReader',
   data: () => ({
     items: [],
@@ -120,5 +122,5 @@ export default {
       this.$router.push({ path: '/add-item', query: { isbn: this.code } })
     }
   }
-}
+})
 </script>

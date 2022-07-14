@@ -3,13 +3,14 @@
     <!-- mobileの時はlistにoverflow指定しないようにしてwindowのスクロールに任せる -->
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
-        <note-list ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" />
+        <note-list ref="listMobile" class="ma-0 pa-0 fill-height" />
       </v-list>
       <div style="position: fixed; bottom: 100px; right: 16px;">
         <v-btn
           elevation="2"
           fab
           color="secondary"
+          @click="add"
         >
           <v-icon>mdi-plus</v-icon>
         </v-btn>
@@ -34,7 +35,7 @@
       >
         <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
-          <note-list ref="listDesktop" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged" />
+          <note-list ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
         <div style="position: absolute; bottom: 32px; right: 32px;">
           <v-btn
@@ -67,52 +68,14 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 
-export default {
+export default Vue.extend({
   name: 'IndexPage',
-  beforeRouteUpdate(to, from, next) {
-    console.log(from)
-
-    this.$store.commit('CHANGE_IS_SHOW_BACK', to.path !== '/')
-
-    switch (this.navi) {
-      case 'Books':
-      case 'Notes':
-      case 'Scraps':
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', true)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', true)
-        break;
-      default:
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', false)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', false)
-    }
-
-    if (this.isMobile)
-    {
-      if (to.path === '/')
-      {
-        // hide right menu
-        this.$store.commit('CHANGE_IS_SHOW_SAVE', false)
-        this.$store.commit('CHANGE_IS_SHOW_DEL', false)
-
-      }
-      else
-      {
-        // hide left menu
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', false)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', false)
-      }
-    }
-    next()
-  },
-  layout: 'default',
   data: () => ({
     navi: 'activity',
     cardHeight: 0
-  }),
-  head: () => ({
-    title: 'index'
   }),
   computed: {
     isMobile (){
@@ -125,30 +88,10 @@ export default {
     }
   },
   mounted () {
-    window.addEventListener('resize', this.resize)
-    this.resize()
   },
   methods: {
-    resize () {
-      this.cardHeight = window.innerHeight - 48
-    },
-    naviChanged (value) {
-      this.$store.commit('CHANGE_TITLE', value)
-      this.$store.commit('CHANGE_IS_SHOW_SEARCH', value === 'Books' || value === 'Notes' || value === 'Scraps')
-      this.$store.commit('CHANGE_IS_SHOW_ADD', value === 'Books' || value === 'Notes' || value === 'Scraps')
-    },
     add () {
-      switch (this.navi) {
-      case 'Books':
-        this.$router.push({ path: '/books/'})
-        break;
-      case 'Notes':
-        this.$router.push({ path: '/notes/'})
-        break;
-      case 'Scraps':
-        this.$router.push({ path: '/scraps/'})
-        break;
-      }
+      this.$router.push({ path: '/notes/new'})
     },
     search () {
       if (this.isMobile) {
@@ -163,10 +106,7 @@ export default {
       } else {
         this.$refs.contentDesktop.save()
       }
-    },
-    del () {
-      console.log('del')
     }
   }
-}
+})
 </script>

@@ -14,11 +14,12 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 import IDBExportImport from 'indexeddb-export-import'
 import { db } from '../../js/db/implements/dexie/BIBLIoBIBLIDatabase'
 
-export default {
+export default Vue.extend({
   name: 'SettingsPage',
   data () {
     return {
@@ -96,5 +97,5 @@ export default {
       })
     }
   }
-}
+})
 </script>
