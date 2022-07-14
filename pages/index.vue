@@ -1,6 +1,6 @@
 <template>
   <div v-if="isMobile"> 
-    <activity-list v-if="isRoot" ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged" />
+    <list-activity v-if="isRoot" ref="listMobile" class="ma-0 pa-0 fill-height" />
     <v-card v-else>
       <div style="padding: 16px;">
         <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height" />
@@ -17,7 +17,7 @@
         lx="4"
         class="ma-0 pa-0 fill-height"
       >
-        <activity-list ref="listDesktop" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged" />
+        <list-activity ref="listDesktop" class="ma-0 pa-0 fill-height" />
       </v-col>
       <v-col
         xs="12"

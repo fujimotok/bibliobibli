@@ -3,7 +3,7 @@
     <!-- mobileの時はlistにoverflow指定しないようにしてwindowのスクロールに任せる -->
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
-        <note-list ref="listMobile" class="ma-0 pa-0 fill-height" />
+        <list-note ref="listMobile" class="ma-0 pa-0 fill-height" />
       </v-list>
       <div style="position: fixed; bottom: 100px; right: 16px;">
         <v-btn
@@ -35,7 +35,7 @@
       >
         <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
-          <note-list ref="listDesktop" class="ma-0 pa-0 fill-height" />
+          <list-note ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
         <div style="position: absolute; bottom: 32px; right: 32px;">
           <v-btn

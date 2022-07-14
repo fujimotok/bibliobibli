@@ -3,7 +3,7 @@
     <!-- mobileの時はlistにoverflow指定しないようにしてwindowのスクロールに任せる -->
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
-        <others-list ref="listMobile" v-model="navi" class="ma-0 pa-0 fill-height" />
+        <list-etc ref="listMobile" class="ma-0 pa-0 fill-height" />
       </v-list>
     </div>
     <v-card v-else>
@@ -25,7 +25,7 @@
       >
         <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
-          <others-list ref="listDesktop" v-model="navi" class="ma-0 pa-0 fill-height" @input="naviChanged" />
+          <list-etc ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
       </v-col>
       <v-col

@@ -40,7 +40,7 @@
     <v-main>
       <Nuxt ref="page" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
     </v-main>
-    <bottom-navi v-model="selectedNaviItem" app @change="onNaviChanged" />
+    <navi-bottom v-model="selectedNaviItem" app @change="onNaviChanged" />
   </v-app>
   <v-app v-else ref="app">
     <v-app-bar
@@ -99,7 +99,7 @@
       hide-overlay
       app
     >
-      <left-navi v-model="selectedNaviItem" @change="onNaviChanged" />
+      <navi-left v-model="selectedNaviItem" @change="onNaviChanged" />
     </v-navigation-drawer>
     <v-main>
       <Nuxt ref="page" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
