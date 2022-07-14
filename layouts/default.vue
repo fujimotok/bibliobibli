@@ -40,7 +40,7 @@
     <v-main>
       <Nuxt ref="page" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
     </v-main>
-    <bottom-navi v-model="selectedNaviItem" app />
+    <bottom-navi v-model="selectedNaviItem" app @change="onNaviChanged" />
   </v-app>
   <v-app v-else ref="app">
     <v-app-bar
@@ -99,7 +99,7 @@
       hide-overlay
       app
     >
-      <left-navi v-model="selectedNaviItem" />
+      <left-navi v-model="selectedNaviItem" @change="onNaviChanged" />
     </v-navigation-drawer>
     <v-main>
       <Nuxt ref="page" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
@@ -115,7 +115,7 @@ export default Vue.extend({
   data () {
     return {
       cachePageList: ['IndexPage'],
-      innerSelectedNaviItem: "Activity"
+      selectedNaviItem: "Activity"
     }
   },
   computed: {
@@ -123,36 +123,6 @@ export default Vue.extend({
       const xs = this.$vuetify.breakpoint.xs
       const sm = this.$vuetify.breakpoint.sm
       return xs || sm
-    },
-    selectedNaviItem: {
-      get () {
-        const self:any = this
-        return self.innerSelectedNaviItem
-      },
-      set (value) {
-        const self:any = this
-        if (self.innerSelectedNaviItem !== value)
-        {
-          self.innerSelectedNaviItem = value
-        }
-        switch (value) {
-          case "Activity":
-            this.$router.push("/")
-            break;
-          case "Books":
-            this.$router.push("/books/")
-            break;
-          case "Notes":
-            this.$router.push("/notes/")
-            break;
-          case "Scraps":
-            this.$router.push("/scraps/")
-            break;
-          case "Etc":
-            this.$router.push("/etc/")
-            break;
-        }
-      }
     },
     isRoot (){
       return this.$route.path === '/' || this.$route.path === '/books/' || this.$route.path === '/notes/' || this.$route.path === '/scraps/' || this.$route.path === '/etc/'
@@ -188,23 +158,23 @@ export default Vue.extend({
   },
   mounted () {
     const self:any = this
-      switch(self.$route.path.split('/')[1])
-      {
-        case 'books':
-          self.selectedNaviItem = "Books"
-          break
-        case 'notes':
-          self.selectedNaviItem = "Notes"
-          break
-        case 'scraps':
-          self.selectedNaviItem = "Scrapss"
-          break
-        case 'etc':
-          self.selectedNaviItem = "Etc"
-          break
-        default:
-          self.selectedNaviItem = "Activity"
-      }
+    switch(self.$route.path.split('/')[1])
+    {
+      case 'books':
+        self.selectedNaviItem = "Books"
+        break
+      case 'notes':
+        self.selectedNaviItem = "Notes"
+        break
+      case 'scraps':
+        self.selectedNaviItem = "Scrapss"
+        break
+      case 'etc':
+        self.selectedNaviItem = "Etc"
+        break
+      default:
+        self.selectedNaviItem = "Activity"
+    }
   },
   methods: {
     search () {
@@ -215,6 +185,25 @@ export default Vue.extend({
       const self:any = this
       self.$refs.page.$children[0].menu()
     },
+    onNaviChanged (value: string)  {
+      switch (value) {
+        case "Activity":
+          this.$router.push("/")
+          break;
+        case "Books":
+          this.$router.push("/books/")
+          break;
+        case "Notes":
+          this.$router.push("/notes/")
+          break;
+        case "Scraps":
+          this.$router.push("/scraps/")
+          break;
+        case "Etc":
+          this.$router.push("/etc/")
+          break;
+      }
+    }
   }
 })
 </script>

@@ -51,7 +51,7 @@ export default Vue.extend({
       set (value) {
         const self:any = this
         self.$props.value = value
-        self.$emit('input', value)
+        self.$emit('change', value)
       }
     }
   },
