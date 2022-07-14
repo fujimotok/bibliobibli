@@ -34,7 +34,7 @@
       >
         <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
-          <blist-ook ref="listDesktop" class="ma-0 pa-0 fill-height" />
+          <list-book ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
         <div style="position: absolute; bottom: 32px; right: 32px;">
           <v-btn
