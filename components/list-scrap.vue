@@ -16,30 +16,30 @@
 <script lang="ts">
 import Vue from 'vue'
 
+export type DataType = {
+  items: object[]
+}
+
 export default Vue.extend({
   props: {
-    value: Number
+    value: { type: Number, default: 0 }
   },
-  data () {
+  data (): DataType {
     return {
-      listHeight: 0,
       items: []
     }
   },
   computed: {
     internalValue: {
-      get () {
+      get (): number {
         return this.value
       },
-      set (value) {
+      set (value): void {
         this.$emit('input', value)
       }
     }
   },
   mounted () {
-    window.addEventListener('resize', this.resize)
-    this.resize()
-
     this.items = [
       { id: 0, link: '/scraps/0' },
       { id: 1, link: '/scraps/1' },
@@ -54,10 +54,7 @@ export default Vue.extend({
     ]
   },
   methods: {
-    resize () {
-      this.listHeight = window.innerHeight - (48 + 2)
-    },
-    show (link) {
+    show (link: string) {
       this.$router.push({ path: link })
     }
   }

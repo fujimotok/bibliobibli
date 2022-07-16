@@ -36,7 +36,7 @@ export default Vue.extend({
     value: Number
   },
   methods: {
-    updateValue (newValue) {
+    updateValue (newValue: number) {
       this.$emit('input', newValue)
     }
   }

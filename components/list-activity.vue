@@ -16,11 +16,15 @@
 <script lang="ts">
 import Vue from 'vue'
 
+export type DataType = {
+  items: object[]
+}
+
 export default Vue.extend({
   props: {
-    value: Number
+    value: { type: Number, default: 0 }
   },
-  data () {
+  data (): DataType {
     return {
       items: []
     }
@@ -45,7 +49,7 @@ export default Vue.extend({
     ]
   },
   methods: {
-    show (link) {
+    show (link: string) {
       this.$router.push({ path: link })
     }
   }

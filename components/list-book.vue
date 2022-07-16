@@ -42,22 +42,30 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { TagRepository } from '../js/db/interfaces/TagRepository'
+import { TagRepository, Tag } from '../js/db/interfaces/TagRepository'
 import { Status, BookRepository } from '~/js/db/interfaces/BookRepository'
+
+export type DataType = {
+  items: object[]
+  tagItems: Tag[]
+  searchWord: string
+  searchTags: Tag[]
+  isLoading: boolean
+  status: object
+}
 
 export default Vue.extend({
   props: {
-    value: Number
+    value: { type: Number, default: 0 }
   },
-  data () {
+  data (): DataType {
     return {
-      listHeight: 0,
       items: [],
       tagItems: [],
       searchWord: '',
       searchTags: [],
-      status: Status,
-      isLoading: false
+      isLoading: false,
+      status: Status
     }
   },
   computed: {
@@ -71,44 +79,40 @@ export default Vue.extend({
     }
   },
   async mounted () {
-    window.addEventListener('resize', this.resize)
-    this.resize()
-
     const tagRepo: TagRepository = this.$tagRepository
-    const tags = await tagRepo.find('')
-    this.tagItems = tags[0]
-
+    const tags = await tagRepo.find('', 0, 30)
+    if (tags !== undefined) {
+      this.tagItems = tags[0]
+    }
+    
     this.search()
   },
   methods: {
-    resize () {
-      this.listHeight = window.innerHeight - (48 + 2)
-    },
     show (id: number) {
       this.$router.push({ path: '/books/' + id })
     },
     async search (offset = 0) {
       const bookRepo: BookRepository = this.$bookRepository
       const books = await bookRepo.find(this.searchWord, [0,1,2,3], [], offset, 20)
-      
-      books[0].forEach((book) => {
-        this.items.push({
-          id: book.id,
-          title: book.title,
-          authors: book.authors,
-          status: book.status,
-          tags: book.tags.map((tag) => {
-            const elem = this.tagItems.find((t) => t.id === tag)
-            return elem.name
+      if (books !== undefined) {
+        books[0].forEach((book) => {
+          this.items.push({
+            id: book.id,
+            title: book.title,
+            authors: book.authors,
+            status: book.status,
+            tags: book.tags.map((tag) => {
+              const elem = this.tagItems.find((t) => t.id === tag)
+              return elem?.name
+            })
           })
         })
-      })
+      }
     },
     onIntersect () {
       this.isLoading = true
       this.search(this.items.length)
       this.isLoading = false
-      console.log('onIntersect')
     }
   }
 })

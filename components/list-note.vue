@@ -22,15 +22,18 @@
 import Vue from 'vue'
 import { NoteRepository } from '~/js/db/interfaces/NoteRepository'
 
+export type DataType = {
+  items: object[]
+  isLoading: boolean
+}
+
 export default Vue.extend({
   props: {
-    value: Number
+    value: { type: Number, default: 0 }
   },
-  data () {
+  data (): DataType {
     return {
-      listHeight: 0,
       items: [],
-      searchTags: [],
       isLoading: false
     }
   },
@@ -45,29 +48,24 @@ export default Vue.extend({
     }
   },
   mounted () {
-    window.addEventListener('resize', this.resize)
-    this.resize()
-
     this.search()
   },
   methods: {
-    resize () {
-      this.listHeight = window.innerHeight - (48 + 2)
-    },
     show (id: number) {
       this.$router.push({ path: '/notes/' + id })
     },
     async search (offset = 0) {
       const noteRepo: NoteRepository = this.$noteRepository
       const notes = await noteRepo.find('', offset, 20)
-      
-      notes[0].forEach((note) => {
-        this.items.push({
-          id: note.id,
-          header: note.content.slice(0, note.content.search(/\r\n|\r|\n/)),
-          path: note.path,
+      if (notes !== undefined) {
+        notes[0].forEach((note) => {
+          this.items.push({
+            id: note.id,
+            header: note.content.slice(0, note.content.search(/\r\n|\r|\n/)),
+            path: note.path,
+          })
         })
-      })
+      }
     },
     onIntersect () {
       this.isLoading = true
