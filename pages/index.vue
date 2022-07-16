@@ -39,104 +39,40 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import ListActivity from '~/components/list-activity.vue'
 
 export default Vue.extend({
   name: 'IndexPage',
-  beforeRouteUpdate(to, from, next) {
-    console.log(from)
-
-    this.$store.commit('CHANGE_IS_SHOW_BACK', to.path !== '/')
-
-    switch (this.navi) {
-      case 'Books':
-      case 'Notes':
-      case 'Scraps':
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', true)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', true)
-        break;
-      default:
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', false)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', false)
-    }
-
-    if (this.isMobile)
-    {
-      if (to.path === '/')
-      {
-        // hide right menu
-        this.$store.commit('CHANGE_IS_SHOW_SAVE', false)
-        this.$store.commit('CHANGE_IS_SHOW_DEL', false)
-
-      }
-      else
-      {
-        // hide left menu
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', false)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', false)
-      }
-    }
-    next()
-  },
-  layout: 'default',
   data: () => ({
-    navi: 'activity',
-    cardHeight: 0
-  }),
-  head: () => ({
-    title: 'index'
   }),
   computed: {
-    isMobile (){
+    isMobile (): boolean {
       const xs = this.$vuetify.breakpoint.xs
       const sm = this.$vuetify.breakpoint.sm
       return xs || sm
     },
-    isRoot (){
+    isRoot (): boolean {
       return this.$route.path === '/'
     }
   },
   mounted () {
-    window.addEventListener('resize', this.resize)
-    this.resize()
   },
   methods: {
-    resize () {
-      this.cardHeight = window.innerHeight - 48
+    add (): void {
+      this.$router.push({ path: '/books/new'})
     },
-    naviChanged (value) {
-      this.$store.commit('CHANGE_TITLE', value)
-      this.$store.commit('CHANGE_IS_SHOW_SEARCH', value === 'Books' || value === 'Notes' || value === 'Scraps')
-      this.$store.commit('CHANGE_IS_SHOW_ADD', value === 'Books' || value === 'Notes' || value === 'Scraps')
-    },
-    add () {
-      switch (this.navi) {
-      case 'Books':
-        this.$router.push({ path: '/books/'})
-        break;
-      case 'Notes':
-        this.$router.push({ path: '/notes/'})
-        break;
-      case 'Scraps':
-        this.$router.push({ path: '/scraps/'})
-        break;
-      }
-    },
-    search () {
+    search (): void {
       if (this.isMobile) {
-        this.$refs.listMobile.search()
+        const list = this.$refs.listMobile as InstanceType<typeof ListActivity>
+        list.search()
       } else {
-        this.$refs.listDesktop.search()
+        const list = this.$refs.listDesktop  as InstanceType<typeof ListActivity>
+        list.search()
       }
     },
-    save () {
-      if (this.isMobile) {
-        this.$refs.contentMobile.save()
-      } else {
-        this.$refs.contentDesktop.save()
-      }
+    save (): void {
     },
     del () {
-      console.log('del')
     }
   }
 })

@@ -1,6 +1,5 @@
 <template>
   <div v-if="isMobile">
-    <!-- mobileの時はlistにoverflow指定しないようにしてwindowのスクロールに任せる -->
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
         <list-note ref="listMobile" class="ma-0 pa-0 fill-height" />
@@ -33,7 +32,6 @@
         class="ma-0 pa-0 fill-height"
         style="position: relative;"
       >
-        <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
           <list-note ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
@@ -57,7 +55,6 @@
         class="ma-0 pa-0 fill-height"
         style="position: relative;"
       >
-        <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-card class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
           <div style="padding: 16px;">
             <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height" />
@@ -70,42 +67,38 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import ListNote from '~/components/list-note.vue'
 
 export default Vue.extend({
-  name: 'IndexPage',
+  name: 'NotesPage',
   data: () => ({
-    navi: 'activity',
-    cardHeight: 0
   }),
   computed: {
-    isMobile (){
+    isMobile (): boolean {
       const xs = this.$vuetify.breakpoint.xs
       const sm = this.$vuetify.breakpoint.sm
       return xs || sm
     },
-    isRoot (){
+    isRoot (): boolean {
       return this.$route.path === '/notes/'
     }
   },
   mounted () {
   },
   methods: {
-    add () {
+    add (): void {
       this.$router.push({ path: '/notes/new'})
     },
-    search () {
+    search (): void {
       if (this.isMobile) {
-        this.$refs.listMobile.search()
+        const list = this.$refs.listMobile as InstanceType<typeof ListNote>
+        list.search()
       } else {
-        this.$refs.listDesktop.search()
+        const list = this.$refs.listDesktop  as InstanceType<typeof ListNote>
+        list.search()
       }
     },
-    save () {
-      if (this.isMobile) {
-        this.$refs.contentMobile.save()
-      } else {
-        this.$refs.contentDesktop.save()
-      }
+    save (): void {
     }
   }
 })

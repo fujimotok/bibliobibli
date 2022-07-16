@@ -1,6 +1,5 @@
 <template>
   <div v-if="isMobile">
-    <!-- mobileの時はlistにoverflow指定しないようにしてwindowのスクロールに任せる -->
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
         <list-book ref="listMobile" class="ma-0 pa-0 fill-height" />
@@ -32,7 +31,6 @@
         class="ma-0 pa-0 fill-height"
         style="position: relative;"
       >
-        <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
           <list-book ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
@@ -56,7 +54,6 @@
         class="ma-0 pa-0 fill-height"
         style="position: relative;"
       >
-        <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-card class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
           <div style="padding: 16px;">
             <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height" />
@@ -69,84 +66,40 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import ListBook from '~/components/list-book.vue'
 
 export default Vue.extend({
-  name: 'IndexPage',
-  beforeRouteUpdate(to, from, next) {
-    console.log(from)
-
-    this.$store.commit('CHANGE_IS_SHOW_BACK', to.path !== '/')
-
-    switch (this.navi) {
-      case 'Books':
-      case 'Notes':
-      case 'Scraps':
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', true)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', true)
-        break;
-      default:
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', false)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', false)
-    }
-
-    if (this.isMobile)
-    {
-      if (to.path === '/')
-      {
-        // hide right menu
-        this.$store.commit('CHANGE_IS_SHOW_SAVE', false)
-        this.$store.commit('CHANGE_IS_SHOW_DEL', false)
-
-      }
-      else
-      {
-        // hide left menu
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', false)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', false)
-      }
-    }
-    next()
-  },
-  layout: 'default',
+  name: 'BooksPage',
   data: () => ({
-    navi: 'activity',
-    cardHeight: 0
-  }),
-  head: () => ({
-    title: 'index'
   }),
   computed: {
-    isMobile (){
+    isMobile (): boolean {
       const xs = this.$vuetify.breakpoint.xs
       const sm = this.$vuetify.breakpoint.sm
       return xs || sm
     },
-    isRoot (){
+    isRoot (): boolean {
       return this.$route.path === '/books/'
     }
   },
   mounted () {
-    window.addEventListener('resize', this.resize)
-    this.resize()
   },
   methods: {
-    resize () {
-      this.cardHeight = window.innerHeight - 48
-    },
-    add () {
+    add (): void {
       this.$router.push({ path: '/books/new'})
     },
-    search () {
+    search (): void {
       if (this.isMobile) {
-        this.$refs.listMobile.search()
+        const list = this.$refs.listMobile as InstanceType<typeof ListBook>
+        list.search()
       } else {
-        this.$refs.listDesktop.search()
+        const list = this.$refs.listDesktop  as InstanceType<typeof ListBook>
+        list.search()
       }
     },
-    save () {
+    save (): void {
     },
-    del () {
-      console.log('del')
+    del (): void {
     }
   }
 })

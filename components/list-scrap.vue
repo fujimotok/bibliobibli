@@ -56,6 +56,8 @@ export default Vue.extend({
   methods: {
     show (link: string) {
       this.$router.push({ path: link })
+    },
+    search(){
     }
   }
 })

@@ -1,6 +1,5 @@
 <template>
   <div v-if="isMobile">
-    <!-- mobileの時はlistにoverflow指定しないようにしてwindowのスクロールに任せる -->
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
         <list-scrap ref="listMobile" class="ma-0 pa-0 fill-height" />
@@ -32,7 +31,6 @@
         class="ma-0 pa-0 fill-height"
         style="position: relative;"
       >
-        <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
           <list-scrap ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
@@ -56,7 +54,6 @@
         class="ma-0 pa-0 fill-height"
         style="position: relative;"
       >
-        <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-card class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
           <div style="padding: 16px;">
             <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height" />
@@ -69,6 +66,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import ListScrap from '~/components/list-scrap.vue'
 
 export default Vue.extend({
   name: 'IndexPage',
@@ -116,37 +114,34 @@ export default Vue.extend({
     title: 'index'
   }),
   computed: {
-    isMobile (){
+    isMobile (): boolean {
       const xs = this.$vuetify.breakpoint.xs
       const sm = this.$vuetify.breakpoint.sm
       return xs || sm
     },
-    isRoot (){
+    isRoot (): boolean {
       return this.$route.path === '/scraps/'
     }
   },
   mounted () {
-    window.addEventListener('resize', this.resize)
-    this.resize()
   },
   methods: {
-    resize () {
-      this.cardHeight = window.innerHeight - 48
-    },
-    add () {
+    add (): void {
       this.$router.push({ path: '/scraps/new'})
     },
-    search () {
-      if (this.isMobile) {
-        this.$refs.listMobile.search()
+    search (): void  {
+      const self = this
+      if (self.isMobile) {
+        const list = self.$refs.listMobile as InstanceType<typeof ListScrap>
+        list.search()
       } else {
-        this.$refs.listDesktop.search()
+        const list = self.$refs.listDesktop as InstanceType<typeof ListScrap>
+        list.search()
       }
     },
-    save () {
+    save (): void  {
     },
-    del () {
-      console.log('del')
+    del (): void  {
     }
   }
 })

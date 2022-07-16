@@ -52,83 +52,22 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-  name: 'IndexPage',
-  beforeRouteUpdate(to, from, next) {
-    console.log(from)
-
-    this.$store.commit('CHANGE_IS_SHOW_BACK', to.path !== '/')
-
-    switch (this.navi) {
-      case 'Books':
-      case 'Notes':
-      case 'Scraps':
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', true)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', true)
-        break;
-      default:
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', false)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', false)
-    }
-
-    if (this.isMobile)
-    {
-      if (to.path === '/')
-      {
-        // hide right menu
-        this.$store.commit('CHANGE_IS_SHOW_SAVE', false)
-        this.$store.commit('CHANGE_IS_SHOW_DEL', false)
-
-      }
-      else
-      {
-        // hide left menu
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', false)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', false)
-      }
-    }
-    next()
-  },
-  layout: 'default',
+  name: 'EtcPage',
   data: () => ({
-    navi: 'activity',
-    cardHeight: 0
-  }),
-  head: () => ({
-    title: 'index'
   }),
   computed: {
-    isMobile (){
+    isMobile (): boolean {
       const xs = this.$vuetify.breakpoint.xs
       const sm = this.$vuetify.breakpoint.sm
       return xs || sm
     },
-    isRoot (){
+    isRoot (): boolean {
       return this.$route.path === '/etc/'
     }
   },
   mounted () {
-    window.addEventListener('resize', this.resize)
-    this.resize()
   },
   methods: {
-    resize () {
-      this.cardHeight = window.innerHeight - 48
-    },
-    add () {
-      this.$router.push({ path: '/books/new'})
-    },
-    search () {
-      if (this.isMobile) {
-        this.$refs.listMobile.search()
-      } else {
-        this.$refs.listDesktop.search()
-      }
-    },
-    save () {
-    },
-    del () {
-      console.log('del')
-    }
   }
 })
 </script>
