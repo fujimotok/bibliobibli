@@ -1,15 +1,17 @@
 <template>
   <div>
     <v-text-field v-model="note.path" label="path" />
+    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" />
     <vue-simplemde ref="markdownEditor" v-model="note.content" :configs="config" />
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+  import Vue from 'vue'
 import { NoteRepository, Note } from '../../js/db/interfaces/NoteRepository'
 
 export type DataType = {
+  file: object
   config: object
   note: Note
 }
@@ -18,6 +20,7 @@ export default Vue.extend({
   name: 'NotesIndexPage',
   data(): DataType {
     return {
+      file: {},
       config: {
         spellChecker: false,
         forceSync: true,
@@ -38,21 +41,27 @@ export default Vue.extend({
           {
             name: 'image',
             action: (editor: any) => {
-              const self = this
-              this.$refs.fileInput.$refs.input.addEventListener('change', function onChange () {
-                self.$refs.fileInput.$refs.input.removeEventListener('change', onChange)
-                const fileReader = new FileReader()
-                fileReader.onload = function () {
-                  const dataURI = this.result
-                  const cm = editor.codemirror
-                  const pos = cm.getCursor('start')
-                  cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
+              const self = this as any
+              const file = this.$refs.fileInput as Vue
+              if (file) {
+                const input = file.$refs.input as HTMLElement
+                if (input) {
+                  input.addEventListener('change', function onChange () {
+                    input.removeEventListener('change', onChange)
+                    const fileReader = new FileReader()
+                    fileReader.onload = function () {
+                      const dataURI = this.result
+                      const cm = editor.codemirror
+                      const pos = cm.getCursor('start')
+                      cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
+                    }
+                    if (self.file) {
+                      fileReader.readAsDataURL(self.file)
+                    }
+                  })
+                  input.click()
                 }
-                if (self.file) {
-                  fileReader.readAsDataURL(self.file)
-                }
-              })
-              this.$refs.fileInput.$refs.input.click()
+              }
             },
             className: 'fa fa-image',
             title: 'image'

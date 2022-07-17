@@ -39,20 +39,27 @@ export default Vue.extend({
           {
             name: 'image',
             action: (editor: any) => {
-              this.$refs.fileInput.$refs.input.addEventListener('change', function onChange () {
-                this.$refs.fileInput.$refs.input.removeEventListener('change', onChange)
-                const fileReader = new FileReader()
-                fileReader.onload = function () {
-                  const dataURI = this.result
-                  const cm = editor.codemirror
-                  const pos = cm.getCursor('start')
-                  cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
+              const self = this as any
+              const file = this.$refs.fileInput as Vue
+              if (file) {
+                const input = file.$refs.input as HTMLElement
+                if (input) {
+                  input.addEventListener('change', function onChange () {
+                    input.removeEventListener('change', onChange)
+                    const fileReader = new FileReader()
+                    fileReader.onload = function () {
+                      const dataURI = this.result
+                      const cm = editor.codemirror
+                      const pos = cm.getCursor('start')
+                      cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
+                    }
+                    if (self.file) {
+                      fileReader.readAsDataURL(self.file)
+                    }
+                  })
+                  input.click()
                 }
-                if (self.file) {
-                  fileReader.readAsDataURL(self.file)
-                }
-              })
-              this.$refs.fileInput.$refs.input.click()
+              }
             },
             className: 'fa fa-image',
             title: 'image'
