@@ -20,6 +20,9 @@
       ],
       "@/*": [
         "./*"
+      ],
+      "indexeddb-export-import": [
+        "./types/indexeddb-export-import"
       ]
     },
     "types": [
