@@ -4,7 +4,7 @@
       <template v-for="(tag, index) in tags">
         <v-list-item :key="index">
           <v-list-item-content>
-            <v-list-item-title v-text="tag.tag" />
+            <v-list-item-title v-text="tag.name" />
           </v-list-item-content>
           <v-list-item-action>
             <div>
@@ -20,6 +20,16 @@
         <v-divider :key="`${index}-divider`" />
       </template>
     </v-list-item-group>
+    <div style="position: fixed; bottom: 16px; right: 16px;">
+      <v-btn
+        elevation="2"
+        fab
+        color="secondary"
+        @click="add"
+      >
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
+    </div>
     <v-dialog v-model="dialog" max-width="400">
       <v-card class="pa-4">
         <v-card-title>
@@ -107,6 +117,7 @@ export default Vue.extend({
       const tagRepo: TagRepository = this.$tagRepository
       if (this.selectedTag) {
         if (this.selectedTag.id) {
+          this.selectedTag.name = this.editTag
           await tagRepo.store(this.selectedTag)
           this.load()
         }
