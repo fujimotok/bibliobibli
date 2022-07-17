@@ -6,12 +6,14 @@ import { ScrapRepository } from '../js/db/interfaces/ScrapRepository'
 import { TagRepository } from '../js/db/interfaces/TagRepository'
 import { DiaryRepository } from '../js/db/interfaces/DiaryRepository'
 import { TodoRepository } from '../js/db/interfaces/TodoRepository'
+import { ExportImport } from '../js/db/interfaces/ExportImport'
 import { BookRepositoryDexie } from '../js/db/implements/dexie/BookRepositoryDexie'
 import { NoteRepositoryDexie } from '../js/db/implements/dexie/NoteRepositoryDexie'
 import { ScrapRepositoryDexie } from '../js/db/implements/dexie/ScrapRepositoryDexie'
 import { TagRepositoryDexie } from '../js/db/implements/dexie/TagRepositoryDexie'
 import { DiaryRepositoryDexie } from '../js/db/implements/dexie/DiaryRepositoryDexie'
 import { TodoRepositoryDexie } from '../js/db/implements/dexie/TodoRepositoryDexie'
+import { ExportImportDexie } from '../js/db/implements/dexie/ExportImportDexie'
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -21,6 +23,7 @@ declare module 'vue/types/vue' {
     $tagRepository: TagRepository;
     $diaryRepository: DiaryRepository;
     $todoRepository: TodoRepository;
+    $exportImport: ExportImport;
   }
 }
 
@@ -30,3 +33,4 @@ Vue.prototype.$scrapRepository = new ScrapRepositoryDexie
 Vue.prototype.$tagRepository = new TagRepositoryDexie
 Vue.prototype.$diaryRepository = new DiaryRepositoryDexie
 Vue.prototype.$todoRepository = new TodoRepositoryDexie
+Vue.prototype.$exportImport = new ExportImportDexie

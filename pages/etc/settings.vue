@@ -15,9 +15,8 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import IDBExportImport from 'indexeddb-export-import'
-import { db } from '../../js/db/implements/dexie/BIBLIoBIBLIDatabase'
+  import Vue from 'vue'
+import { ExportImport } from '../../js/db/interfaces/ExportImport'
 
 export default Vue.extend({
   name: 'SettingsPage',
@@ -30,64 +29,56 @@ export default Vue.extend({
     title: 'Settings'
   }),
   methods: {
-    dataImport () {
-      if (window.File && this.file) {
-        this.readFileAsync(this.file)
-          .then((result) => {
-            db.open().then(() => {
-              const idbDatabase = db.backendDB() // get native IDBDatabase object from Dexie wrapper
-
-              // export to JSON, clear database, and import from JSON
-              IDBExportImport.clearDatabase(idbDatabase, (err: any) => {
-                if (!err) { // cleared data successfully
-                  IDBExportImport.importFromJsonString(idbDatabase, result, (err: any) => {
-                    if (!err) {
-                      alert('インポート完了')
-                      sessionStorage.setItem('DBChangeEvent', 'import')
-                      this.$router.push('/')
-                    } else {
-                      alert('インポートに失敗しました')
-                    }
-                  })
-                }
-              })
-            })
-          })
-          .catch((e) => {
-            alert(`エラー:${e}`)
-          })
-      } else {
+    async dataImport () {
+      if (!window.File) {
         alert('お使いのブラウザは対応しておりません')
+        return
       }
-    },
-    dataExport () {
-      db.open().then(() => {
-        try {
-          const idbDatabase = db.backendDB()
 
-          IDBExportImport.exportToJsonString(idbDatabase, function (err: any, jsonString: string) {
-            if (err) {
-              console.error(err)
-            } else {
-              console.log('Exported as JSON: ' + jsonString)
-
-              const fileName = 'export.json'
-              const data = jsonString
-              const link = document.createElement('a')
-
-              link.href = 'data:application/json,' + encodeURIComponent(data)
-              link.download = fileName
-              link.click()
-            }
-          })
-        } catch (error) {
-          console.error('' + error)
-        }
+      if (!this.file) {
+        return
+      }
+      
+      const ret = await this.readFileAsync(this.file).catch((e) => {
+        alert(`エラー:${e}`)
       })
+
+      const ei: ExportImport = this.$exportImport
+      if (typeof(ret) !== 'string') {
+        return
+      }
+      
+      const isSuccess = await ei.Import(ret)
+      
+      if (!isSuccess) {
+        alert('インポートに失敗しました')
+        return
+      }
+
+      alert('インポート完了')
+      sessionStorage.setItem('DBChangeEvent', 'import')
+      this.$router.push('/')
     },
-    // ファイルデータを非同期で読み込みます。
+    async dataExport () {
+      const ei: ExportImport = this.$exportImport
+      const json = await ei.Export()
+      
+      if (json === '' ) {
+        alert('エクスポートに失敗しました')
+        return
+      }
+
+      const fileName = 'export.json'
+      const data = json
+      const link = document.createElement('a')
+
+      link.href = 'data:application/json,' + encodeURIComponent(data)
+      link.download = fileName
+      link.click()
+    },
     readFileAsync (file: any) {
-      return new Promise((resolve, reject) => {
+      // ファイルデータを非同期で読み込みます。
+      return new Promise<string | ArrayBuffer | null>((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = () => {
           resolve(reader.result)
