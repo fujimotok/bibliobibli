@@ -160,7 +160,7 @@ export default Vue.extend({
           self.selectedNaviItem = "Notes"
           break
         case 'scraps':
-          self.selectedNaviItem = "Scrapss"
+          self.selectedNaviItem = "Scraps"
           break
         case 'etc':
           self.selectedNaviItem = "Etc"
@@ -181,7 +181,7 @@ export default Vue.extend({
         self.selectedNaviItem = "Notes"
         break
       case 'scraps':
-        self.selectedNaviItem = "Scrapss"
+        self.selectedNaviItem = "Scraps"
         break
       case 'etc':
         self.selectedNaviItem = "Etc"

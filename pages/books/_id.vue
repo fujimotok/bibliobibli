@@ -1,9 +1,5 @@
 <template>
   <div>
-    <global-events
-      :filter="(event, handler, eventName) => event.altKey || event.ctrlKey"
-      @keydown.prevent.ctrl.s="save()"
-    />
     <div>
       <div style="display: flex;align-items: center;">
         <icon-combobox v-model="book.status" :items="states" item-value="id" item-text="status" />
@@ -151,7 +147,7 @@ export default Vue.extend({
 
     const bookRepo: BookRepository = this.$bookRepository
     const ret = await bookRepo.findById(Number(this.$route.params.id))
-    if (ret != undefined) {
+    if (ret !== undefined) {
       this.book = ret
     }
   },

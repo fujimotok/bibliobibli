@@ -57,14 +57,11 @@ export default Vue.extend({
   },
   computed: {
     internalValue: {
-      get () {
-        const self:any = this
-        return self.$props.value
+      get (): string {
+        return this.value
       },
-      set (value) {
-        const self:any = this
-        self.$props.value = value
-        self.$emit('change', value)
+      set (value: string) {
+        this.$emit('change', value)
       }
     }
   }

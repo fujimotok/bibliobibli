@@ -1,13 +1,17 @@
 <template>
-  <div v-if="isMobile"> 
-    <list-activity v-if="isRoot" ref="listMobile" class="ma-0 pa-0 fill-height" />
+  <div v-if="isMobile">
+    <div v-if="isRoot">
+      <v-list style="padding-bottom: 80px;">
+        <list-activity ref="listMobile" class="ma-0 pa-0 fill-height" />
+      </v-list>
+    </div>
     <v-card v-else>
       <div style="padding: 16px;">
         <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height" />
       </div>
     </v-card>
   </div>
-  <v-container v-else class="ma-0 pa-0 fill-height" fluid>
+  <v-container v-else class="ma-0 pa-0 fill-height" fluid style="position: relative;">
     <v-row class="ma-0 pa-0 fill-height" no-gutters>
       <v-col
         xs="12"
@@ -16,8 +20,11 @@
         lg="4"
         lx="4"
         class="ma-0 pa-0 fill-height"
+        style="position: relative;"
       >
-        <list-activity ref="listDesktop" class="ma-0 pa-0 fill-height" />
+        <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
+          <list-activity ref="listDesktop" class="ma-0 pa-0 fill-height" />
+        </v-list>
       </v-col>
       <v-col
         xs="12"
@@ -26,8 +33,9 @@
         lg="8"
         lx="8"
         class="ma-0 pa-0 fill-height"
+        style="position: relative;"
       >
-        <v-card class="overflow-y-auto" :height="cardHeight">
+        <v-card class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
           <div style="padding: 16px;">
             <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height" />
           </div>
@@ -39,10 +47,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import listActivity from '~/components/list-activity.vue'
 import ListActivity from '~/components/list-activity.vue'
 
 export default Vue.extend({
   name: 'IndexPage',
+  components: { listActivity },
   data: () => ({
   }),
   computed: {
