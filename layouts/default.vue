@@ -11,6 +11,7 @@
         color="white"
         icon
         small
+        @click.stop="$router.go(-1)"
       >
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
@@ -32,7 +33,7 @@
         icon
         small
         class="mx-2"
-        @click="add()"
+        @click="menu()"
       >
         <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
@@ -40,7 +41,7 @@
     <v-main>
       <Nuxt ref="page" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
     </v-main>
-    <navi-bottom v-model="selectedNaviItem" app @change="onNaviChanged" />
+    <navi-bottom v-show="isRoot" v-model="selectedNaviItem" app @change="onNaviChanged" />
   </v-app>
   <v-app v-else ref="app">
     <v-app-bar
@@ -50,10 +51,10 @@
       dense
       app
     >
-      <v-btn color="white" icon small @click="add()">
+      <v-btn color="white" icon small @click.stop="$router.go(-1)">
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
-      <v-btn color="white" icon small @click="add()">
+      <v-btn color="white" icon small @click.stop="$router.go(1)">
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
       <v-container class="ml-2 pa-0 fill-height" fluid>
@@ -125,7 +126,20 @@ export default Vue.extend({
       return xs || sm
     },
     isRoot (){
-      return this.$route.path === '/' || this.$route.path === '/books/' || this.$route.path === '/notes/' || this.$route.path === '/scraps/' || this.$route.path === '/etc/'
+      switch (this.$route.path) {
+        case '/':
+        case '/books':
+        case '/books/':
+        case '/notes':
+        case '/notes/':
+        case '/scraps':
+        case '/scraps/':
+        case '/etc':
+        case '/etc/':
+          return true
+        default:
+          return false
+      }
     },
     title () {
       return this.$store.state.title
