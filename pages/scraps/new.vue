@@ -1,67 +1,76 @@
 <template>
   <div>
-    <vue-simplemde ref="markdownEditor" v-model="scrap.content" :configs="config"/>
+    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" />
+    <vue-simplemde ref="markdownEditor" v-model="scrap.content" :configs="config" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { ScrapRepository } from '../../js/db/interfaces/ScrapRepository'
+import { ScrapRepository, Scrap } from '../../js/db/interfaces/ScrapRepository'
+
+export type DataType = {
+  config: object
+  scrap: Scrap
+  file: string,
+}
 
 export default Vue.extend({
   name: 'ScrapsIndexPage',
-  data: () => ({
-    config: {
-      spellChecker: false,
-      forceSync: true,
-      indentWithTabs: false,
-      status: false,
-      toolbar: [
-        'bold',
-        'strikethrough',
-        '|',
-        'heading',
-        'unordered-list',
-        'ordered-list',
-        '|',
-        'code',
-        'quote',
-        '|',
-        'link',
-        {
-          name: 'image',
-          action: (editor) => {
-            const self = this
-            this.$refs.fileInput.$refs.input.addEventListener('change', function onChange () {
-              self.$refs.fileInput.$refs.input.removeEventListener('change', onChange)
-              const fileReader = new FileReader()
-              fileReader.onload = function () {
-                const dataURI = this.result
-                const cm = editor.codemirror
-                const pos = cm.getCursor('start')
-                cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
-              }
-              if (self.file) {
-                fileReader.readAsDataURL(self.file)
-              }
-            })
-            this.$refs.fileInput.$refs.input.click()
+  data(): DataType {
+    return {
+      config: {
+        spellChecker: false,
+        forceSync: true,
+        indentWithTabs: false,
+        status: false,
+        toolbar: [
+          'bold',
+          'strikethrough',
+          '|',
+          'heading',
+          'unordered-list',
+          'ordered-list',
+          '|',
+          'code',
+          'quote',
+          '|',
+          'link',
+          {
+            name: 'image',
+            action: (editor: any) => {
+              this.$refs.fileInput.$refs.input.addEventListener('change', function onChange () {
+                this.$refs.fileInput.$refs.input.removeEventListener('change', onChange)
+                const fileReader = new FileReader()
+                fileReader.onload = function () {
+                  const dataURI = this.result
+                  const cm = editor.codemirror
+                  const pos = cm.getCursor('start')
+                  cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
+                }
+                if (self.file) {
+                  fileReader.readAsDataURL(self.file)
+                }
+              })
+              this.$refs.fileInput.$refs.input.click()
+            },
+            className: 'fa fa-image',
+            title: 'image'
           },
-          className: 'fa fa-image',
-          title: 'image'
-        },
-        '|',
-        'preview'
-      ]
-    },
-    scrap: {
-      id: null,
-      createdAt: '',
-      updatedAt: '',
-      content: '',
-      path: '',
+          '|',
+          'preview'
+        ]
+      },
+      scrap: {
+        id: undefined,
+        tags: [],
+        createdAt: '',
+        updatedAt: '',
+        content: '',
+      },
+      file: ''
     }
-  }),
+  },
   beforeMount () {
     this.$store.commit('CHANGE_IS_SHOW_SAVE', true)
     this.$store.commit('CHANGE_IS_SHOW_DEL', false)
@@ -72,9 +81,13 @@ export default Vue.extend({
   },
   methods: {
     resize () {
-      const toolbarHeight = document.querySelector('.editor-toolbar').clientHeight
-      const height = window.visualViewport.height - (48 + 16 * 2 + toolbarHeight)
-      document.querySelector('.CodeMirror').style.height = height + 'px'
+      const toolbarHeight = document.querySelector('.editor-toolbar')?.clientHeight || 0
+      const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
+      const node = document.querySelector('.CodeMirror') as HTMLElement
+      const style = node?.style
+      if (style) {
+        style.height = height + 'px'
+      }
       window.scroll(0, 0)
     },
     save () {

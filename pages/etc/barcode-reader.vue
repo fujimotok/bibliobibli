@@ -37,16 +37,32 @@
 import Vue from 'vue'
 import Quagga from 'quagga'
 
+export type Result = {
+  code: string
+  format: string
+}
+
+export type DataType = {
+  items: Result[]
+  isError: boolean
+  done: boolean
+  code: string
+  format: object
+  config: object
+}
+
 export default Vue.extend({
   name: 'BarcodeReader',
-  data: () => ({
-    items: [],
-    isError: false,
-    done: false,
-    code: '0',
-    format: { format: 'CODE128' },
-    config: {}
-  }),
+  data(): DataType {
+    return {
+      items: [],
+      isError: false,
+      done: false,
+      code: '0',
+      format: { format: 'CODE128' },
+      config: {}
+    }
+  },
   head: () => ({
     title: 'バーコードリーダー'
   }),
@@ -76,16 +92,16 @@ export default Vue.extend({
     return false
   },
   methods: {
-    onInitilize (error) {
+    onInitilize (error: any) {
       if (error) {
-        alert(`Error: ${error}`, error)
+        alert(`Error: ${error}`)
         return
       }
 
       // エラーがない場合は、読み取りを開始
       Quagga.start()
     },
-    onDetected (success) {
+    onDetected (success: any) {
       Quagga.stop()
       this.items.push({ code: success.codeResult.code, format: this.QuaggaToJsBarcodeFormat(success.codeResult.format) })
       this.done = true
@@ -93,7 +109,7 @@ export default Vue.extend({
       this.format = { format: this.items[0].format }
       alert('読込完了')
     },
-    QuaggaToJsBarcodeFormat (QuaggaFormat) {
+    QuaggaToJsBarcodeFormat (QuaggaFormat: string) {
       switch (QuaggaFormat) {
         case 'code_128': return 'CODE128'
         case 'ean': return 'EAN13'
@@ -108,7 +124,7 @@ export default Vue.extend({
         default: return ''
       }
     },
-    select (index) {
+    select (index: number) {
       this.isError = false
       this.code = this.items[index].code
       this.format = { format: this.items[index].format }

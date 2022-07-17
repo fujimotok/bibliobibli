@@ -1,68 +1,74 @@
 <template>
   <div>
     <v-text-field v-model="note.path" label="path" />
-    <vue-simplemde ref="markdownEditor" v-model="note.content" :configs="config"/>
+    <vue-simplemde ref="markdownEditor" v-model="note.content" :configs="config" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { NoteRepository } from '../../js/db/interfaces/NoteRepository'
+import { NoteRepository, Note } from '../../js/db/interfaces/NoteRepository'
+
+export type DataType = {
+  config: object
+  note: Note
+}
 
 export default Vue.extend({
   name: 'NotesIndexPage',
-  data: () => ({
-    config: {
-      spellChecker: false,
-      forceSync: true,
-      indentWithTabs: false,
-      status: false,
-      toolbar: [
-        'bold',
-        'strikethrough',
-        '|',
-        'heading',
-        'unordered-list',
-        'ordered-list',
-        '|',
-        'code',
-        'quote',
-        '|',
-        'link',
-        {
-          name: 'image',
-          action: (editor) => {
-            const self = this
-            this.$refs.fileInput.$refs.input.addEventListener('change', function onChange () {
-              self.$refs.fileInput.$refs.input.removeEventListener('change', onChange)
-              const fileReader = new FileReader()
-              fileReader.onload = function () {
-                const dataURI = this.result
-                const cm = editor.codemirror
-                const pos = cm.getCursor('start')
-                cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
-              }
-              if (self.file) {
-                fileReader.readAsDataURL(self.file)
-              }
-            })
-            this.$refs.fileInput.$refs.input.click()
+  data(): DataType {
+    return {
+      config: {
+        spellChecker: false,
+        forceSync: true,
+        indentWithTabs: false,
+        status: false,
+        toolbar: [
+          'bold',
+          'strikethrough',
+          '|',
+          'heading',
+          'unordered-list',
+          'ordered-list',
+          '|',
+          'code',
+          'quote',
+          '|',
+          'link',
+          {
+            name: 'image',
+            action: (editor: any) => {
+              this.$refs.fileInput.$refs.input.addEventListener('change', function onChange () {
+                this.$refs.fileInput.$refs.input.removeEventListener('change', onChange)
+                const fileReader = new FileReader()
+                fileReader.onload = function () {
+                  const dataURI = this.result
+                  const cm = editor.codemirror
+                  const pos = cm.getCursor('start')
+                  cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
+                }
+                if (self.file) {
+                  fileReader.readAsDataURL(self.file)
+                }
+              })
+              this.$refs.fileInput.$refs.input.click()
+            },
+            className: 'fa fa-image',
+            title: 'image'
           },
-          className: 'fa fa-image',
-          title: 'image'
-        },
-        '|',
-        'preview'
-      ]
-    },
-    note: {
-      id: null,
-      createdAt: '',
-      updatedAt: '',
-      content: '',
-      path: '',
+          '|',
+          'preview'
+        ]
+      },
+      note: {
+        id: undefined,
+        createdAt: '',
+        updatedAt: '',
+        content: '',
+        path: '',
+      }
     }
-  }),
+  },
   beforeMount () {
     this.$store.commit('CHANGE_IS_SHOW_SAVE', true)
     this.$store.commit('CHANGE_IS_SHOW_DEL', false)
@@ -73,9 +79,13 @@ export default Vue.extend({
   },
   methods: {
     resize () {
-      const toolbarHeight = document.querySelector('.editor-toolbar').clientHeight
+      const toolbarHeight = document.querySelector('.editor-toolbar')?.clientHeight || 0
       const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
-      document.querySelector('.CodeMirror').style.height = height + 'px'
+      const node = document.querySelector('.CodeMirror') as HTMLElement
+      const style = node?.style
+      if (style) {
+        style.height = height + 'px'
+      }
       window.scroll(0, 0)
     },
     save () {

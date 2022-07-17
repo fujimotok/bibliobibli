@@ -38,9 +38,9 @@ export default Vue.extend({
               const idbDatabase = db.backendDB() // get native IDBDatabase object from Dexie wrapper
 
               // export to JSON, clear database, and import from JSON
-              IDBExportImport.clearDatabase(idbDatabase, (err) => {
+              IDBExportImport.clearDatabase(idbDatabase, (err: any) => {
                 if (!err) { // cleared data successfully
-                  IDBExportImport.importFromJsonString(idbDatabase, result, (err) => {
+                  IDBExportImport.importFromJsonString(idbDatabase, result, (err: any) => {
                     if (!err) {
                       alert('インポート完了')
                       sessionStorage.setItem('DBChangeEvent', 'import')
@@ -65,7 +65,7 @@ export default Vue.extend({
         try {
           const idbDatabase = db.backendDB()
 
-          IDBExportImport.exportToJsonString(idbDatabase, function (err, jsonString) {
+          IDBExportImport.exportToJsonString(idbDatabase, function (err: any, jsonString: string) {
             if (err) {
               console.error(err)
             } else {
@@ -86,7 +86,7 @@ export default Vue.extend({
       })
     },
     // ファイルデータを非同期で読み込みます。
-    readFileAsync (file) {
+    readFileAsync (file: any) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = () => {
