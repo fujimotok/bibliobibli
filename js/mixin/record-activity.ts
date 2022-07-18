@@ -2,6 +2,7 @@ import Vue from 'vue'
 import {Activity, ActivityRepository} from "~/js/db/interfaces/ActivityRepository"
 
 export default Vue.extend({
+  name: 'RecordActivity',
   methods: {
     async recordActivity (link: string, title: string, content: string): Promise<void> {
       const repo: ActivityRepository = this.$activityRepository

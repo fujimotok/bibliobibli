@@ -4,12 +4,16 @@
     v-model="internalValue"
   >
     <template v-for="(item, index) in items">
-      <v-list-item :key="index" @click="show(item.id)">
+      <v-list-item :key="index" @click="show(item)">
         <v-list-item-content>
           <v-list-item-title v-text="item.title" />
           <v-list-item-subtitle
-            class="text-caption"
+            class="text-caption wrap-text"
             v-text="item.content"
+          />        
+          <v-list-item-subtitle
+            class="text-caption"
+            v-text="item.eventAt"
           />        
         </v-list-item-content>
       </v-list-item>
@@ -26,7 +30,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { ActivityRepository } from '~/js/db/interfaces/ActivityRepository'
+import { Activity, ActivityRepository } from '~/js/db/interfaces/ActivityRepository'
 
 export type DataType = {
   items: object[]
@@ -57,18 +61,21 @@ export default Vue.extend({
     this.search()
   },
   methods: {
-    show (id: number) {
-      this.$router.push({ path: '/books/' + id })
+    show (item: Activity) {
+      this.$router.push({ path: item.link })
     },
     async search (offset = 0) {
       const repo: ActivityRepository = this.$activityRepository
       const activities = await repo.find('', offset, 20)
       if (activities !== undefined) {
         activities[0].forEach((activity) => {
+          const dt = new Date(activity.createdAt || '')
+          dt.setTime( dt.getTime() - dt.getTimezoneOffset() * 60 * 1000 )
           this.items.push({
             link: activity.link,
             title: activity.title,
             content: activity.content,
+            eventAt: dt.toLocaleString()
           })
         })
       }
@@ -81,3 +88,9 @@ export default Vue.extend({
   }
 })
 </script>
+
+<style scoped>
+.wrap-text {
+  white-space: normal
+}
+</style>
