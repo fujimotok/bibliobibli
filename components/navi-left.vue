@@ -1,5 +1,5 @@
 <template>
-  <v-list-item-group v-model="internalValue" class="mt-2">
+  <v-list-item-group v-model="internalValue" class="mt-2" mandatory>
     <v-list-item value="Activity">
       <div class="icon-with-text">
         <v-icon :color="internalValue === 'Activity' ? 'primary' : 'normal'">

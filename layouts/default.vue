@@ -18,12 +18,12 @@
       <v-toolbar-title class="mx-2" v-text="title" />
       <v-spacer />
       <v-btn
-        v-show="isRoot"
+        v-show="isRoot && hasSearch"
         color="white"
         icon
         small
         class="mx-2"
-        @click="add()"
+        @click.stop="search()"
       >
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
@@ -33,7 +33,7 @@
         icon
         small
         class="mx-2"
-        @click="menu()"
+        @click.stop="menu()"
       >
         <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
@@ -69,7 +69,14 @@
             <v-row>
               <v-toolbar-title class="mx-2" v-text="title" />
               <v-spacer />
-              <v-btn color="white" icon small class="mx-2" @click="add()">
+              <v-btn
+                v-show="hasSearch"
+                color="white"
+                icon
+                small
+                class="mx-2"
+                @click.stop="search()"
+              >
                 <v-icon>mdi-magnify</v-icon>
               </v-btn>
             </v-row>
@@ -85,7 +92,7 @@
               <v-divider vertical />
               <v-toolbar-title class="mx-2" v-text="title" />
               <v-spacer />
-              <v-btn color="white" icon small class="mx-2" @click="add()">
+              <v-btn color="white" icon small class="mx-2" @click.stop="menu()">
                 <v-icon>mdi-dots-vertical</v-icon>
               </v-btn>
             </v-row>
@@ -111,12 +118,20 @@
 <script lang="ts">
 import Vue from 'vue'
 
+export type DataType = {
+  cachePageList: string[],
+  selectedNaviItem: string,
+  hasSearch: boolean
+}
+
+
 export default Vue.extend({
   name: 'DefaultLayout',
-  data () {
+  data (): DataType {
     return {
       cachePageList: ['IndexPage'],
-      selectedNaviItem: "Activity"
+      selectedNaviItem: "Activity",
+      hasSearch: true
     }
   },
   computed: {
@@ -150,45 +165,11 @@ export default Vue.extend({
   },
   watch:{
     $route (to, _){
-      const self:any = this
-      switch(to.path.split('/')[1])
-      {
-        case 'books':
-          self.selectedNaviItem = "Books"
-          break
-        case 'notes':
-          self.selectedNaviItem = "Notes"
-          break
-        case 'scraps':
-          self.selectedNaviItem = "Scraps"
-          break
-        case 'etc':
-          self.selectedNaviItem = "Etc"
-          break
-        default:
-          self.selectedNaviItem = "Activity"
-      }
+      this.onRouteChanged(to.path)
     }
   },
   mounted () {
-    const self:any = this
-    switch(self.$route.path.split('/')[1])
-    {
-      case 'books':
-        self.selectedNaviItem = "Books"
-        break
-      case 'notes':
-        self.selectedNaviItem = "Notes"
-        break
-      case 'scraps':
-        self.selectedNaviItem = "Scraps"
-        break
-      case 'etc':
-        self.selectedNaviItem = "Etc"
-        break
-      default:
-        self.selectedNaviItem = "Activity"
-    }
+    this.onRouteChanged(this.$route.path)
   },
   methods: {
     search () {
@@ -200,22 +181,47 @@ export default Vue.extend({
       self.$refs.page.$children[0].menu()
     },
     onNaviChanged (value: string)  {
+      console.log('navichanged:' + value)
       switch (value) {
-        case "Activity":
-          this.$router.push("/")
+        case 'Activity':
+          this.$router.push('/')
           break;
-        case "Books":
-          this.$router.push("/books/")
+        case 'Books':
+          this.$router.push('/books/')
           break;
-        case "Notes":
-          this.$router.push("/notes/")
+        case 'Notes':
+          this.$router.push('/notes/')
           break;
-        case "Scraps":
-          this.$router.push("/scraps/")
+        case 'Scraps':
+          this.$router.push('/scraps/')
           break;
-        case "Etc":
-          this.$router.push("/etc/")
+        case 'Etc':
+          this.$router.push('/etc/')
           break;
+      }
+    },
+    onRouteChanged (route: string) {
+      switch(route.split('/')[1])
+      {
+        case 'books':
+          this.hasSearch = true;
+          this.selectedNaviItem = 'Books'
+          break
+        case 'notes':
+          this.hasSearch = true;
+          this.selectedNaviItem = 'Notes'
+          break
+        case 'scraps':
+          this.hasSearch = true;
+          this.selectedNaviItem = 'Scraps'
+          break
+        case 'etc':
+          this.hasSearch = false;
+          this.selectedNaviItem = 'Etc'
+          break
+        default:
+          this.hasSearch = false;
+          this.selectedNaviItem = 'Activity'
       }
     }
   }
