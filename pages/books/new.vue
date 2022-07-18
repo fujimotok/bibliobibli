@@ -1,9 +1,5 @@
 <template>
   <div>
-    <global-events
-      :filter="(event, handler, eventName) => event.altKey || event.ctrlKey"
-      @keydown.prevent.ctrl.s="save()"
-    />
     <div>
       <div style="display: flex;align-items: center;">
         <icon-combobox v-model="book.status" :items="states" item-value="id" item-text="status" />
@@ -15,14 +11,16 @@
         ref="isbn"
         v-model="book.isbn"
         label="isbn13"
-        @change="onChangeISBN(isbn)"
+        append-outer-icon="mdi-barcode-scan"
+        @change="onChangeISBN"
+        @click:append-outer="barcodeReader"
       />
       <v-text-field v-model="book.title" label="title" />
       <v-combobox v-model="book.authors" multiple label="authors" />
       <v-text-field v-model="book.publisher" label="publisher" />
       <v-menu
-        ref="menu"
-        v-model="menu"
+        ref="datePickerMenu"
+        v-model="datePickerMenu"
         :close-on-content-click="false"
         transition="scale-transition"
         offset-y
@@ -74,12 +72,13 @@
 <script lang="ts">
   import Vue from 'vue'
 import axios from 'axios'
-import { BookRepository, Book } from '../../js/db/interfaces/BookRepository'
-import { TagRepository } from '../../js/db/interfaces/TagRepository'
+import { BookRepository, Book } from '~/js/db/interfaces/BookRepository'
+import { TagRepository } from '~/js/db/interfaces/TagRepository'
+import Mixin from '~/js/mixin/record-activity'
 
 export type DataType = {
   activePicker: string | undefined
-  menu: boolean
+  datePickerMenu: boolean
   states: object[]
   tagItems: object[]
   book: Book
@@ -89,12 +88,12 @@ export interface VMenu extends Vue {
   save(value: any): void
 }
 
-export default Vue.extend({
+export default Mixin.extend({
   name: 'BooksNewPage',
   data(): DataType {
     return {
       activePicker: undefined,
-      menu: false,
+      datePickerMenu: false,
       states: [
         { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
         { text: '未読', value: 1, icon: 'mdi-progress-clock' },
@@ -120,7 +119,7 @@ export default Vue.extend({
     }
   },
   watch: {
-    menu (val) {
+    datePickerMenu (val) {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
     }
   },
@@ -129,10 +128,15 @@ export default Vue.extend({
       const el = this.$refs.isbn as HTMLElement
       el.focus()
     })
+
+    if (this.$route.query.isbn) {
+      this.book.isbn = this.$route.query.isbn as string
+      this.onChangeISBN(this.book.isbn)
+    }
   },
   async beforeMount () {
     const tagRepo: TagRepository = this.$tagRepository
-    tagRepo.find('', 0, 0).then((tags) => {
+    await tagRepo.find('', 0, 0).then((tags) => {
       if (tags !== undefined) {
         this.tagItems = tags[0]
       }
@@ -140,17 +144,34 @@ export default Vue.extend({
   },
   methods: {
     barcodeReader () {
-      this.$router.push('/barcode-reader')
+      this.$router.push('/books/barcode-reader')
     },
     dateChanged (date: string) {
-      const menu = this.$refs.menu as VMenu
+      const menu = this.$refs.datePickerMenu as VMenu
       menu.save(date)
     },
     onChangeISBN (value: string) {
-      const isbn = value.replace(/[^0-9]/g, '')
+      let isbn = value.replace(/[^0-9]/g, '')
+      
+      switch (isbn.length) {
+        case 9:
+          isbn = this.checkDigit('978' + isbn)
+          break;
+        case 10:
+          isbn = this.checkDigit('978' + isbn.slice(0, 9))
+          break;
+        case 12:
+          isbn = this.checkDigit(isbn)
+          break;
+        case 13:
+        default:
+          break;
+      }
+      
       this.$nextTick(() => {
         this.book.isbn = isbn
       })
+
       if (isbn.length === 13) {
         axios.get('https://api.openbd.jp/v1/get?isbn=' + isbn)
           .then((res) => {
@@ -158,7 +179,7 @@ export default Vue.extend({
               this.book.title = res.data[0].summary.title
               this.book.authors = res.data[0].summary.author.split(' ')
               this.book.publisher = res.data[0].summary.publisher
-
+              
               if (res.data[0].summary.pubdate.includes('-')) {
                 const date = res.data[0].summary.pubdate.split('-')
                 const year = date[0] || '2000'
@@ -170,11 +191,20 @@ export default Vue.extend({
                   '-' + res.data[0].summary.pubdate.substr(4, 2) +
                   '-' + res.data[0].summary.pubdate.substr(6, 2)
               }
-
+              
               this.book.cover = res.data[0].summary.cover || '/noimage.png'
             }
           })
       }
+    },
+    checkDigit (isbn12: string): string {
+      const sum = isbn12.split('').map(s => parseInt(s))
+        .reduce((p, c, i) => p + ((i % 2 === 0) ? c : c * 3));
+      
+      const rem = 10 - sum % 10;
+      const checkdigit = rem === 10 ? 0 : rem;
+
+      return `${isbn12}${checkdigit}`;
     },
     addLink () {
       this.book.links.push('')
@@ -184,9 +214,16 @@ export default Vue.extend({
         this.book.links.pop()
       }
     },
-    save () {
+    async save () {
       const bookRepo: BookRepository = this.$bookRepository
-      bookRepo.store(this.book)
+      const ret = await bookRepo.store(this.book)
+      if (ret) {
+        await this.recordActivity(`/books/${ret.id}`, 'Created Book Info', `${ret.title} is created.`)
+        this.$router.push({ path: `/books/` })
+      }
+      
+    },
+    menu () {
     }
   }
 })
