@@ -33,13 +33,23 @@
         icon
         small
         class="mx-2"
+        @click.stop="save()"
+      >
+        <v-icon>mdi-content-save</v-icon>
+      </v-btn>
+      <v-btn
+        v-show="!isRoot"
+        color="white"
+        icon
+        small
+        class="mx-2"
         @click.stop="menu()"
       >
         <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
     </v-app-bar>
     <v-main>
-      <Nuxt ref="page" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
+      <Nuxt ref="pageMobile" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
     </v-main>
     <navi-bottom v-show="isRoot" v-model="selectedNaviItem" app @change="onNaviChanged" />
   </v-app>
@@ -92,6 +102,9 @@
               <v-divider vertical />
               <v-toolbar-title class="mx-2" v-text="title" />
               <v-spacer />
+              <v-btn color="white" icon small class="mx-2" @click.stop="save()">
+                <v-icon>mdi-content-save</v-icon>
+              </v-btn>
               <v-btn color="white" icon small class="mx-2" @click.stop="menu()">
                 <v-icon>mdi-dots-vertical</v-icon>
               </v-btn>
@@ -110,7 +123,7 @@
       <navi-left v-model="selectedNaviItem" @change="onNaviChanged" />
     </v-navigation-drawer>
     <v-main>
-      <Nuxt ref="page" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
+      <Nuxt ref="pageDesktop" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
     </v-main>
   </v-app>
 </template>
@@ -124,6 +137,11 @@ export type DataType = {
   hasSearch: boolean
 }
 
+export interface Page extends Vue {
+  search(): void
+  save(): void
+  menu(): void
+}
 
 export default Vue.extend({
   name: 'DefaultLayout',
@@ -173,15 +191,39 @@ export default Vue.extend({
   },
   methods: {
     search () {
-      const self:any = this
-      self.$refs.page.$children[0].search()
+      if (this.isMobile) {
+        const elem = this.$refs.pageMobile as Vue
+        const page = elem.$children.find((e: any) => !(e._inactive)) as Page
+        page.search()
+      } else {
+        const elem = this.$refs.pageDesktop as Vue
+        const page = elem.$children.find((e: any) => !(e._inactive)) as Page
+        page.search()
+      }
+    },
+    save () {
+      if (this.isMobile) {
+        const elem = this.$refs.pageMobile as Vue
+        const page = elem.$children.find((e: any) => !(e._inactive)) as Page
+        page.save()
+      } else {
+        const elem = this.$refs.pageDesktop as Vue
+        const page = elem.$children.find((e: any) => !(e._inactive)) as Page
+        page.save()
+      }
     },
     menu () {
-      const self:any = this
-      self.$refs.page.$children[0].menu()
+      if (this.isMobile) {
+        const elem = this.$refs.pageMobile as Vue
+        const page = elem.$children.find((e: any) => !(e._inactive)) as Page
+        page.menu()
+      } else {
+        const elem = this.$refs.pageDesktop as Vue
+        const page = elem.$children.find((e: any) => !(e._inactive)) as Page
+        page.menu()
+      }
     },
     onNaviChanged (value: string)  {
-      console.log('navichanged:' + value)
       switch (value) {
         case 'Activity':
           this.$router.push('/')
