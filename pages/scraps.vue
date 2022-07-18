@@ -9,6 +9,7 @@
           elevation="2"
           fab
           color="secondary"
+          @click.stop="add"
         >
           <v-icon>mdi-plus</v-icon>
         </v-btn>
@@ -40,6 +41,7 @@
             fab
             small
             color="secondary"
+            @click.stop="add"
           >
             <v-icon>mdi-plus</v-icon>
           </v-btn>
@@ -70,48 +72,7 @@ import ListScrap from '~/components/list-scrap.vue'
 
 export default Vue.extend({
   name: 'IndexPage',
-  beforeRouteUpdate(to, from, next) {
-    console.log(from)
-
-    this.$store.commit('CHANGE_IS_SHOW_BACK', to.path !== '/')
-
-    switch (this.navi) {
-      case 'Books':
-      case 'Notes':
-      case 'Scraps':
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', true)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', true)
-        break;
-      default:
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', false)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', false)
-    }
-
-    if (this.isMobile)
-    {
-      if (to.path === '/')
-      {
-        // hide right menu
-        this.$store.commit('CHANGE_IS_SHOW_SAVE', false)
-        this.$store.commit('CHANGE_IS_SHOW_DEL', false)
-
-      }
-      else
-      {
-        // hide left menu
-        this.$store.commit('CHANGE_IS_SHOW_SEARCH', false)
-        this.$store.commit('CHANGE_IS_SHOW_ADD', false)
-      }
-    }
-    next()
-  },
-  layout: 'default',
   data: () => ({
-    navi: 'activity',
-    cardHeight: 0
-  }),
-  head: () => ({
-    title: 'index'
   }),
   computed: {
     isMobile (): boolean {
@@ -127,7 +88,7 @@ export default Vue.extend({
   },
   methods: {
     add (): void {
-      this.$router.push({ path: '/scraps/new'})
+      this.$router.push({ path: '/scraps/new' })
     },
     search (): void  {
       const self = this

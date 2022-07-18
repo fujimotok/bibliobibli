@@ -1,23 +1,46 @@
 <template>
   <v-list-item-group
+    v-if="items.length > 0"
     v-model="internalValue"
   >
     <template v-for="(item, index) in items">
-      <v-list-item :key="index" @click="show(item.link)">
+      <v-list-item :key="index" @click="show(item.id)">
         <v-list-item-content>
-          <v-list-item-title v-text="item.id" />
+          <v-list-item-title v-text="item.header" />
+          <div>
+            <v-chip
+              v-for="tag in item.tags"
+              :key="tag"
+              small
+              class="mr-1 mt-1"
+            >
+              {{ tag }}
+            </v-chip>
+          </div>
         </v-list-item-content>
       </v-list-item>
       <v-divider :key="`${index}-divider`" />
     </template>
+    <div v-intersect.quite="onIntersect" />
   </v-list-item-group>
+  <div v-else style="position: absolute; height: 90%; width: 100%; align-items: center;">
+    <p style="position: relative; top: 50%; text-align: center;">
+      No Result
+    </p>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import { TagRepository, Tag } from '../js/db/interfaces/TagRepository'
+import { ScrapRepository } from '~/js/db/interfaces/ScrapRepository'
 
 export type DataType = {
   items: object[]
+  tagItems: Tag[]
+  searchWord: string
+  searchTags: number[]
+  isLoading: boolean
 }
 
 export default Vue.extend({
@@ -26,7 +49,11 @@ export default Vue.extend({
   },
   data (): DataType {
     return {
-      items: []
+      items: [],
+      tagItems: [],
+      searchWord: '',
+      searchTags: [],
+      isLoading: false,
     }
   },
   computed: {
@@ -39,26 +66,35 @@ export default Vue.extend({
       }
     }
   },
-  mounted () {
-    this.items = [
-      { id: 0, link: '/scraps/0' },
-      { id: 1, link: '/scraps/1' },
-      { id: 2, link: '/scraps/2' },
-      { id: 3, link: '/scraps/3' },
-      { id: 4, link: '/scraps/4' },
-      { id: 5, link: '/scraps/5' },
-      { id: 6, link: '/scraps/6' },
-      { id: 7, link: '/scraps/7' },
-      { id: 8, link: '/scraps/8' },
-      { id: 9, link: '/scraps/9' }
-    ]
+  async mounted () {
+    const tagRepo: TagRepository = this.$tagRepository
+    const tags = await tagRepo.find('', 0, 30)
+    if (tags !== undefined) {
+      this.tagItems = tags[0]
+    }
+    
+    this.search()
   },
   methods: {
     show (link: string) {
       this.$router.push({ path: link })
     },
-    search(){
-    }
+    async search (offset = 0) {
+      const scrapRepo: ScrapRepository = this.$scrapRepository
+      const scraps = await scrapRepo.find(this.searchWord, this.searchTags, offset, 20)
+      if (scraps !== undefined) {
+        scraps[0].forEach((scrap) => {
+          this.items.push({
+            id: scrap.id,
+            header: scrap.content.slice(0, scrap.content.search(/\r\n|\r|\n/)),
+            tags: scrap.tags.map((tag) => {
+              const elem = this.tagItems.find((t) => t.id === tag)
+              return elem?.name
+            })
+          })
+        })
+      }
+    },
   }
 })
 </script>
