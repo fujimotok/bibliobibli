@@ -5,6 +5,7 @@ import { Scrap } from '../../interfaces/ScrapRepository'
 import { Tag } from '../../interfaces/TagRepository'
 import { Diary } from '../../interfaces/DiaryRepository'
 import { Todo } from '../../interfaces/TodoRepository'
+import { Activity } from '../../interfaces/ActivityRepository'
 
 class BIBLIoBIBLIDatabase extends Dexie {
   books!: Dexie.Table<Book, number>
@@ -13,6 +14,7 @@ class BIBLIoBIBLIDatabase extends Dexie {
   tags!: Dexie.Table<Tag, number>
   diaries!: Dexie.Table<Diary, number>
   todos!: Dexie.Table<Todo, number>
+  activities!: Dexie.Table<Activity, number>
 
   constructor () {
     super('BIBLIoBIBLI')
@@ -22,7 +24,8 @@ class BIBLIoBIBLIDatabase extends Dexie {
       scraps: '++id, createdAt, updatedAt, *tags, content',
       tags: '++id, createdAt, updatedAt, name',
       diaries: '++id, createdAt, updatedAt, eventAt, content',
-      todos: '++id, createdAt, updatedAt, priority, dueAt, content'
+      todos: '++id, createdAt, updatedAt, priority, dueAt, content',
+      activities: '++id, createdAt, link, title, content'
     })
   }
 }
