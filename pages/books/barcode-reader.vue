@@ -136,7 +136,7 @@ export default Vue.extend({
       Quagga.init(this.config, this.onInitilize)
     },
     enter () {
-      this.$router.push({ path: '/books/new', query: { isbn: this.code } })
+      this.$router.replace({ path: '/books/new', query: { isbn: this.code } })
     }
   }
 })

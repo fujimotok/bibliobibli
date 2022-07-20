@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
+import Vue from 'vue'
 import axios from 'axios'
 import { BookRepository, Book } from '~/js/db/interfaces/BookRepository'
 import { TagRepository } from '~/js/db/interfaces/TagRepository'
@@ -219,7 +219,7 @@ export default Mixin.extend({
       const ret = await bookRepo.store(this.book)
       if (ret) {
         await this.recordActivity(`/books/${ret.id}`, 'Created Book Info', `${ret.title} is created.`)
-        this.$router.push({ path: `/books/` })
+        this.$router.replace({ path: `/books/${ret.id}` })
       }
       
     },
