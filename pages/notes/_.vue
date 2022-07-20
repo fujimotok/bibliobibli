@@ -1,25 +1,49 @@
 <template>
   <div>
-    <v-text-field v-model="note.path" label="path" />
     <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" />
     <vue-simplemde ref="markdownEditor" v-model="note.content" :configs="config" />
+    <v-bottom-sheet v-model="bottomSheet" max-width="480px">
+      <v-list style="padding-bottom: 40px;">
+        <p class="text-h6 ma-2">
+          Menu
+        </p>
+        <v-divider />
+        <v-list-item-group>
+          <v-list-item @click="remove">
+            <v-list-item-avatar>
+              <v-avatar>
+                <v-icon>
+                  mdi-delete
+                </v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>
+              削除
+            </v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </v-bottom-sheet>
   </div>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-import { NoteRepository, Note } from '../../js/db/interfaces/NoteRepository'
+import Vue from 'vue'
+import { NoteRepository, Note } from '~/js/db/interfaces/NoteRepository'
+import Mixin from '~/js/mixin/record-activity'
 
 export type DataType = {
+  bottomSheet: boolean
   file: object
   config: object
   note: Note
 }
 
-export default Vue.extend({
+export default Mixin.extend({
   name: 'NotesIndexPage',
   data(): DataType {
     return {
+      bottomSheet: false,
       file: {},
       config: {
         spellChecker: false,
@@ -121,10 +145,25 @@ export default Vue.extend({
       }
       window.scroll(0, 0)
     },
-    save () {
+    async save () {
+      await this.recordActivity(`/notes/${this.note.id}`, 'Update Note', `${this.note.path} is updated.`)
       const noteRepo: NoteRepository = this.$noteRepository
-      noteRepo.store(this.note)
-    }
+      await noteRepo.store(this.note)
+    },
+    menu () {
+      this.bottomSheet = true
+    },
+    async remove () {
+      if (confirm('本当に削除しても良いですか？')) {
+        await this.recordActivity('', 'Delete Note', `${this.note.path} is deleted.`)
+        const noteRepo: NoteRepository = this.$noteRepository
+        if (this.note.id) {
+          await noteRepo.remove(this.note.id)
+        }
+        this.bottomSheet = false
+        this.$router.push('/notes/')
+      }
+    },
   }
 })
 </script>

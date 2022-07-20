@@ -61,7 +61,7 @@ export default Vue.extend({
         notes[0].forEach((note) => {
           this.items.push({
             id: note.id,
-            header: note.content.slice(0, note.content.search(/\r\n|\r|\n/)),
+            header: note.path.split('/').slice(-1)[0],
             path: note.path,
           })
         })

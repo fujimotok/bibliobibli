@@ -87,6 +87,18 @@
             </v-list-item-title>
           </v-list-item>
           <v-divider />
+          <v-list-item @click="note">
+            <v-list-item-avatar>
+              <v-avatar>
+                <v-icon>
+                  mdi-note-multiple-outline
+                </v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>
+              ノートを書く
+            </v-list-item-title>
+          </v-list-item>
         </v-list-item-group>
       </v-list>
     </v-bottom-sheet>
@@ -267,6 +279,9 @@ export default Mixin.extend({
         this.bottomSheet = false
         this.$router.push('/books/')
       }
+    },
+    note () {
+      this.$router.push(`/notes/new?id=${this.book.id}`)
     }
   }
 })

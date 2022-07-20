@@ -9,7 +9,7 @@
           elevation="2"
           fab
           color="secondary"
-          @click="add"
+          @click.stop="add"
         >
           <v-icon>mdi-plus</v-icon>
         </v-btn>
@@ -41,6 +41,7 @@
             fab
             small
             color="secondary"
+            @click.stop="add"
           >
             <v-icon>mdi-plus</v-icon>
           </v-btn>
@@ -68,6 +69,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import ListNote from '~/components/list-note.vue'
+
+export interface Content extends Vue {
+  save(): void
+  menu(): void
+}
 
 export default Vue.extend({
   name: 'NotesPage',
@@ -99,6 +105,22 @@ export default Vue.extend({
       }
     },
     save (): void {
+      if (this.isMobile) {
+        const content = this.$refs.contentMobile as Content
+        content.save()
+      } else {
+        const content = this.$refs.contentDesktop as Content
+        content.save()
+      }
+    },
+    menu (): void {
+      if (this.isMobile) {
+        const content = this.$refs.contentMobile as Content
+        content.menu()
+      } else {
+        const content = this.$refs.contentDesktop as Content
+        content.menu()
+      }
     }
   }
 })
