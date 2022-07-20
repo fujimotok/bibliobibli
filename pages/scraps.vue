@@ -70,8 +70,13 @@
 import Vue from 'vue'
 import ListScrap from '~/components/list-scrap.vue'
 
+export interface Content extends Vue {
+  save(): void
+  menu(): void
+}
+
 export default Vue.extend({
-  name: 'IndexPage',
+  name: 'ScrapsPage',
   data: () => ({
   }),
   computed: {
@@ -100,9 +105,23 @@ export default Vue.extend({
         list.search()
       }
     },
-    save (): void  {
+    save (): void {
+      if (this.isMobile) {
+        const content = this.$refs.contentMobile as Content
+        content.save()
+      } else {
+        const content = this.$refs.contentDesktop as Content
+        content.save()
+      }
     },
-    del (): void  {
+    menu (): void {
+      if (this.isMobile) {
+        const content = this.$refs.contentMobile as Content
+        content.menu()
+      } else {
+        const content = this.$refs.contentDesktop as Content
+        content.menu()
+      }
     }
   }
 })

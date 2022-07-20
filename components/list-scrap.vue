@@ -76,8 +76,8 @@ export default Vue.extend({
     this.search()
   },
   methods: {
-    show (link: string) {
-      this.$router.push({ path: link })
+    show (id: number) {
+      this.$router.push({ path: '/scraps/' + id })
     },
     async search (offset = 0) {
       const scrapRepo: ScrapRepository = this.$scrapRepository

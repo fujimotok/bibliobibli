@@ -2,20 +2,44 @@
   <div>
     <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" />
     <vue-simplemde ref="markdownEditor" v-model="scrap.content" :configs="config" />
+    <v-bottom-sheet v-model="bottomSheet" max-width="480px">
+      <v-list style="padding-bottom: 40px;">
+        <p class="text-h6 ma-2">
+          Menu
+        </p>
+        <v-divider />
+        <v-list-item-group>
+          <v-list-item @click="remove">
+            <v-list-item-avatar>
+              <v-avatar>
+                <v-icon>
+                  mdi-delete
+                </v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>
+              削除
+            </v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </v-bottom-sheet>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { ScrapRepository, Scrap } from '../../js/db/interfaces/ScrapRepository'
+import Mixin from '~/js/mixin/record-activity'
 
 export type DataType = {
   config: object
   scrap: Scrap
-  file: string,
+  file: string
+  bottomSheet: boolean
 }
 
-export default Vue.extend({
+export default Mixin.extend({
   name: 'ScrapsPage',
   data(): DataType {
     return {
@@ -75,7 +99,8 @@ export default Vue.extend({
         updatedAt: '',
         content: '',
       },
-      file: ''
+      file: '',
+      bottomSheet: false
     }
   },
   watch: {
@@ -111,10 +136,25 @@ export default Vue.extend({
       }
       window.scroll(0, 0)
     },
-    save () {
+    async save () {
+      await this.recordActivity(`/scraps/${this.scrap.id}`, 'Update Scrap Info', `${this.scrap.id} is updated.`)
       const scrapRepo: ScrapRepository = this.$scrapRepository
-      scrapRepo.store(this.scrap)
-    }
+      await scrapRepo.store(this.scrap)
+    },
+    menu () {
+      this.bottomSheet = true
+    },
+    async remove () {
+      if (confirm('本当に削除しても良いですか？')) {
+        await this.recordActivity('', 'Delete Scrap', `${this.scrap.id} is deleted.`)
+        const scrapRepo: ScrapRepository = this.$scrapRepository
+        if (this.scrap.id) {
+          await scrapRepo.remove(this.scrap.id)
+        }
+        this.bottomSheet = false
+        this.$router.push('/scraps/')
+      }
+    },
   }
 })
 </script>

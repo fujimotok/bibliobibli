@@ -1,6 +1,15 @@
 <template>
   <div>
     <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" />
+    <v-select
+      v-model="scrap.tags"
+      multiple
+      :items="tagItems"
+      item-value="id"
+      item-text="name"
+      label="tags"
+      :menu-props="{ offsetY: true }"
+    />
     <vue-simplemde ref="markdownEditor" v-model="scrap.content" :configs="config" />
   </div>
 </template>
@@ -8,14 +17,17 @@
 <script lang="ts">
 import Vue from 'vue'
 import { ScrapRepository, Scrap } from '../../js/db/interfaces/ScrapRepository'
+import { TagRepository } from '~/js/db/interfaces/TagRepository'
+import Mixin from '~/js/mixin/record-activity'
 
 export type DataType = {
   config: object
   scrap: Scrap
-  file: string,
+  file: string
+  tagItems: object[]
 }
 
-export default Vue.extend({
+export default Mixin.extend({
   name: 'ScrapsIndexPage',
   data(): DataType {
     return {
@@ -75,12 +87,17 @@ export default Vue.extend({
         updatedAt: '',
         content: '',
       },
-      file: ''
+      file: '',
+      tagItems: []
     }
   },
-  beforeMount () {
-    this.$store.commit('CHANGE_IS_SHOW_SAVE', true)
-    this.$store.commit('CHANGE_IS_SHOW_DEL', false)
+  async beforeMount () {
+    const tagRepo: TagRepository = this.$tagRepository
+    await tagRepo.find('', 0, 0).then((tags) => {
+      if (tags !== undefined) {
+        this.tagItems = tags[0]
+      }
+    })
   },
   mounted () {
     window.addEventListener('resize', this.resize)
@@ -97,9 +114,15 @@ export default Vue.extend({
       }
       window.scroll(0, 0)
     },
-    save () {
+    async save () {
       const scrapRepo: ScrapRepository = this.$scrapRepository
-      scrapRepo.store(this.scrap)
+      const ret = await scrapRepo.store(this.scrap)
+      if (ret) {
+        await this.recordActivity(`/scraps/${ret.id}`, 'Created Scrap', `${ret.id} is created.`)
+        this.$router.replace({ path: `/scraps/${ret.id}` })
+      }
+    },
+    menu () {
     }
   }
 })
