@@ -25,7 +25,7 @@
       <v-icon>mdi-note-multiple-outline</v-icon>
     </v-btn>
     
-    <V-btn value="Etc">
+    <v-btn value="Etc">
       <span>Etc...</span>
       <v-icon>mdi-dots-horizontal</v-icon>
     </v-btn>
