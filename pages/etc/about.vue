@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <v-card>
+  <v-container class="fill-height" fluid>
+    <v-card style="width: 100%">
       <v-card-title>
         アプリ情報
       </v-card-title>
@@ -8,7 +8,7 @@
       <v-card-text>
         <v-container>
           <v-row justify="center">
-            <v-img src="icon.png" max-width="128" :aspect-ratio="1/1" />
+            <v-img src="../icon.png" max-width="128" :aspect-ratio="1/1" />
           </v-row>
           <v-row>
             <v-col>アプリ名</v-col><v-col>BIBLIoBIBLI</v-col>
@@ -19,7 +19,7 @@
         </v-container>
       </v-card-text>
     </v-card>
-    <v-card class="mt-4">
+    <v-card style="width: 100%" class="mt-4">
       <v-card-title>
         使い方
       </v-card-title>
@@ -30,11 +30,13 @@
   </v-container>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+
+export default Vue.extend({
   name: 'AboutPage',
   head: () => ({
     title: 'About'
   })
-}
+})
 </script>

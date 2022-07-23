@@ -4,7 +4,7 @@
       <template v-for="(tag, index) in tags">
         <v-list-item :key="index">
           <v-list-item-content>
-            <v-list-item-title v-text="tag.tag" />
+            <v-list-item-title v-text="tag.name" />
           </v-list-item-content>
           <v-list-item-action>
             <div>
@@ -20,6 +20,16 @@
         <v-divider :key="`${index}-divider`" />
       </template>
     </v-list-item-group>
+    <div style="position: fixed; bottom: 16px; right: 16px;">
+      <v-btn
+        elevation="2"
+        fab
+        color="secondary"
+        @click="add"
+      >
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
+    </div>
     <v-dialog v-model="dialog" max-width="400">
       <v-card class="pa-4">
         <v-card-title>
@@ -44,13 +54,22 @@
   </v-list>
 </template>
 
-<script>
-import { db } from '../js/db'
+<script lang="ts">
+import Vue from 'vue'
+import { TagRepository, Tag } from '../../js/db/interfaces/TagRepository'
 
-export default {
+export type DataType = {
+  tags: Tag[]
+  selectedTag: Tag | null
+  editTag: string
+  dialog: boolean
+  dialogTitle: string
+}
+
+export default Vue.extend({
   name: 'TagsPage',
   layout: 'tags',
-  data () {
+  data (): DataType {
     return {
       tags: [],
       selectedTag: null,
@@ -66,11 +85,12 @@ export default {
     this.load()
   },
   methods: {
-    load () {
-      db.tags.orderBy(':id').reverse().toArray()
-        .then((tags) => {
-          this.tags = tags
-        })
+    async load () {
+      const tagRepo: TagRepository = this.$tagRepository
+      const tags = await tagRepo.find('', 0, 0)
+      if (tags !== undefined) {
+        this.tags = tags[0]
+      }
     },
     add () {
       this.selectedTag = null
@@ -78,58 +98,39 @@ export default {
       this.dialogTitle = 'Add'
       this.dialog = true
     },
-    edit (tag) {
+    edit (tag: Tag) {
       this.selectedTag = tag
-      this.editTag = tag.tag
+      this.editTag = tag.name
       this.dialogTitle = 'Edit'
       this.dialog = true
     },
-    del (tag) {
+    async del (tag: Tag) {
       if (confirm('本当に削除しても良いですか？')) {
-        db.books.filter((book) => {
-          return book.tags.includes(tag.tag)
-        }).toArray().then((records) => {
-          for (const record of records) {
-            const newTags = record.tags.filter(t => t !== tag.tag)
-            db.books.update(record.id, { tags: newTags })
-          }
-          sessionStorage.setItem('DBChangeEvent', 'import')
-        })
-
-        db.tags.delete(tag.id).then(() => {
+        const tagRepo: TagRepository = this.$tagRepository
+        if (tag.id) {
+          await tagRepo.remove(tag.id)
           this.load()
-        })
+        }
       }
     },
-    save () {
+    async save () {
+      const tagRepo: TagRepository = this.$tagRepository
       if (this.selectedTag) {
-        db.books.filter((book) => {
-          return book.tags.includes(this.selectedTag.tag)
-        }).toArray().then((records) => {
-          for (const record of records) {
-            const index = record.tags.indexOf(this.selectedTag.tag)
-            const newTags = record.tags
-            if (index > -1) {
-              newTags[index] = this.editTag
-            }
-            db.books.update(record.id, { tags: newTags })
-          }
-          this.selectedTag.tag = this.editTag
-          sessionStorage.setItem('DBChangeEvent', 'import')
-        })
-
-        db.tags.update(this.selectedTag.id, {
-          tag: this.editTag
-        })
-      } else {
-        db.tags.add({
-          tag: this.editTag
-        }).then(() => {
+        if (this.selectedTag.id) {
+          this.selectedTag.name = this.editTag
+          await tagRepo.store(this.selectedTag)
           this.load()
-        })
+        }
+      } else {
+        const newTag: Tag = {
+          id: undefined,
+          name: this.editTag
+        }
+        await tagRepo.store(newTag)
+        this.load()
       }
       this.dialog = false
     }
   }
-}
+})
 </script>

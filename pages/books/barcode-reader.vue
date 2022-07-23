@@ -1,50 +1,69 @@
 <template>
-  <v-list two-line>
-    <v-list-item-group>
-      <div v-if="done" class="text-caption">
-        候補
-      </div>
-      <v-divider v-if="done" />
-      <template v-for="(item, index) in items">
-        <v-list-item :key="item.format" @click="select(index)">
-          <v-list-item-content>
-            <v-list-item-title v-text="item.code" />
-            <v-list-item-subtitle
-              class="text-caption"
-              v-text="item.format"
-            />
-          </v-list-item-content>
-        </v-list-item>
-        <v-divider
-          :key="index"
-        />
-      </template>
-    </v-list-item-group>
-    <v-layout v-if="done" justify-center>
-      <v-btn class="mr-4" @click="enter">
-        決定
-      </v-btn>
-      <v-btn @click="retry">
-        リトライ
-      </v-btn>
-    </v-layout>
-
-    <div id="interactive" class="viewport" />
-  </v-list>
+  <div>
+    <v-list two-line>
+      <v-list-item-group>
+        <div v-if="done" class="text-caption">
+          候補
+        </div>
+        <v-divider v-if="done" />
+        <template v-for="(item, index) in items">
+          <v-list-item :key="item.format" @click="select(index)">
+            <v-list-item-content>
+              <v-list-item-title v-text="item.code" />
+              <v-list-item-subtitle
+                class="text-caption"
+                v-text="item.format"
+              />
+            </v-list-item-content>
+          </v-list-item>
+          <v-divider
+            :key="index"
+          />
+        </template>
+      </v-list-item-group>
+      <v-layout v-if="done" justify-center>
+        <v-btn class="mr-4" @click="enter">
+          決定
+        </v-btn>
+        <v-btn @click="retry">
+          リトライ
+        </v-btn>
+      </v-layout>
+    </v-list>
+    <div id="interactive" />
+  </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 import Quagga from 'quagga'
-export default {
+
+export type Result = {
+  code: string
+  format: string
+}
+
+export type DataType = {
+  items: Result[]
+  isError: boolean
+  done: boolean
+  code: string
+  format: object
+  config: object
+}
+
+export default Vue.extend({
   name: 'BarcodeReader',
-  data: () => ({
-    items: [],
-    isError: false,
-    done: false,
-    code: '0',
-    format: { format: 'CODE128' },
-    config: {}
-  }),
+  data(): DataType {
+    return {
+      items: [],
+      isError: false,
+      done: false,
+      code: '0',
+      format: { format: 'CODE128' },
+      config: {}
+    }
+  },
   head: () => ({
     title: 'バーコードリーダー'
   }),
@@ -54,8 +73,8 @@ export default {
       inputStream: {
         type: 'LiveStream',
         target: document.querySelector('#interactive'), // カメラ映像を表示するHTML要素の設定
-        constraints: { facingMode: 'environment' }, // バックカメラの利用を設定. (フロントカメラは'user')
-        area: { top: '30%', right: '0%', left: '0%', bottom: '30%' }
+        constraints: { facingMode: 'environment'}, // バックカメラの利用を設定. (フロントカメラは'user')
+        area: { top: '30%', right: '10%', left: '10%', bottom: '30%' }
       },
       // 解析するワーカ数の設定
       numOfWorkers: navigator.hardwareConcurrency || 4,
@@ -68,22 +87,22 @@ export default {
   destroyed () {
     Quagga.stop()
   },
-  errorCaptured (err, vm, info) {
+  errorCaptured (err) {
     console.log('catched by `CHILD errorCaptured`', err.toString())
     this.isError = true
     return false
   },
   methods: {
-    onInitilize (error) {
+    onInitilize (error: any) {
       if (error) {
-        alert(`Error: ${error}`, error)
+        alert(`Error1: ${error}`)
         return
       }
 
       // エラーがない場合は、読み取りを開始
       Quagga.start()
     },
-    onDetected (success) {
+    onDetected (success: any) {
       Quagga.stop()
       this.items.push({ code: success.codeResult.code, format: this.QuaggaToJsBarcodeFormat(success.codeResult.format) })
       this.done = true
@@ -91,7 +110,7 @@ export default {
       this.format = { format: this.items[0].format }
       alert('読込完了')
     },
-    QuaggaToJsBarcodeFormat (QuaggaFormat) {
+    QuaggaToJsBarcodeFormat (QuaggaFormat: string) {
       switch (QuaggaFormat) {
         case 'code_128': return 'CODE128'
         case 'ean': return 'EAN13'
@@ -106,7 +125,7 @@ export default {
         default: return ''
       }
     },
-    select (index) {
+    select (index: number) {
       this.isError = false
       this.code = this.items[index].code
       this.format = { format: this.items[index].format }
@@ -117,8 +136,14 @@ export default {
       Quagga.init(this.config, this.onInitilize)
     },
     enter () {
-      this.$router.push({ path: '/add-item', query: { isbn: this.code } })
+      this.$router.replace({ path: '/books/new', query: { isbn: this.code } })
     }
   }
-}
+})
 </script>
+
+<style scoped>
+#interactive {
+    margin: -16px;
+}
+</style>

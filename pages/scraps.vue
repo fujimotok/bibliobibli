@@ -2,8 +2,18 @@
   <div v-if="isMobile">
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
-        <list-activity ref="listMobile" class="ma-0 pa-0 fill-height" />
+        <list-scrap ref="listMobile" class="ma-0 pa-0 fill-height" />
       </v-list>
+      <div style="position: fixed; bottom: 100px; right: 16px;">
+        <v-btn
+          elevation="2"
+          fab
+          color="secondary"
+          @click.stop="add"
+        >
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </div>
     </div>
     <v-card v-else>
       <div style="padding: 16px;">
@@ -23,8 +33,19 @@
         style="position: relative;"
       >
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
-          <list-activity ref="listDesktop" class="ma-0 pa-0 fill-height" />
+          <list-scrap ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
+        <div style="position: absolute; bottom: 32px; right: 32px;">
+          <v-btn
+            elevation="2"
+            fab
+            small
+            color="secondary"
+            @click.stop="add"
+          >
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </div>
       </v-col>
       <v-col
         xs="12"
@@ -47,12 +68,15 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import listActivity from '~/components/list-activity.vue'
-import ListActivity from '~/components/list-activity.vue'
+import ListScrap from '~/components/list-scrap.vue'
+
+export interface Content extends Vue {
+  save(): void
+  menu(): void
+}
 
 export default Vue.extend({
-  name: 'IndexPage',
-  components: { listActivity },
+  name: 'ScrapsPage',
   data: () => ({
   }),
   computed: {
@@ -62,27 +86,42 @@ export default Vue.extend({
       return xs || sm
     },
     isRoot (): boolean {
-      return this.$route.path === '/'
+      return this.$route.path === '/scraps/'
     }
   },
   mounted () {
   },
   methods: {
     add (): void {
-      this.$router.push({ path: '/books/new'})
+      this.$router.push({ path: '/scraps/new' })
     },
-    search (): void {
-      if (this.isMobile) {
-        const list = this.$refs.listMobile as InstanceType<typeof ListActivity>
+    search (): void  {
+      const self = this
+      if (self.isMobile) {
+        const list = self.$refs.listMobile as InstanceType<typeof ListScrap>
         list.search()
       } else {
-        const list = this.$refs.listDesktop  as InstanceType<typeof ListActivity>
+        const list = self.$refs.listDesktop as InstanceType<typeof ListScrap>
         list.search()
       }
     },
     save (): void {
+      if (this.isMobile) {
+        const content = this.$refs.contentMobile as Content
+        content.save()
+      } else {
+        const content = this.$refs.contentDesktop as Content
+        content.save()
+      }
     },
-    del () {
+    menu (): void {
+      if (this.isMobile) {
+        const content = this.$refs.contentMobile as Content
+        content.menu()
+      } else {
+        const content = this.$refs.contentDesktop as Content
+        content.menu()
+      }
     }
   }
 })
