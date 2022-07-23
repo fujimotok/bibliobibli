@@ -4,6 +4,7 @@
   >
     <template v-for="(item, index) in items">
       <v-list-item :key="index" @click="show(item.id)">
+        <div v-if="index === items.length - 1" v-intersect.quiet="onIntersect" />
         <v-list-item-content>
           <v-list-item-title v-text="item.header" />
           <v-list-item-subtitle
@@ -14,7 +15,42 @@
       </v-list-item>
       <v-divider :key="`${index}-divider`" />
     </template>
-    <div v-intersect.quite="onIntersect" />
+    <v-dialog v-model="dialog" max-width="400">
+      <v-card class="pa-4">
+        <v-card-title>
+          Search
+        </v-card-title>
+        <v-card-text>
+          <v-text-field
+            ref="input"
+            v-model="searchWord"
+            hide-details
+            outlined
+            prepend-inner-icon="mdi-magnify"
+            single-line
+            placeholder="Search word"
+            class="mb-4"
+            @keydown.enter="onEnter"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn @click="clear()">
+            <v-icon>mdi-filter-variant-remove</v-icon>
+            クリア
+          </v-btn>
+          <v-btn class="primary" @click="find(); dialog = false">
+            <v-icon>mdi-magnify</v-icon>
+            検索
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <div v-if="items.length == 0" style="position: absolute; height: 90%; width: 100%; align-items: center;">
+      <p style="position: relative; top: 50%; text-align: center;">
+        No Result
+      </p>
+    </div>
   </v-list-item-group>
 </template>
 
@@ -25,6 +61,8 @@ import { NoteRepository } from '~/js/db/interfaces/NoteRepository'
 export type DataType = {
   items: object[]
   isLoading: boolean
+  searchWord: string
+  dialog: boolean
 }
 
 export default Vue.extend({
@@ -34,7 +72,9 @@ export default Vue.extend({
   data (): DataType {
     return {
       items: [],
-      isLoading: false
+      isLoading: false,
+      searchWord: '',
+      dialog: false
     }
   },
   computed: {
@@ -48,15 +88,19 @@ export default Vue.extend({
     }
   },
   mounted () {
-    this.search()
+    this.find()
   },
   methods: {
     show (id: number) {
       this.$router.push({ path: '/notes/' + id })
     },
-    async search (offset = 0) {
+    async find (offset = 0) {
+      if (offset === 0) {
+        this.items = []
+      }
+      
       const noteRepo: NoteRepository = this.$noteRepository
-      const notes = await noteRepo.find('', offset, 20)
+      const notes = await noteRepo.find(this.searchWord, offset, 20)
       if (notes !== undefined) {
         notes[0].forEach((note) => {
           this.items.push({
@@ -67,10 +111,30 @@ export default Vue.extend({
         })
       }
     },
-    onIntersect () {
+    async onIntersect () {
       this.isLoading = true
-      this.search(this.items.length)
+      await this.find(this.items.length)
       this.isLoading = false
+    },
+    search () {
+      this.dialog = true
+    },
+    clear () {
+      this.searchWord = ''
+
+      this.find()
+      this.dialog = false
+      window.scrollTo({ top: 0 })
+    },
+    onEnter (event: any) {
+      if (event.keyCode !== 13) {
+        return
+      }
+      const input = this.$refs.input as HTMLElement
+      input.blur() // hide software keyboard
+      this.find()
+      this.dialog = false
+      window.scrollTo({ top: 0 })
     }
   }
 })

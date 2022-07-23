@@ -125,6 +125,11 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <div v-if="items.length == 0" style="position: absolute; height: 90%; width: 100%; align-items: center;">
+      <p style="position: relative; top: 50%; text-align: center;">
+        No Result
+      </p>
+    </div>
   </v-list-item-group>
 </template>
 
