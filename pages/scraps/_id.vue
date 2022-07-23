@@ -35,7 +35,7 @@ import Mixin from '~/js/mixin/record-activity'
 export type DataType = {
   config: object
   scrap: Scrap
-  file: string
+  file: object
   bottomSheet: boolean
 }
 
@@ -99,7 +99,7 @@ export default Mixin.extend({
         updatedAt: '',
         content: '',
       },
-      file: '',
+      file: {},
       bottomSheet: false
     }
   },

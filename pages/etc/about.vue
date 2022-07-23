@@ -8,7 +8,7 @@
       <v-card-text>
         <v-container>
           <v-row justify="center">
-            <v-img src="icon.png" max-width="128" :aspect-ratio="1/1" />
+            <v-img src="../icon.png" max-width="128" :aspect-ratio="1/1" />
           </v-row>
           <v-row>
             <v-col>アプリ名</v-col><v-col>BIBLIoBIBLI</v-col>

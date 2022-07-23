@@ -23,7 +23,7 @@ import Mixin from '~/js/mixin/record-activity'
 export type DataType = {
   config: object
   scrap: Scrap
-  file: string
+  file: object
   tagItems: object[]
 }
 
@@ -87,7 +87,7 @@ export default Mixin.extend({
         updatedAt: '',
         content: '',
       },
-      file: '',
+      file: {},
       tagItems: []
     }
   },

@@ -1,6 +1,5 @@
 <template>
   <div v-if="isMobile">
-    <!-- mobileの時はlistにoverflow指定しないようにしてwindowのスクロールに任せる -->
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
         <list-etc ref="listMobile" class="ma-0 pa-0 fill-height" />
@@ -23,7 +22,6 @@
         class="ma-0 pa-0 fill-height"
         style="position: relative;"
       >
-        <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
           <list-etc ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
@@ -37,7 +35,6 @@
         class="ma-0 pa-0 fill-height"
         style="position: relative;"
       >
-        <!-- desktopの時はlistにoverflow指定して個別のスクロール -->
         <v-card class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
           <div style="padding: 16px;">
             <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height" />
