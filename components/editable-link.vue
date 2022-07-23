@@ -15,7 +15,7 @@
       </template>
     </v-text-field>
   </div>
-  <div v-else style="display: flex;align-items: center;">
+  <div v-else style="display: flex; align-items: center;">
     <div>
       <div>
         <label style="font-size: 12px; color: #00000099">
@@ -26,7 +26,7 @@
         <a v-if="value" :href="value" target="_blank" style="word-break: break-all;">
           {{ value }}
         </a>
-        <p v-else style="word-wrap:break-word;">
+        <p v-else style="word-wrap: break-word;">
           {{ label }} is empty
         </p>
       </div>
@@ -42,11 +42,13 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+
+export default Vue.extend({
   props: {
-    value: String,
-    label: String
+    value: { type: String, default: "" },
+    label: { type: String, default: "Label" },
   },
   data () {
     return {
@@ -55,13 +57,13 @@ export default {
   },
   computed: {
     internalValue: {
-      get () {
+      get (): string {
         return this.value
       },
-      set (value) {
+      set (value: string): void {
         this.$emit('input', value)
       }
     }
   }
-}
+})
 </script>

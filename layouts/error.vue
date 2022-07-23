@@ -12,8 +12,15 @@
   </v-app>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+
+export type DataType = {
+  pageNotFound: string
+  otherError: string
+}
+
+export default Vue.extend({
   name: 'EmptyLayout',
   layout: 'empty',
   props: {
@@ -22,20 +29,18 @@ export default {
       default: null
     }
   },
-  data () {
+  data(): DataType {
     return {
       pageNotFound: '404 Not Found',
       otherError: 'An error occurred'
     }
   },
   head () {
-    const title =
-      this.error.statusCode === 404 ? this.pageNotFound : this.otherError
     return {
-      title
+      title: 'error'
     }
   }
-}
+})
 </script>
 
 <style scoped>

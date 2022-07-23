@@ -19,7 +19,7 @@ const config = {
     title: 'BIBLIoBIBLI',
     meta: [
       { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
       { hid: 'description', name: 'description', content: '' },
       { name: 'format-detection', content: 'telephone=no' },
       { name: 'mobile-web-app-capable', content: 'yes' }
@@ -37,6 +37,7 @@ const config = {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     { src: '~plugins/nuxt-simplemde-plugin.js', mode: 'client' },
+    { src: '~plugins/dependencies.ts', mode: 'client' },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -44,6 +45,7 @@ const config = {
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
+    '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/vuetify
@@ -62,7 +64,8 @@ const config = {
       name: 'BIBLIoBIBLI',
       lang: 'ja',
       description: '説明',
-      orientation: 'portrait', scope: '/',
+      orientation: 'portrait',
+      scope: '/',
       display: 'standalone',
       id: '/',
       start_url: '/',
@@ -104,8 +107,9 @@ const config = {
           info: '#03a9f4',
           success: '#8bc34a'
         }
-      }
-    }
+      },
+      options: { customProperties: true }
+    },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

@@ -2,7 +2,7 @@
   <div v-if="isMobile">
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
-        <list-activity ref="listMobile" class="ma-0 pa-0 fill-height" />
+        <list-etc ref="listMobile" class="ma-0 pa-0 fill-height" />
       </v-list>
     </div>
     <v-card v-else>
@@ -23,7 +23,7 @@
         style="position: relative;"
       >
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
-          <list-activity ref="listDesktop" class="ma-0 pa-0 fill-height" />
+          <list-etc ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
       </v-col>
       <v-col
@@ -47,12 +47,9 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import listActivity from '~/components/list-activity.vue'
-import ListActivity from '~/components/list-activity.vue'
 
 export default Vue.extend({
-  name: 'IndexPage',
-  components: { listActivity },
+  name: 'EtcPage',
   data: () => ({
   }),
   computed: {
@@ -62,28 +59,12 @@ export default Vue.extend({
       return xs || sm
     },
     isRoot (): boolean {
-      return this.$route.path === '/'
+      return this.$route.path === '/etc/'
     }
   },
   mounted () {
   },
   methods: {
-    add (): void {
-      this.$router.push({ path: '/books/new'})
-    },
-    search (): void {
-      if (this.isMobile) {
-        const list = this.$refs.listMobile as InstanceType<typeof ListActivity>
-        list.search()
-      } else {
-        const list = this.$refs.listDesktop  as InstanceType<typeof ListActivity>
-        list.search()
-      }
-    },
-    save (): void {
-    },
-    del () {
-    }
   }
 })
 </script>
