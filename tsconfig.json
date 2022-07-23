@@ -23,6 +23,9 @@
       ],
       "indexeddb-export-import": [
         "./types/indexeddb-export-import"
+      ],
+      "quagga": [
+        "./types/quagga"
       ]
     },
     "types": [
