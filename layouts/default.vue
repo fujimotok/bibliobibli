@@ -188,6 +188,20 @@ export default Vue.extend({
   },
   mounted () {
     this.onRouteChanged(this.$route.path)
+
+    // Global click event handler for a tag
+    document.addEventListener("click", (event: MouseEvent) => {
+      const element = event.target as HTMLAnchorElement
+      if (element.tagName === 'A') {
+        const path = element.href
+        const reg = new RegExp('^(https?:)?//'+document.domain);
+
+        if (path.match(reg) || path.charAt(0) === '/') {
+          this.$router.push(path.replace(reg, ''))
+          event.preventDefault()
+        }
+      }
+    })
   },
   methods: {
     search () {
