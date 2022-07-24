@@ -38,6 +38,7 @@ export type DataType = {
 }
 
 export default Vue.extend({
+  name: 'ListActivities',
   props: {
     value: { type: Number, default: 0 }
   },

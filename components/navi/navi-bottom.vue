@@ -36,6 +36,7 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+  name: 'NaviBottom',
   props: {
     value: {
       type: String,
@@ -44,14 +45,11 @@ export default Vue.extend({
   },
   computed: {
     internalValue: {
-      get () {
-        const self:any = this
-        return self.$props.value
+      get (): string {
+        return this.$props.value
       },
-      set (value) {
-        const self:any = this
-        self.$props.value = value
-        self.$emit('change', value)
+      set (value: string) {
+        this.$emit('change', value)
       }
     }
   },
