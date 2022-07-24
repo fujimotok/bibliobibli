@@ -29,6 +29,7 @@ export type DataType = {
 }
 
 export default Vue.extend({
+  name: 'ListEtc',
   props: {
     value: { type: Number, default: 0 }
   },
