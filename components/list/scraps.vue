@@ -1,26 +1,34 @@
 <template>
-  <v-list-item-group
-    v-model="internalValue"
-  >
-    <template v-for="(item, index) in items">
-      <v-list-item :key="index" @click="show(item.id)">
-        <v-list-item-content>
-          <div v-if="index === items.length - 1" v-intersect.quiet="onIntersect" />
-          <v-list-item-title v-text="item.header" />
-          <div>
-            <v-chip
-              v-for="tag in item.tags"
-              :key="tag"
-              small
-              class="mr-1 mt-1"
-            >
-              {{ tag }}
-            </v-chip>
-          </div>
-        </v-list-item-content>
-      </v-list-item>
-      <v-divider :key="`${index}-divider`" />
-    </template>
+  <div>
+    <v-list-item-group
+      v-if="items.length > 0"
+      v-model="internalValue"
+    >
+      <template v-for="(item, index) in items">
+        <v-list-item :key="index" @click="show(item.id)">
+          <v-list-item-content>
+            <div v-if="index === items.length - 1" v-intersect.quiet="onIntersect" />
+            <v-list-item-title v-text="item.header" />
+            <div>
+              <v-chip
+                v-for="tag in item.tags"
+                :key="tag"
+                small
+                class="mr-1 mt-1"
+              >
+                {{ tag }}
+              </v-chip>
+            </div>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider :key="`${index}-divider`" />
+      </template>
+    </v-list-item-group>
+    <div v-else style="position: absolute; height: 90%; width: 100%; align-items: center;">
+      <p style="position: relative; top: 50%; text-align: center;">
+        No Result
+      </p>
+    </div>
     <v-dialog v-model="dialog" max-width="400">
       <v-card class="pa-4">
         <v-card-title>
@@ -81,17 +89,12 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <div v-if="items.length == 0" style="position: absolute; height: 90%; width: 100%; align-items: center;">
-      <p style="position: relative; top: 50%; text-align: center;">
-        No Result
-      </p>
-    </div>
-  </v-list-item-group>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { TagRepository, Tag } from '../js/db/interfaces/TagRepository'
+import { TagRepository, Tag } from '~/js/db/interfaces/TagRepository'
 import { ScrapRepository } from '~/js/db/interfaces/ScrapRepository'
 
 export type DataType = {
@@ -104,6 +107,7 @@ export type DataType = {
 }
 
 export default Vue.extend({
+  name: 'ListScraps',
   props: {
     value: { type: Number, default: 0 }
   },

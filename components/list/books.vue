@@ -1,42 +1,50 @@
 <template>
-  <v-list-item-group
-    v-model="internalValue"
-  >
-    <template v-for="(item, index) in items">
-      <v-list-item :key="index" @click="show(item.id)">
-        <div v-if="index === items.length - 1" v-intersect.quiet="onIntersect" />
-        <v-list-item-content>
-          <v-list-item-title v-text="item.title" />
-          <v-list-item-subtitle
-            class="text-caption"
-            v-text="item.authors ? item.authors.join(', ') : '' "
-          />        
-          <div>
-            <v-icon v-if="item.status == status.want">
-              mdi-progress-star
-            </v-icon>
-            <v-icon v-else-if="item.status == status.unread">
-              mdi-progress-clock
-            </v-icon>
-            <v-icon v-else-if="item.status == status.reading">
-              mdi-progress-check
-            </v-icon>
-            <v-icon v-else>
-              mdi-check
-            </v-icon>
-            <v-chip
-              v-for="tag in item.tags"
-              :key="tag"
-              small
-              class="mr-1 mt-1"
-            >
-              {{ tag }}
-            </v-chip>
-          </div>
-        </v-list-item-content>
-      </v-list-item>
-      <v-divider :key="`${index}-divider`" />
-    </template>
+  <div>
+    <v-list-item-group
+      v-if="items.length > 0"
+      v-model="internalValue"
+    >
+      <template v-for="(item, index) in items">
+        <v-list-item :key="index" @click="show(item.id)">
+          <div v-if="index === items.length - 1" v-intersect.quiet="onIntersect" />
+          <v-list-item-content>
+            <v-list-item-title v-text="item.title" />
+            <v-list-item-subtitle
+              class="text-caption"
+              v-text="item.authors ? item.authors.join(', ') : '' "
+            />        
+            <div>
+              <v-icon v-if="item.status == status.want">
+                mdi-progress-star
+              </v-icon>
+              <v-icon v-else-if="item.status == status.unread">
+                mdi-progress-clock
+              </v-icon>
+              <v-icon v-else-if="item.status == status.reading">
+                mdi-progress-check
+              </v-icon>
+              <v-icon v-else>
+                mdi-check
+              </v-icon>
+              <v-chip
+                v-for="tag in item.tags"
+                :key="tag"
+                small
+                class="mr-1 mt-1"
+              >
+                {{ tag }}
+              </v-chip>
+            </div>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider :key="`${index}-divider`" />
+      </template>
+    </v-list-item-group>
+    <div v-else style="position: absolute; height: 90%; width: 100%; align-items: center;">
+      <p style="position: relative; top: 50%; text-align: center;">
+        No Result
+      </p>
+    </div>
     <v-dialog v-model="dialog" max-width="400">
       <v-card class="pa-4">
         <v-card-title>
@@ -125,17 +133,12 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <div v-if="items.length == 0" style="position: absolute; height: 90%; width: 100%; align-items: center;">
-      <p style="position: relative; top: 50%; text-align: center;">
-        No Result
-      </p>
-    </div>
-  </v-list-item-group>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { TagRepository, Tag } from '../js/db/interfaces/TagRepository'
+import { TagRepository, Tag } from '~/js/db/interfaces/TagRepository'
 import { Status, BookRepository } from '~/js/db/interfaces/BookRepository'
 
 export type DataType = {
@@ -151,6 +154,7 @@ export type DataType = {
 }
 
 export default Vue.extend({
+  name: 'ListBooks',
   props: {
     value: { type: Number, default: 0 }
   },

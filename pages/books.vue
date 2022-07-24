@@ -2,7 +2,7 @@
   <div v-if="isMobile">
     <div v-if="isRoot">
       <v-list style="padding-bottom: 80px;">
-        <list-book ref="listMobile" class="ma-0 pa-0 fill-height" />
+        <list-books ref="listMobile" class="ma-0 pa-0 fill-height" />
       </v-list>
       <div style="position: fixed; bottom: 100px; right: 16px;">
         <v-btn
@@ -33,7 +33,7 @@
         style="position: relative;"
       >
         <v-list class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
-          <list-book ref="listDesktop" class="ma-0 pa-0 fill-height" />
+          <list-books ref="listDesktop" class="ma-0 pa-0 fill-height" />
         </v-list>
         <div style="position: absolute; bottom: 32px; right: 32px;">
           <v-btn
@@ -68,7 +68,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import ListBook from '~/components/list-book.vue'
+import ListBooks from '~/components/list/books.vue'
 
 export interface Content extends Vue {
   save(): void
@@ -97,10 +97,10 @@ export default Vue.extend({
     },
     search (): void {
       if (this.isMobile) {
-        const list = this.$refs.listMobile as InstanceType<typeof ListBook>
+        const list = this.$refs.listMobile as InstanceType<typeof ListBooks>
         list.search()
       } else {
-        const list = this.$refs.listDesktop as InstanceType<typeof ListBook>
+        const list = this.$refs.listDesktop as InstanceType<typeof ListBooks>
         list.search()
       }
     },
