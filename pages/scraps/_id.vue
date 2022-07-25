@@ -1,7 +1,6 @@
 <template>
   <div>
-    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" />
-    <vue-simplemde ref="markdownEditor" v-model="scrap.content" :configs="config" />
+    <markdown v-model="scrap.content" />
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
         <p class="text-h6 ma-2">
@@ -28,14 +27,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import { ScrapRepository, Scrap } from '../../js/db/interfaces/ScrapRepository'
 import Mixin from '~/js/mixin/record-activity'
 
 export type DataType = {
-  config: object
   scrap: Scrap
-  file: object
   bottomSheet: boolean
 }
 
@@ -43,55 +39,6 @@ export default Mixin.extend({
   name: 'ScrapsPage',
   data(): DataType {
     return {
-      config: {
-        spellChecker: false,
-        forceSync: true,
-        indentWithTabs: false,
-        status: false,
-        toolbar: [
-          'bold',
-          'strikethrough',
-          '|',
-          'heading',
-          'unordered-list',
-          'ordered-list',
-          '|',
-          'code',
-          'quote',
-          '|',
-          'link',
-          {
-            name: 'image',
-            action: (editor: any) => {
-              const self = this as any
-              const file = this.$refs.fileInput as Vue
-              if (file) {
-                const input = file.$refs.input as HTMLElement
-                if (input) {
-                  input.addEventListener('change', function onChange () {
-                    input.removeEventListener('change', onChange)
-                    const fileReader = new FileReader()
-                    fileReader.onload = function () {
-                      const dataURI = this.result
-                      const cm = editor.codemirror
-                      const pos = cm.getCursor('start')
-                      cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
-                    }
-                    if (self.file) {
-                      fileReader.readAsDataURL(self.file)
-                    }
-                  })
-                  input.click()
-                }
-              }
-            },
-            className: 'fa fa-image',
-            title: 'image'
-          },
-          '|',
-          'preview'
-        ]
-      },
       scrap: {
         id: undefined,
         tags: [],
@@ -99,7 +46,6 @@ export default Mixin.extend({
         updatedAt: '',
         content: '',
       },
-      file: {},
       bottomSheet: false
     }
   },
@@ -158,30 +104,3 @@ export default Mixin.extend({
   }
 })
 </script>
-
-<style>
-.CodeMirror .CodeMirror-code .cm-header-1 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-header-2 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-header-3 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-header-4 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-comment {
-    background: rgba(0, 0, 255, .1);
-    border-radius: 2px;
-}
-</style>

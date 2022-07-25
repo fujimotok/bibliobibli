@@ -1,7 +1,6 @@
 <template>
   <div>
-    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" />
-    <vue-simplemde ref="markdownEditor" v-model="note.content" :configs="config" />
+    <markdown v-model="note.content" />
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
         <p class="text-h6 ma-2">
@@ -28,14 +27,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import { NoteRepository, Note } from '~/js/db/interfaces/NoteRepository'
 import Mixin from '~/js/mixin/record-activity'
 
 export type DataType = {
   bottomSheet: boolean
-  file: object
-  config: object
   note: Note
 }
 
@@ -44,56 +40,6 @@ export default Mixin.extend({
   data(): DataType {
     return {
       bottomSheet: false,
-      file: {},
-      config: {
-        spellChecker: false,
-        forceSync: true,
-        indentWithTabs: false,
-        status: false,
-        toolbar: [
-          'bold',
-          'strikethrough',
-          '|',
-          'heading',
-          'unordered-list',
-          'ordered-list',
-          '|',
-          'code',
-          'quote',
-          '|',
-          'link',
-          {
-            name: 'image',
-            action: (editor: any) => {
-              const self = this as any
-              const file = this.$refs.fileInput as Vue
-              if (file) {
-                const input = file.$refs.input as HTMLElement
-                if (input) {
-                  input.addEventListener('change', function onChange () {
-                    input.removeEventListener('change', onChange)
-                    const fileReader = new FileReader()
-                    fileReader.onload = function () {
-                      const dataURI = this.result
-                      const cm = editor.codemirror
-                      const pos = cm.getCursor('start')
-                      cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
-                    }
-                    if (self.file) {
-                      fileReader.readAsDataURL(self.file)
-                    }
-                  })
-                  input.click()
-                }
-              }
-            },
-            className: 'fa fa-image',
-            title: 'image'
-          },
-          '|',
-          'preview'
-        ]
-      },
       note: {
         id: undefined,
         createdAt: '',
@@ -130,21 +76,8 @@ export default Mixin.extend({
     this.$store.commit('CHANGE_IS_SHOW_DEL', false)
   },
   mounted () {
-    window.addEventListener('resize', this.resize)
-    window.visualViewport.addEventListener('resize', this.resize)
-    this.resize()
   },
   methods: {
-    resize () {
-      const toolbarHeight = document.querySelector('.editor-toolbar')?.clientHeight || 0
-      const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
-      const node = document.querySelector('.CodeMirror') as HTMLElement
-      const style = node?.style
-      if (style) {
-        style.height = height + 'px'
-      }
-      window.scroll(0, 0)
-    },
     async save () {
       await this.recordActivity(`/notes/${this.note.id}`, 'Update Note', `${this.note.path} is updated.`)
       const noteRepo: NoteRepository = this.$noteRepository
@@ -167,30 +100,3 @@ export default Mixin.extend({
   }
 })
 </script>
-
-<style>
-.CodeMirror .CodeMirror-code .cm-header-1 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-header-2 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-header-3 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-header-4 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-comment {
-    background: rgba(0, 0, 255, .1);
-    border-radius: 2px;
-}
-</style>

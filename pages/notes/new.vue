@@ -1,18 +1,16 @@
 <template>
   <div>
     <v-text-field v-model="note.path" label="path" />
-    <vue-simplemde ref="markdownEditor" v-model="note.content" :configs="config" />
+    <markdown v-model="note.content" />
   </div>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
 import { NoteRepository, Note } from '~/js/db/interfaces/NoteRepository'
 import { BookRepository, Book } from '~/js/db/interfaces/BookRepository'
 import Mixin from '~/js/mixin/record-activity'
 
 export type DataType = {
-  config: object
   note: Note
   book: Book | undefined
 }
@@ -21,55 +19,6 @@ export default Mixin.extend({
   name: 'NotesNewPage',
   data(): DataType {
     return {
-      config: {
-        spellChecker: false,
-        forceSync: true,
-        indentWithTabs: false,
-        status: false,
-        toolbar: [
-          'bold',
-          'strikethrough',
-          '|',
-          'heading',
-          'unordered-list',
-          'ordered-list',
-          '|',
-          'code',
-          'quote',
-          '|',
-          'link',
-          {
-            name: 'image',
-            action: (editor: any) => {
-              const self = this as any
-              const file = this.$refs.fileInput as Vue
-              if (file) {
-                const input = file.$refs.input as HTMLElement
-                if (input) {
-                  input.addEventListener('change', function onChange () {
-                    input.removeEventListener('change', onChange)
-                    const fileReader = new FileReader()
-                    fileReader.onload = function () {
-                      const dataURI = this.result
-                      const cm = editor.codemirror
-                      const pos = cm.getCursor('start')
-                      cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
-                    }
-                    if (self.file) {
-                      fileReader.readAsDataURL(self.file)
-                    }
-                  })
-                  input.click()
-                }
-              }
-            },
-            className: 'fa fa-image',
-            title: 'image'
-          },
-          '|',
-          'preview'
-        ]
-      },
       note: {
         id: undefined,
         createdAt: '',
@@ -140,31 +89,3 @@ export default Mixin.extend({
   }
 })
 </script>
-
-<style>
-.CodeMirror .CodeMirror-code .cm-header-1 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-header-2 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-header-3 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-header-4 {
-    font-size: 110%;
-    line-height: 110%;
-}
-
-.CodeMirror .CodeMirror-code .cm-comment {
-    background: rgba(0, 0, 255, .1);
-    border-radius: 2px;
-}
-</style>
-
