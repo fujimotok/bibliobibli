@@ -65,7 +65,6 @@
           <v-select
             v-model="searchStates"
             multiple
-            return-object
             :items="states"
             label="states"
             :menu-props="{ offsetY: true }"
@@ -231,8 +230,8 @@ export default Vue.extend({
       const bookRepo: BookRepository = this.$bookRepository
       const books = await bookRepo.find(this.searchWord, this.searchStates, this.searchTags, offset, 20)
       if (books !== undefined) {
-        const res = books[0].map((book) => {
-          return {
+        books[0].forEach((book) => {
+          this.items.push({
             id: book.id,
             title: book.title,
             authors: book.authors,
@@ -241,10 +240,9 @@ export default Vue.extend({
               const elem = this.tagItems.find((t) => t.id === tag)
               return elem?.name
             })
-          }
+          })
         })
-        
-        this.items = this.items.concat(res)
+        this.$store.commit('CHANGE_SEARCH_COUNT', books[1])
       }
     },
     async onIntersect () {

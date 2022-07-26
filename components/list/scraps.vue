@@ -173,6 +173,7 @@ export default Vue.extend({
             })
           })
         })
+        this.$store.commit('CHANGE_SEARCH_COUNT', scraps[1])
       }
     },
     async onIntersect () {
