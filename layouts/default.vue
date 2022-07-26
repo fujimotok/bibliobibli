@@ -17,6 +17,7 @@
       </v-btn>
       <v-toolbar-title class="mx-2" v-text="title" />
       <v-spacer />
+      <v-toolbar-title class="mx-2" v-text="count" />
       <v-btn
         v-show="isRoot && hasSearch"
         color="white"
@@ -79,6 +80,7 @@
             <v-row>
               <v-toolbar-title class="mx-2" v-text="title" />
               <v-spacer />
+              <v-toolbar-title class="mx-2" v-text="count" />
               <v-btn
                 v-show="hasSearch"
                 color="white"
@@ -274,10 +276,12 @@ export default Vue.extend({
         case 'etc':
           this.hasSearch = false;
           this.selectedNaviItem = 'Etc'
+          this.$store.commit('CHANGE_SEARCH_COUNT', '')
           break
         default:
           this.hasSearch = false;
           this.selectedNaviItem = 'Activity'
+          this.$store.commit('CHANGE_SEARCH_COUNT', '')
       }
     }
   }
