@@ -33,10 +33,6 @@ export default Mixin.extend({
     this.note.path = '/Fleeting/' + this.formatDate(new Date)
   },
   async mounted () {
-    window.addEventListener('resize', this.resize)
-    window.visualViewport.addEventListener('resize', this.resize)
-    this.resize()
-    
     if (this.$route.query.id) {
       const idStr = this.$route.query.id as string
       const id = Number.parseInt(idStr)
@@ -49,16 +45,6 @@ export default Mixin.extend({
     }
   },
   methods: {
-    resize (): void {
-      const toolbarHeight = document.querySelector('.editor-toolbar')?.clientHeight || 0
-      const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
-      const node = document.querySelector('.CodeMirror') as HTMLElement
-      const style = node?.style
-      if (style) {
-        style.height = height + 'px'
-      }
-      window.scroll(0, 0)
-    },
     formatDate(dt: Date): string {
       const yyyy = dt.getFullYear()
       const MM = ('00' + (dt.getMonth()+1)).slice(-2)
