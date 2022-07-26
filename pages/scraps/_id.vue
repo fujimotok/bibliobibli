@@ -1,10 +1,19 @@
 <template>
   <div>
+    <v-select
+      v-model="scrap.tags"
+      multiple
+      :items="tagItems"
+      item-value="id"
+      item-text="name"
+      label="tags"
+      :menu-props="{ offsetY: true }"
+    />
     <markdown v-model="scrap.content" />
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
-        <p class="text-h6 ma-2">
-          Menu
+        <p class="text-h6 ma-4">
+          {{ scrap.id }}: {{ scrap.content.split(/\r\n|\r|\n/)[0] }}
         </p>
         <v-divider />
         <v-list-item-group>
@@ -28,10 +37,12 @@
 
 <script lang="ts">
 import { ScrapRepository, Scrap } from '../../js/db/interfaces/ScrapRepository'
+import { TagRepository } from '~/js/db/interfaces/TagRepository'
 import Mixin from '~/js/mixin/record-activity'
 
 export type DataType = {
   scrap: Scrap
+  tagItems: object[]
   bottomSheet: boolean
 }
 
@@ -46,6 +57,7 @@ export default Mixin.extend({
         updatedAt: '',
         content: '',
       },
+      tagItems: [],
       bottomSheet: false
     }
   },
@@ -60,6 +72,13 @@ export default Mixin.extend({
     }
   },
   async beforeMount () {
+    const tagRepo: TagRepository = this.$tagRepository
+    await tagRepo.find('', 0, 0).then((tags) => {
+      if (tags !== undefined) {
+        this.tagItems = tags[0]
+      }
+    })
+
     const scrapRepo: ScrapRepository = this.$scrapRepository
     const ret = await scrapRepo.findById(Number(this.$route.params.id))
     if (ret) {
@@ -67,21 +86,8 @@ export default Mixin.extend({
     }
   },
   mounted () {
-    window.addEventListener('resize', this.resize)
-    window.visualViewport.addEventListener('resize', this.resize)
-    this.resize()
   },
   methods: {
-    resize () {
-      const toolbarHeight = document.querySelector('.editor-toolbar')?.clientHeight || 0
-      const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
-      const node = document.querySelector('.CodeMirror') as HTMLElement
-      const style = node?.style
-      if (style) {
-        style.height = height + 'px'
-      }
-      window.scroll(0, 0)
-    },
     async save () {
       await this.recordActivity(`/scraps/${this.scrap.id}`, 'Update Scrap Info', `${this.scrap.id} is updated.`)
       const scrapRepo: ScrapRepository = this.$scrapRepository

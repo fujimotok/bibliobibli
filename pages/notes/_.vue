@@ -3,11 +3,24 @@
     <markdown v-model="note.content" />
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
-        <p class="text-h6 ma-2">
-          Menu
+        <p class="text-h6 ma-4">
+          {{ note.id }}: {{ note.path }}
         </p>
         <v-divider />
         <v-list-item-group>
+          <v-list-item @click="rename">
+            <v-list-item-avatar>
+              <v-avatar>
+                <v-icon>
+                  mdi-pencil
+                </v-icon>
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-title>
+              名称変更
+            </v-list-item-title>
+          </v-list-item>
+          <v-divider />
           <v-list-item @click="remove">
             <v-list-item-avatar>
               <v-avatar>
@@ -97,6 +110,24 @@ export default Mixin.extend({
         this.$router.push('/notes/')
       }
     },
+    async rename () {
+      const ret = prompt('名称変更', this.note.path)
+      if (ret) {
+        await this.recordActivity(`/notes/${this.note.id}`, 'Update Note', `${this.note.path} is deleted.`)
+        const noteRepo: NoteRepository = this.$noteRepository
+        if (this.note.id) {
+          this.note.path = ret
+          await noteRepo.store(this.note)
+        }
+        this.bottomSheet = false
+      }
+    },
   }
 })
 </script>
+
+<style scoped>
+.v-sheet {
+    border-radius: 20px 20px 0 0;
+}
+</style>

@@ -69,8 +69,8 @@
     </div>
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
-        <p class="text-h6 ma-2">
-          Menu
+        <p class="text-h6 ma-4">
+          {{ book.id }}: {{ book.title }}
         </p>
         <v-divider />
         <v-list-item-group>
@@ -286,3 +286,9 @@ export default Mixin.extend({
   }
 })
 </script>
+
+<style scoped>
+.v-sheet {
+    border-radius: 20px 20px 0 0;
+}
+</style>

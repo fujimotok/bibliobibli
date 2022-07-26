@@ -46,20 +46,8 @@ export default Mixin.extend({
     })
   },
   mounted () {
-    window.addEventListener('resize', this.resize)
-    this.resize()
   },
   methods: {
-    resize () {
-      const toolbarHeight = document.querySelector('.editor-toolbar')?.clientHeight || 0
-      const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
-      const node = document.querySelector('.CodeMirror') as HTMLElement
-      const style = node?.style
-      if (style) {
-        style.height = height + 'px'
-      }
-      window.scroll(0, 0)
-    },
     async save () {
       const scrapRepo: ScrapRepository = this.$scrapRepository
       const ret = await scrapRepo.store(this.scrap)
