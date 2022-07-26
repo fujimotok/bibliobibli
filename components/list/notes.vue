@@ -113,6 +113,7 @@ export default Vue.extend({
             path: note.path,
           })
         })
+        this.$store.commit('CHANGE_SEARCH_COUNT', notes[1])
       }
     },
     async onIntersect () {
