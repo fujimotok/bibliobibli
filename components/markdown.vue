@@ -39,12 +39,13 @@ export interface Match {
 }
 
 export type DataType = {
+  dialog: boolean
+  dirty: boolean
   file: object
-  config: object
   matches: Match[]
   current: number
   searchWord: string
-  dialog: boolean
+  config: object
 }
 
 export interface Marker extends Vue {
@@ -70,12 +71,17 @@ export interface VueSimplemde extends Vue {
 export default Vue.extend({
   name: 'MarkdownEditor',
   props: {
-    value: { type: String, default: '' }
+    value: { type: String, default: '' },
+    save: { type: Function, default: () => {} }
   },
   data(): DataType {
     return {
       dialog: false,
+      dirty: false,
       file: {},
+      matches: [],
+      current: 0,
+      searchWord: '',
       config: {
         spellChecker: false,
         forceSync: true,
@@ -132,10 +138,7 @@ export default Vue.extend({
           '|',
           'preview'
         ]
-      },
-      matches: [],
-      current: 0,
-      searchWord: ''
+      }
     }
   },
   computed: {
@@ -144,6 +147,7 @@ export default Vue.extend({
         return this.value
       },
       set (value: string): void {
+        this.dirty = true
         this.$emit('input', value)
       }
     }
@@ -231,6 +235,12 @@ export default Vue.extend({
       const cm = vmde.simplemde.codemirror
       cm.getAllMarks().filter(m => m.className === 'mark').forEach(m => m.clear())
       cm.getAllMarks().filter(m => m.className === 'selection').forEach(m => m.clear())
+    },
+    async leave () {
+      if (this.dirty) {
+        await this.$props.save()
+      }
+      this.dirty = false
     }
   }
 })
