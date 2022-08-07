@@ -189,6 +189,14 @@ export default Mixin.extend({
       this.book = ret
     }
   },
+  beforeRouteUpdate(_, __, next) {
+    this.save()
+    next()
+  },
+  beforeRouteLeave(_, ___, next) {
+    this.save()
+    next()
+  },
   methods: {
     barcodeReader () {
       this.$router.push('/barcode-reader')
@@ -262,9 +270,14 @@ export default Mixin.extend({
       }
     },
     async save () {
-      await this.recordActivity(`/books/${this.book.id}`, 'Update Book Info', `${this.book.title} is updated.`)
       const bookRepo: BookRepository = this.$bookRepository
-      await bookRepo.store(this.book)
+      const book = this.book
+      
+      const oldBook = await bookRepo.findById(book.id || -1)
+      if (oldBook && JSON.stringify(oldBook) !== JSON.stringify(book)) {
+        await this.recordActivity(`/books/${book.id}`, 'Update Book Info', `${book.title} is updated.`)
+        await bookRepo.store(book)
+      }
     },
     menu () {
       this.bottomSheet = true
