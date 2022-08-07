@@ -86,7 +86,7 @@ export class ActivityRepositoryDexie implements ActivityRepository
   {
     const words = word.split(' ')
     const regex = new RegExp(words.join('|'), 'i')
-    const collection = db.activities.orderBy(':id').reverse().filter((activity: Activity) => {
+    const collection = db.activities.orderBy('createdAt').reverse().filter((activity: Activity) => {
       return regex.test(activity.title) || regex.test(activity.content)
     })
     const count = await collection.count()
