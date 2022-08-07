@@ -41,6 +41,7 @@ export interface Match {
 export type DataType = {
   dialog: boolean
   dirty: boolean
+  timerID: number
   file: object
   matches: Match[]
   current: number
@@ -78,6 +79,7 @@ export default Vue.extend({
     return {
       dialog: false,
       dirty: false,
+      timerID: 0,
       file: {},
       matches: [],
       current: 0,
@@ -148,6 +150,14 @@ export default Vue.extend({
       },
       set (value: string): void {
         this.dirty = true
+        if (this.timerID > 0) {
+          window.clearTimeout(this.timerID)
+          this.timerID = 0
+        }
+        this.timerID = window.setTimeout(() => {
+          this.leave()
+          this.timerID = 0
+        }, 3000)
         this.$emit('input', value)
       }
     }
