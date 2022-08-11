@@ -25,7 +25,7 @@
         "./types/indexeddb-export-import"
       ],
       "quagga": [
-        "./types/quagga"
+        "./node_modules/quagga/type-definitions/quagga.d.ts"
       ]
     },
     "types": [

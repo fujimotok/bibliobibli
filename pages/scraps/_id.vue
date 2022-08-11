@@ -9,7 +9,7 @@
       label="tags"
       :menu-props="{ offsetY: true }"
     />
-    <markdown v-model="scrap.content" />
+    <markdown ref="markdown" v-model="scrap.content" :save="save" />
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
         <p class="text-h6 ma-4">
@@ -44,6 +44,10 @@ export type DataType = {
   scrap: Scrap
   tagItems: object[]
   bottomSheet: boolean
+}
+
+export interface Markdown extends Vue {
+  leave(): void
 }
 
 export default Mixin.extend({
@@ -87,11 +91,22 @@ export default Mixin.extend({
   },
   mounted () {
   },
+  beforeRouteUpdate(_, __, next) {
+    const m = this.$refs.markdown as Markdown
+    m.leave()
+    next()
+  },
+  beforeRouteLeave(_, ___, next) {
+    const m = this.$refs.markdown as Markdown
+    m.leave()
+    next()
+  },
   methods: {
     async save () {
-      await this.recordActivity(`/scraps/${this.scrap.id}`, 'Update Scrap Info', `${this.scrap.id} is updated.`)
+      const scrap = this.scrap // When page update or leave, this.scrap change after 'await'.
+      await this.recordActivity(`/scraps/${scrap.id}`, 'Update Scrap Info', `${scrap.content.split(/\r\n|\r|\n/)[0]} is updated.`)
       const scrapRepo: ScrapRepository = this.$scrapRepository
-      await scrapRepo.store(this.scrap)
+      await scrapRepo.store(scrap)
     },
     menu () {
       this.bottomSheet = true

@@ -14,6 +14,12 @@ export interface ActivityRepository {
   findById(id: number): Promise<Activity | undefined>
 
   /**
+   * Get activity entry by URI.
+   * @param {string} uri
+   */
+  findByURI(uri: string): Promise<Activity | undefined>
+
+  /**
    * Create or Update activity entry.
    * @param {Activity} activity If you want create new entry, Set null in Activity.id.
    * @return {Activity} When created new entry, Activity.id is updated. When updated entry, Activity.updateAt is updated.

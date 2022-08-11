@@ -20,6 +20,24 @@ export class ActivityRepositoryDexie implements ActivityRepository
   }
 
   /**
+   * Get activity entry by uri.
+   * @param {string} uri
+   */
+  async findByURI(uri: string): Promise<Activity | undefined>
+  {
+    return await db.activities
+      .where('link')
+      .equals(uri)
+      .first()
+      .then((activity: Activity | undefined) => {
+        return activity
+      })
+      .catch(() => {
+        return undefined
+      })
+  }
+
+  /**
    * Create or Update activity entry.
    * @param {Activity} activity If you want create new entry, Set null in Activity.id.
    * @return {Activity} When created new entry, Activity.id is updated. When updated entry, Activity.updateAt is updated.
@@ -33,9 +51,19 @@ export class ActivityRepositoryDexie implements ActivityRepository
                 + sign + Math.abs(tz).toString().padStart(2, '0') + ':00'
 
     activity.createdAt = now
-    delete activity.id // To set id automatically.
-    const addedId = await db.activities.add(activity)
-    return await this.findById(addedId)
+    if (activity.id && await this.findById(activity.id))
+    {
+      activity.createdAt = now
+      await db.activities.update(activity.id, activity)
+      return await this.findById(activity.id)
+    }
+    else
+    {
+      activity.createdAt = now
+      delete activity.id // To set id automatically.
+      const addedId = await db.activities.add(activity)
+      return await this.findById(addedId)
+    }
   }
 
   /**
@@ -58,7 +86,7 @@ export class ActivityRepositoryDexie implements ActivityRepository
   {
     const words = word.split(' ')
     const regex = new RegExp(words.join('|'), 'i')
-    const collection = db.activities.orderBy(':id').reverse().filter((activity: Activity) => {
+    const collection = db.activities.orderBy('createdAt').reverse().filter((activity: Activity) => {
       return regex.test(activity.title) || regex.test(activity.content)
     })
     const count = await collection.count()

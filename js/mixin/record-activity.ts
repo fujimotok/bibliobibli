@@ -12,6 +12,11 @@ export default Vue.extend({
         content
       }
 
+      const oldAct = await repo.findByURI(link)
+      if (oldAct)
+      {
+        act.id = oldAct.id
+      }
       await repo.store(act)
       
       // limit data counts.

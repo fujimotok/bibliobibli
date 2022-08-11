@@ -1,6 +1,6 @@
 <template>
   <div>
-    <markdown v-model="note.content" />
+    <markdown ref="markdown" v-model="note.content" :save="save" />
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
         <p class="text-h6 ma-4">
@@ -48,6 +48,10 @@ export type DataType = {
   note: Note
 }
 
+export interface Markdown extends Vue {
+  leave(): void
+}
+
 export default Mixin.extend({
   name: 'NotesIndexPage',
   data(): DataType {
@@ -90,11 +94,23 @@ export default Mixin.extend({
   },
   mounted () {
   },
+  beforeRouteUpdate(_, __, next) {
+    const m = this.$refs.markdown as Markdown
+    m.leave()
+    next()
+  },
+  beforeRouteLeave(_, ___, next) {
+    const m = this.$refs.markdown as Markdown
+    m.leave()
+    next()
+  },
   methods: {
     async save () {
-      await this.recordActivity(`/notes/${this.note.id}`, 'Update Note', `${this.note.path} is updated.`)
+      const note = this.note // When page update or leave, this.note change after 'await'.
+      await this.recordActivity(`/notes/${note.id}`, 'Update Note', `${note.path} is updated.`)
       const noteRepo: NoteRepository = this.$noteRepository
-      await noteRepo.store(this.note)
+      const res = await noteRepo.store(note)
+      console.log('saved', res)
     },
     menu () {
       this.bottomSheet = true
