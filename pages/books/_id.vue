@@ -109,6 +109,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import { BookRepository, Book } from '~/js/db/interfaces/BookRepository'
+import { NoteRepository, Note } from '~/js/db/interfaces/NoteRepository'
 import { TagRepository } from '~/js/db/interfaces/TagRepository'
 import Mixin from '~/js/mixin/record-activity'
 
@@ -293,8 +294,26 @@ export default Mixin.extend({
         this.$router.push('/books/')
       }
     },
-    note () {
-      this.$router.push(`/notes/new?id=${this.book.id}`)
+    async note () {
+      const noteRepo: NoteRepository = this.$noteRepository
+      const bookRepo: BookRepository = this.$bookRepository
+      
+      const note: Note = {
+        path: `/Literature/${this.book.title}`,
+        content: `[book info](/books/${this.book.id})`,
+      }
+
+      const ret = await noteRepo.store(note)
+      if (ret) {
+        await this.recordActivity(`/notes/${ret.id}`, 'Created Note', `${ret.path} is created.`)
+        
+        if (this.book) {
+          this.book.links.push(`/notes/${ret.id}`)
+          await bookRepo.store(this.book)
+        }
+
+        this.$router.replace({ path: `/notes/${ret.id}` })
+      }
     }
   }
 })
