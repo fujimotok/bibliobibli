@@ -109,6 +109,7 @@
 import Vue from 'vue'
 import axios from 'axios'
 import { BookRepository, Book } from '~/js/db/interfaces/BookRepository'
+import { NoteRepository, Note } from '~/js/db/interfaces/NoteRepository'
 import { TagRepository } from '~/js/db/interfaces/TagRepository'
 import Mixin from '~/js/mixin/record-activity'
 
@@ -189,6 +190,14 @@ export default Mixin.extend({
       this.book = ret
     }
   },
+  beforeRouteUpdate(_, __, next) {
+    this.save()
+    next()
+  },
+  beforeRouteLeave(_, ___, next) {
+    this.save()
+    next()
+  },
   methods: {
     barcodeReader () {
       this.$router.push('/barcode-reader')
@@ -262,9 +271,14 @@ export default Mixin.extend({
       }
     },
     async save () {
-      await this.recordActivity(`/books/${this.book.id}`, 'Update Book Info', `${this.book.title} is updated.`)
       const bookRepo: BookRepository = this.$bookRepository
-      await bookRepo.store(this.book)
+      const book = this.book
+      
+      const oldBook = await bookRepo.findById(book.id || -1)
+      if (oldBook && JSON.stringify(oldBook) !== JSON.stringify(book)) {
+        await this.recordActivity(`/books/${book.id}`, 'Update Book Info', `${book.title} is updated.`)
+        await bookRepo.store(book)
+      }
     },
     menu () {
       this.bottomSheet = true
@@ -280,8 +294,26 @@ export default Mixin.extend({
         this.$router.push('/books/')
       }
     },
-    note () {
-      this.$router.push(`/notes/new?id=${this.book.id}`)
+    async note () {
+      const noteRepo: NoteRepository = this.$noteRepository
+      const bookRepo: BookRepository = this.$bookRepository
+      
+      const note: Note = {
+        path: `/Literature/${this.book.title}`,
+        content: `[book info](/books/${this.book.id})`,
+      }
+
+      const ret = await noteRepo.store(note)
+      if (ret) {
+        await this.recordActivity(`/notes/${ret.id}`, 'Created Note', `${ret.path} is created.`)
+        
+        if (this.book) {
+          this.book.links.push(`/notes/${ret.id}`)
+          await bookRepo.store(this.book)
+        }
+
+        this.$router.replace({ path: `/notes/${ret.id}` })
+      }
     }
   }
 })

@@ -17,7 +17,7 @@
       </v-btn>
       <v-toolbar-title class="mx-2" v-text="title" />
       <v-spacer />
-      <v-toolbar-title class="mx-2" v-text="count" />
+      <v-toolbar-title v-show="isRoot" class="mx-2" v-text="count" />
       <v-btn
         v-show="isRoot && hasSearch"
         color="white"
@@ -27,16 +27,6 @@
         @click.stop="search()"
       >
         <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-      <v-btn
-        v-show="!isRoot"
-        color="white"
-        icon
-        small
-        class="mx-2"
-        @click.stop="save()"
-      >
-        <v-icon>mdi-content-save</v-icon>
       </v-btn>
       <v-btn
         v-show="!isRoot"
@@ -104,9 +94,6 @@
               <v-divider vertical />
               <v-toolbar-title class="mx-2" v-text="title" />
               <v-spacer />
-              <v-btn color="white" icon small class="mx-2" @click.stop="save()">
-                <v-icon>mdi-content-save</v-icon>
-              </v-btn>
               <v-btn color="white" icon small class="mx-2" @click.stop="menu()">
                 <v-icon>mdi-dots-vertical</v-icon>
               </v-btn>
@@ -141,7 +128,6 @@ export type DataType = {
 
 export interface Page extends Vue {
   search(): void
-  save(): void
   menu(): void
 }
 
@@ -215,17 +201,6 @@ export default Vue.extend({
         const elem = this.$refs.pageDesktop as Vue
         const page = elem.$children.find((e: any) => !(e._inactive)) as Page
         page.search()
-      }
-    },
-    save () {
-      if (this.isMobile) {
-        const elem = this.$refs.pageMobile as Vue
-        const page = elem.$children.find((e: any) => !(e._inactive)) as Page
-        page.save()
-      } else {
-        const elem = this.$refs.pageDesktop as Vue
-        const page = elem.$children.find((e: any) => !(e._inactive)) as Page
-        page.save()
       }
     },
     menu () {

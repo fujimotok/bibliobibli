@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div>
+    <div v-if="barcode === false">
       <div style="display: flex;align-items: center;">
         <icon-combobox v-model="book.status" :items="states" item-value="id" item-text="status" />
         <h2>{{ book.title }}</h2>
       </div>
-      <v-img :src="book.cover" max-height="256" contain />
+      <v-img :src="book.cover" max-height="160" contain />
 
       <v-text-field
         ref="isbn"
@@ -13,7 +13,7 @@
         label="isbn13"
         append-outer-icon="mdi-barcode-scan"
         @change="onChangeISBN"
-        @click:append-outer="barcodeReader"
+        @click:append-outer="barcode = true"
       />
       <v-text-field v-model="book.title" label="title" />
       <v-combobox v-model="book.authors" multiple label="authors" />
@@ -66,11 +66,19 @@
         </v-btn>
       </div>
     </div>
+    <div v-else>
+      <barcode-scanner v-model="code" />
+      <div class="center">
+        <v-btn class="ma-2" @click="barcode = false">
+          スキャンをやめる
+        </v-btn>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+  import Vue from 'vue'
 import axios from 'axios'
 import { BookRepository, Book } from '~/js/db/interfaces/BookRepository'
 import { TagRepository } from '~/js/db/interfaces/TagRepository'
@@ -82,6 +90,8 @@ export type DataType = {
   states: object[]
   tagItems: object[]
   book: Book
+  barcode: boolean
+  code: string
 }
 
 export interface VMenu extends Vue {
@@ -92,6 +102,8 @@ export default Mixin.extend({
   name: 'BooksNewPage',
   data(): DataType {
     return {
+      barcode: false,
+      code: '',
       activePicker: undefined,
       datePickerMenu: false,
       states: [
@@ -115,12 +127,19 @@ export default Mixin.extend({
         readAt: '',
         links: [''],
         tags: [],
-      }
+      },
     }
   },
   watch: {
     datePickerMenu (val) {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
+    },
+    code (val) {
+      if (val.startsWith('978') || val.startsWith('979')) {
+        this.barcode = false
+        this.book.isbn = val
+        this.onChangeISBN(this.book.isbn)
+      }
     }
   },
   mounted () {
@@ -128,7 +147,7 @@ export default Mixin.extend({
       const el = this.$refs.isbn as HTMLElement
       el.focus()
     })
-
+    
     if (this.$route.query.isbn) {
       this.book.isbn = this.$route.query.isbn as string
       this.onChangeISBN(this.book.isbn)
@@ -142,10 +161,10 @@ export default Mixin.extend({
       }
     })
   },
+  deactivated () {
+    this.barcode = false
+  },
   methods: {
-    barcodeReader () {
-      this.$router.push('/books/barcode-reader')
-    },
     dateChanged (date: string) {
       const menu = this.$refs.datePickerMenu as VMenu
       menu.save(date)
@@ -219,12 +238,34 @@ export default Mixin.extend({
       const ret = await bookRepo.store(this.book)
       if (ret) {
         await this.recordActivity(`/books/${ret.id}`, 'Created Book Info', `${ret.title} is created.`)
-        this.$router.replace({ path: `/books/${ret.id}` })
       }
-      
+      this.close()
     },
-    menu () {
+    close () {
+      this.barcode = false
+      this.code = ''
+      this.book = {
+        id: 0,
+        createdAt: '',
+        updatedAt: '',
+        isbn: '',
+        title: 'title',
+        authors: [''],
+        publisher: '',
+        publishedAt: '',
+        cover: '/noimage.png',
+        status: 0,
+        readAt: '',
+        links: [''],
+        tags: [],
+      }
     }
   }
 })
 </script>
+
+<style scoped>
+.center {
+    text-align: center;
+}
+</style>

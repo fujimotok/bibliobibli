@@ -1,18 +1,15 @@
 <template>
   <div>
     <v-text-field v-model="note.path" label="path" />
-    <markdown v-model="note.content" />
   </div>
 </template>
 
 <script lang="ts">
 import { NoteRepository, Note } from '~/js/db/interfaces/NoteRepository'
-import { BookRepository, Book } from '~/js/db/interfaces/BookRepository'
 import Mixin from '~/js/mixin/record-activity'
 
 export type DataType = {
   note: Note
-  book: Book | undefined
 }
 
 export default Mixin.extend({
@@ -25,24 +22,13 @@ export default Mixin.extend({
         updatedAt: '',
         content: '',
         path: '',
-      },
-      book: undefined,
+      }
     }
   },
   beforeMount () {
     this.note.path = '/Fleeting/' + this.formatDate(new Date)
   },
   async mounted () {
-    if (this.$route.query.id) {
-      const idStr = this.$route.query.id as string
-      const id = Number.parseInt(idStr)
-      const bookRepo: BookRepository = this.$bookRepository
-      const book = await bookRepo.findById(id)
-      if (book) {
-        this.book = book
-        this.note.path = `/Literature/${book.title}`
-      }
-    }
   },
   methods: {
     formatDate(dt: Date): string {
@@ -56,21 +42,22 @@ export default Mixin.extend({
     },
     async save () {
       const noteRepo: NoteRepository = this.$noteRepository
-      const bookRepo: BookRepository = this.$bookRepository
       
       const ret = await noteRepo.store(this.note)
       if (ret) {
         await this.recordActivity(`/notes/${ret.id}`, 'Created Note', `${ret.path} is created.`)
         
-        if (this.book) {
-          this.book.links.push(`/notes/${ret.id}`)
-          await bookRepo.store(this.book)
-        }
-
-        this.$router.replace({ path: `/notes/${ret.id}` })
+        this.$router.push({ path: `/notes/${ret.id}` })
       }
     },
-    menu (): void {
+    close () {
+      this.note = {
+        id: undefined,
+        createdAt: '',
+        updatedAt: '',
+        content: '',
+        path: '',
+      }
     }
   }
 })
