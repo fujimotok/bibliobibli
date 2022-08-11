@@ -68,14 +68,16 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { ScrapRepository, Scrap } from '~/js/db/interfaces/ScrapRepository'
 import ListScraps from '~/components/list/scraps.vue'
+import Mixin from '~/js/mixin/record-activity'
 
 export interface Content extends Vue {
   save(): void
   menu(): void
 }
 
-export default Vue.extend({
+export default Mixin.extend({
   name: 'ScrapsPage',
   data: () => ({
   }),
@@ -92,8 +94,19 @@ export default Vue.extend({
   mounted () {
   },
   methods: {
-    add (): void {
-      this.$router.push({ path: '/scraps/new' })
+    async add () {
+      const scrapRepo: ScrapRepository = this.$scrapRepository
+      const clipboard = await navigator.clipboard.readText().catch(() => '');
+
+      const scrap: Scrap = {
+        content: clipboard,
+        tags: []
+      }
+      const ret = await scrapRepo.store(scrap)
+      if (ret) {
+        await this.recordActivity(`/scraps/${ret.id}`, 'Created Scrap', `${scrap.content.split(/\r\n|\r|\n/)[0]} is created.`)
+        this.$router.push({ path: `/scraps/${ret.id}` })
+      }
     },
     search (): void  {
       const self = this
