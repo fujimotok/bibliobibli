@@ -48,6 +48,11 @@
 <script lang="ts">
 import Vue from 'vue'
 
+export interface Content extends Vue {
+  save(): void
+  menu(): void
+}
+
 export default Vue.extend({
   name: 'EtcPage',
   data: () => ({
@@ -65,6 +70,15 @@ export default Vue.extend({
   mounted () {
   },
   methods: {
+    menu (): void {
+      if (this.isMobile) {
+        const content = this.$refs.contentMobile as Content
+        content.menu()
+      } else {
+        const content = this.$refs.contentDesktop as Content
+        content.menu()
+      }
+    }
   }
 })
 </script>
