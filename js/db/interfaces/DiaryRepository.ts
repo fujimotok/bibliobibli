@@ -2,7 +2,7 @@ export type Diary = {
   id?: number
   createdAt?: string // ISO8601 "2022-02-13T02:56:56.188+09:00"
   updatedAt?: string // ISO8601 "2022-02-13T02:56:56.188+09:00"
-  eventAt: string // ISO8601 "2022-02-13T02:56:56.188+09:00"
+  eventAt: string // YYYY-MM-DD "2022-02-13"
   content: string
 }
 

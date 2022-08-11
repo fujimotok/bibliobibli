@@ -79,9 +79,10 @@ export class DiaryRepositoryDexie implements DiaryRepository
   {
     const words = word.split(' ')
     const regex = new RegExp(words.join('|'), 'i')
+    const regexDate = new RegExp(date, 'i')
     const collection = db.diaries.orderBy(':id').reverse().filter((diary) => {
       const hitWord = regex.test(diary.content)
-      const hitDate = diary.eventAt === date
+      const hitDate = regexDate.test(diary.eventAt)
       return hitWord || hitDate
     })
     const count = await collection.count()
