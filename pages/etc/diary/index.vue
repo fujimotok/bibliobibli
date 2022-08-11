@@ -84,6 +84,8 @@ export default Mixin.extend({
         content: `\n# ${date}\n`
       }
       return await diaryRepo.store(diary)      
+    },
+    menu(){
     }
   }
 })

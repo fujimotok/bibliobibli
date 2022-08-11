@@ -85,7 +85,7 @@ export default Mixin.extend({
   methods: {
     async save () {
       const diary = this.diary // When page update or leave, this.diary change after 'await'.
-      await this.recordActivity(`etc/diary/${diary.id}`, 'Update Diary Info', `${diary.content.split(/\r\n|\r|\n/)[0]} is updated.`)
+      await this.recordActivity(`etc/diary/${diary.eventAt}`, 'Update Diary Info', `${diary.eventAt} is updated.`)
       const diaryRepo: DiaryRepository = this.$diaryRepository
       await diaryRepo.store(diary)
     },
