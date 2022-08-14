@@ -104,7 +104,9 @@ export default Mixin.extend({
       }
       const ret = await scrapRepo.store(scrap)
       if (ret) {
-        await this.recordActivity(`/scraps/${ret.id}`, 'Created Scrap', `${scrap.content.split(/\r\n|\r|\n/)[0]} is created.`)
+        await this.recordActivity(`/scraps/${ret.id}`,
+                                  this.$t('scrapCreateActivityTitle').toString(),
+                                  this.$t('scrapCreateActivityContent', {name: ret.content.split(/\r\n|\r|\n/)[0]}).toString())
         this.$router.push({ path: `/scraps/${ret.id}` })
       }
     },

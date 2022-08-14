@@ -83,7 +83,7 @@
               </v-avatar>
             </v-list-item-avatar>
             <v-list-item-title>
-              削除
+              {{ $t('bookDelete') }}
             </v-list-item-title>
           </v-list-item>
           <v-divider />
@@ -96,7 +96,7 @@
               </v-avatar>
             </v-list-item-avatar>
             <v-list-item-title>
-              ノートを書く
+              {{ $t('bookCreateNote') }}
             </v-list-item-title>
           </v-list-item>
         </v-list-item-group>
@@ -247,7 +247,7 @@ export default Mixin.extend({
                   '-' + res.data[0].summary.pubdate.substr(4, 2) +
                   '-' + res.data[0].summary.pubdate.substr(6, 2)
               }
-              
+
               this.book.cover = res.data[0].summary.cover || '/noimage.png'
             }
           })
@@ -266,7 +266,7 @@ export default Mixin.extend({
       this.book.links.push('')
     },
     delLink () {
-      if (confirm('linkを本当に削除しても良いですか？')) {
+      if (confirm(this.$t('bookLinkDeleteConfirm').toString())) {
         this.book.links.pop()
       }
     },
@@ -276,7 +276,10 @@ export default Mixin.extend({
       
       const oldBook = await bookRepo.findById(book.id || -1)
       if (oldBook && JSON.stringify(oldBook) !== JSON.stringify(book)) {
-        await this.recordActivity(`/books/${book.id}`, 'Update Book Info', `${book.title} is updated.`)
+        await this.recordActivity(`/books/${book.id}`,
+                                  this.$t('bookUpdateActivityTitle').toString(),
+                                  this.$t('bookUpdateActivityContent', {name: book.title}).toString())
+
         await bookRepo.store(book)
       }
     },
@@ -284,8 +287,10 @@ export default Mixin.extend({
       this.bottomSheet = true
     },
     async remove () {
-      if (confirm('本当に削除しても良いですか？')) {
-        await this.recordActivity('', 'Delete Book Info', `${this.book.title} is deleted.`)
+      if (confirm(this.$t('bookDeleteConfirm').toString())) {
+        await this.recordActivity('',
+                                  this.$t('bookDeleteActivityTitle').toString(),
+                                  this.$t('bookDeleteActivityContent', {name: this.book.title}).toString())
         const bookRepo: BookRepository = this.$bookRepository
         if (this.book.id) {
           await bookRepo.remove(this.book.id)
@@ -305,7 +310,9 @@ export default Mixin.extend({
 
       const ret = await noteRepo.store(note)
       if (ret) {
-        await this.recordActivity(`/notes/${ret.id}`, 'Created Note', `${ret.path} is created.`)
+        await this.recordActivity(`/notes/${ret.id}`,
+                                  this.$t('noteCreateActivityTitle').toString(),
+                                  this.$t('noteCreateActivityContent', {name: ret.path}).toString())
         
         if (this.book) {
           this.book.links.push(`/notes/${ret.id}`)

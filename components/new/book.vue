@@ -229,7 +229,7 @@ export default Mixin.extend({
       this.book.links.push('')
     },
     delLink () {
-      if (confirm('linkを本当に削除しても良いですか？')) {
+      if (confirm(this.$t('bookLinkDeleteConfirm').toString())) {
         this.book.links.pop()
       }
     },
@@ -237,7 +237,9 @@ export default Mixin.extend({
       const bookRepo: BookRepository = this.$bookRepository
       const ret = await bookRepo.store(this.book)
       if (ret) {
-        await this.recordActivity(`/books/${ret.id}`, 'Created Book Info', `${ret.title} is created.`)
+        await this.recordActivity(`/books/${ret.id}`,
+                                  this.$t('bookCreateActivityTitle').toString(),
+                                  this.$t('bookCreateActivityContent', {name: ret.title}).toString())
       }
       this.close()
     },
