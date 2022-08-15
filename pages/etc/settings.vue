@@ -103,7 +103,8 @@ export default Vue.extend({
         reader.onerror = reject
         reader.readAsText(file)
       })
-    }
+    },
+    menu(){}
   }
 })
 </script>

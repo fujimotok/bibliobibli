@@ -130,7 +130,8 @@ export default Vue.extend({
         this.load()
       }
       this.dialog = false
-    }
+    },
+    menu(){}
   }
 })
 </script>
