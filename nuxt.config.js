@@ -85,14 +85,17 @@ const config = {
 
   i18n: {
     locales: [
-      { code: 'ja', name: 'Japanese', iso: 'ja_JP', file: 'ja.json' },
-      { code: 'en', name: 'English', iso: 'en_US', file: 'en.json' }
+      { code: 'ja', name: 'Japanese', iso: 'ja-JP', file: 'ja.json' },
+      { code: 'en', name: 'English', iso: 'en-US', file: 'en.json' }
     ],
     defaultLocale: 'en',
     langDir: 'js/i18n/',
     strategy: 'no_prefix',
     vueI18n: {
       fallbackLocale: 'en'
+    },
+    detectBrowserLanguage: {
+      useCookie: false
     },
     vueI18nLoader: true,
     lazy: true

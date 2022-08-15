@@ -168,6 +168,28 @@
     (:barcodeScannerStop
      . ((:en . "Stop scanning")
         (:ja . "スキャンをやめる")))
+    ;; import-export
+    (:importTitle
+     . ((:en . "Import & Export")
+        (:ja . "インポート & エクスポート")))
+    (:importLabelImport
+     . ((:en . "Import")
+        (:ja . "インポート")))
+    (:importLabelExport
+     . ((:en . "Export")
+        (:ja . "エクスポート")))
+    (:importErrorFileNotSupport
+     . ((:en . "Your browser does not support File API.")
+        (:ja . "お使いのブラウザは File API に対応しておりません。")))
+    (:importErrorImportFailed
+     . ((:en . "Import failed.")
+        (:ja . "インポートに失敗しました。")))
+    (:importSuccess
+     . ((:en . "Import complete.")
+        (:ja . "インポート完了。")))
+    (:exportErrorImportFailed
+     . ((:en . "Export failed.")
+        (:ja . "エクスポートに失敗しました。")))
     ))
 
 (defun filter-lang (lang-key)

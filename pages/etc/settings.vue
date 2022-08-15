@@ -2,12 +2,15 @@
   <v-container class="fill-height" fluid>
     <v-card style="width: 100%;">
       <v-card-title>
-        データインポート/エクスポート
+        {{ $t('importTitle') }}
       </v-card-title>
+      <v-btn @click="test">
+        test
+      </v-btn>
       <v-card-actions>
-        <v-file-input v-model="file" label="インポート" accept=".json" class="mr-4" @change="dataImport" />
+        <v-file-input v-model="file" :label="$t('importLabelImport')" accept=".json" class="mr-4" @change="dataImport" />
         <v-btn @click="dataExport">
-          エクスポート
+          {{ $t('importLabelExport') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -25,13 +28,13 @@ export default Vue.extend({
       file: null
     }
   },
-  head: () => ({
-    title: 'Settings'
-  }),
   methods: {
+    test(){
+      alert(navigator.language + document.cookie)
+    },
     async dataImport () {
       if (!window.File) {
-        alert('お使いのブラウザは対応しておりません')
+        alert(this.$t('importErrorFileNotSupport').toString())
         return
       }
 
@@ -40,7 +43,7 @@ export default Vue.extend({
       }
       
       const ret = await this.readFileAsync(this.file).catch((e) => {
-        alert(`エラー:${e}`)
+        alert(`${e}`)
       })
 
       const ei: ExportImport = this.$exportImport
@@ -51,11 +54,11 @@ export default Vue.extend({
       const isSuccess = await ei.Import(ret)
       
       if (!isSuccess) {
-        alert('インポートに失敗しました')
+        alert(this.$t('importErrorImportFailed').toString())
         return
       }
 
-      alert('インポート完了')
+      alert(this.$t('importSuccess').toString())
       sessionStorage.setItem('DBChangeEvent', 'import')
       this.$router.push('/')
     },
@@ -64,7 +67,7 @@ export default Vue.extend({
       const json = await ei.Export()
       
       if (json === '' ) {
-        alert('エクスポートに失敗しました')
+        alert(this.$t('exportErrorImportFailed').toString())
         return
       }
 

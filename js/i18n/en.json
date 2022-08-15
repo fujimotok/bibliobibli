@@ -51,5 +51,12 @@
   "editableLinkEmpty": "Empty",
   "bookDialogCreate": "Create",
   "noteDialogCreate": "Create",
-  "barcodeScannerStop": "Stop scanning"
+  "barcodeScannerStop": "Stop scanning",
+  "importTitle": "Import & Export",
+  "importLabelImport": "Import",
+  "importLabelExport": "Export",
+  "importErrorFileNotSupport": "Your browser does not support File API.",
+  "importErrorImportFailed": "Import failed.",
+  "importSuccess": "Import complete.",
+  "exportErrorImportFailed": "Export failed."
 }
