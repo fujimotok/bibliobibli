@@ -26,7 +26,7 @@
               </v-avatar>
             </v-list-item-avatar>
             <v-list-item-title>
-              削除
+              {{ $t('scrapDelete') }}
             </v-list-item-title>
           </v-list-item>
         </v-list-item-group>
@@ -104,7 +104,9 @@ export default Mixin.extend({
   methods: {
     async save () {
       const scrap = this.scrap // When page update or leave, this.scrap change after 'await'.
-      await this.recordActivity(`/scraps/${scrap.id}`, 'Update Scrap Info', `${scrap.content.split(/\r\n|\r|\n/)[0]} is updated.`)
+      await this.recordActivity(`/scraps/${scrap.id}`,
+                                this.$t('scrapUpdateActivityTitle').toString(),
+                                this.$t('scrapUpdateActivityContent', {name: this.scrap.content.split(/\r\n|\r|\n/)[0]}).toString())
       const scrapRepo: ScrapRepository = this.$scrapRepository
       await scrapRepo.store(scrap)
     },
@@ -112,8 +114,11 @@ export default Mixin.extend({
       this.bottomSheet = true
     },
     async remove () {
-      if (confirm('本当に削除しても良いですか？')) {
-        await this.recordActivity('', 'Delete Scrap', `${this.scrap.id} is deleted.`)
+      if (confirm(this.$t('scrapDeleteConfirm').toString())) {
+        await this.recordActivity('',
+                                  this.$t('scrapDeleteActivityTitle').toString(),
+                                  this.$t('scrapDeleteActivityContent', {name: this.scrap.content.split(/\r\n|\r|\n/)[0]}).toString())
+
         const scrapRepo: ScrapRepository = this.$scrapRepository
         if (this.scrap.id) {
           await scrapRepo.remove(this.scrap.id)

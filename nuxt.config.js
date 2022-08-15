@@ -12,7 +12,7 @@ const config = {
         integrity:
         "sha384-GOaSLecPIMCJksN83HLuYf9FToOiQ2Df0+0ntv7ey8zjUHESXhthwvq9hXAZTifA",
         crossorigin: "anonymous",
-        defer:true //ここ
+        defer:true
       }
     ],
     titleTemplate: '%s - BIBLIoBIBLI',
@@ -55,15 +55,15 @@ const config = {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/pwa
-    '@nuxtjs/pwa'
+    '@nuxtjs/pwa',
+    '@nuxtjs/i18n'
   ],
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
     manifest: {
       name: 'BIBLIoBIBLI',
-      lang: 'ja',
-      description: '説明',
+      description: 'Personal knowledge management system',
       orientation: 'portrait',
       scope: '/',
       display: 'standalone',
@@ -81,6 +81,24 @@ const config = {
     },
     workbox: {
     }
+  },
+
+  i18n: {
+    locales: [
+      { code: 'ja', name: 'Japanese', iso: 'ja-JP', file: 'ja.json' },
+      { code: 'en', name: 'English', iso: 'en-US', file: 'en.json' }
+    ],
+    defaultLocale: 'en',
+    langDir: 'js/i18n/',
+    strategy: 'no_prefix',
+    vueI18n: {
+      fallbackLocale: 'en'
+    },
+    detectBrowserLanguage: {
+      useCookie: false
+    },
+    vueI18nLoader: true,
+    lazy: true
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify

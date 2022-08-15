@@ -72,7 +72,9 @@ export default Mixin.extend({
       else {
         const ret = await this.createDiary(date)
         if (ret) {
-          await this.recordActivity(`/etc/diary/${ret.eventAt}`, 'Create Diary', `${ret.eventAt} is created.`)
+          await this.recordActivity(`/etc/diary/${ret.eventAt}`,
+                                    this.$t('diaryCreateActivityTitle').toString(),
+                                    this.$t('diaryCreateActivityContent', {name: ret.eventAt}).toString())
           this.$router.push({ path: `/etc/diary/${ret.eventAt}` })
         }
       }
