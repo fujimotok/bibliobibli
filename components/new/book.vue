@@ -15,9 +15,9 @@
         @change="onChangeISBN"
         @click:append-outer="barcode = true"
       />
-      <v-text-field v-model="book.title" label="title" />
-      <v-combobox v-model="book.authors" multiple label="authors" />
-      <v-text-field v-model="book.publisher" label="publisher" />
+      <v-text-field v-model="book.title" :label="$t('bookLabelTitle')" />
+      <v-combobox v-model="book.authors" multiple :label="$t('bookLabelAuthors')" />
+      <v-text-field v-model="book.publisher" :label="$t('bookLabelPublisher')" />
       <v-menu
         ref="datePickerMenu"
         v-model="datePickerMenu"
@@ -29,7 +29,7 @@
         <template #activator="{ on, attrs }">
           <v-text-field
             v-model="book.publishedAt"
-            label="publish date"
+            :label="$t('bookLabelPublishDate')"
             prepend-icon="mdi-calendar"
             readonly
             v-bind="attrs"
@@ -44,18 +44,18 @@
           @change="dateChanged"
         />
       </v-menu>
-      <v-text-field v-model="book.cover" label="cover" />
+      <v-text-field v-model="book.cover" :label="$t('bookLabelCover')" />
       <v-select
         v-model="book.tags"
         multiple
         :items="tagItems"
         item-value="id"
         item-text="name"
-        label="tags"
+        :label="$t('bookLabelTags')"
         :menu-props="{ offsetY: true }"
       />
       <div v-for="(link, index) in book.links" :key="`${index}-link`">
-        <editable-link v-model="book.links[index]" label="link" />
+        <editable-link v-model="book.links[index]" :label="$t('bookLabelLink')" />
       </div>
       <div class="mb-2">
         <v-btn icon @click="addLink">
@@ -70,7 +70,7 @@
       <barcode-scanner v-model="code" />
       <div class="center">
         <v-btn class="ma-2" @click="barcode = false">
-          スキャンをやめる
+          {{ $t('barcodeScannerStop') }}
         </v-btn>
       </div>
     </div>
@@ -107,10 +107,10 @@ export default Mixin.extend({
       activePicker: undefined,
       datePickerMenu: false,
       states: [
-        { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
-        { text: '未読', value: 1, icon: 'mdi-progress-clock' },
-        { text: '読中', value: 2, icon: 'mdi-progress-check' },
-        { text: '読了', value: 3, icon: 'mdi-check' }
+        { text: this.$t('bookLabelStatusToRead').toString(), value: 0, icon: 'mdi-progress-star' },
+        { text: this.$t('bookLabelStatusPurchased').toString(), value: 1, icon: 'mdi-progress-clock' },
+        { text: this.$t('bookLabelStatusReading').toString(), value: 2, icon: 'mdi-progress-check' },
+        { text: this.$t('bookLabelStatusHaveRead').toString(), value: 3, icon: 'mdi-check' }
       ],
       tagItems: [],
       book: {

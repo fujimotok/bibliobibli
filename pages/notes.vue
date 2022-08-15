@@ -25,7 +25,7 @@
             >
               <v-icon>mdi-window-close</v-icon>
             </v-btn>
-            Create
+            {{ $t('noteDialogCreate') }}
             <v-spacer />
             <v-btn
               icon
@@ -99,7 +99,7 @@
           >
             <v-icon>mdi-window-close</v-icon>
           </v-btn>
-          Create
+          {{ $t('noteDialogCreate') }}
           <v-spacer />
           <v-btn
             icon

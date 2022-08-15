@@ -1,4 +1,18 @@
 {
+  "bookLabelTitle": "Title",
+  "bookLabelAuthors": "Authors",
+  "bookLabelPublisher": "Publisher",
+  "bookLabelPublishDate": "Publish Date",
+  "bookLabelCover": "Cover",
+  "bookLabelTags": "Tags",
+  "bookLabelLink": "Link",
+  "bookLabelCreatedAt": "Created at",
+  "bookLabelUpdatedAt": "Updated at",
+  "bookLabelStatus": "Status",
+  "bookLabelStatusToRead": "To Read",
+  "bookLabelStatusPurchased": "Purchased",
+  "bookLabelStatusReading": "Reading",
+  "bookLabelStatusHaveRead": "Have Read",
   "bookCreateNote": "Write a note",
   "bookDelete": "Delete",
   "bookDeleteConfirm": "Are you sure you want to delete it?",
@@ -33,5 +47,9 @@
   "diaryUpdateActivityTitle": "Updated a diary",
   "diaryUpdateActivityContent": "%{name} is updated.",
   "diaryDeleteActivityTitle": "Deleted a diary",
-  "diaryDeleteActivityContent": "%{name} is deleted."
+  "diaryDeleteActivityContent": "%{name} is deleted.",
+  "editableLinkEmpty": "Empty",
+  "bookDialogCreate": "Create",
+  "noteDialogCreate": "Create",
+  "barcodeScannerStop": "Stop scanning"
 }

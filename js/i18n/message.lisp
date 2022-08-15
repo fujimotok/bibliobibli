@@ -2,6 +2,48 @@
 (setq messages
   '(
     ;; book
+    (:bookLabelTitle
+     . ((:en . "Title")
+        (:ja . "タイトル")))
+    (:bookLabelAuthors
+     . ((:en . "Authors")
+        (:ja . "著者")))
+    (:bookLabelPublisher
+     . ((:en . "Publisher")
+        (:ja . "出版者")))
+    (:bookLabelPublishDate
+     . ((:en . "Publish Date")
+        (:ja . "出版日")))
+    (:bookLabelCover
+     . ((:en . "Cover")
+        (:ja . "表紙")))
+    (:bookLabelTags
+     . ((:en . "Tags")
+        (:ja . "タグ")))
+    (:bookLabelLink
+     . ((:en . "Link")
+        (:ja . "リンク")))
+    (:bookLabelCreatedAt
+     . ((:en . "Created at")
+        (:ja . "作成日時")))
+    (:bookLabelUpdatedAt
+     . ((:en . "Updated at")
+        (:ja . "更新日時")))
+    (:bookLabelStatus
+     . ((:en . "Status")
+        (:ja . "ステータス")))
+    (:bookLabelStatusToRead
+     . ((:en . "To Read")
+        (:ja . "読みたい")))
+    (:bookLabelStatusPurchased
+     . ((:en . "Purchased")
+        (:ja . "購入済み")))
+    (:bookLabelStatusReading
+     . ((:en . "Reading")
+        (:ja . "読書中")))
+    (:bookLabelStatusHaveRead
+     . ((:en . "Have Read")
+        (:ja . "既読")))
     (:bookCreateNote
      . ((:en . "Write a note")
         (:ja . "ノートを書く")))
@@ -110,9 +152,25 @@
     (:diaryDeleteActivityContent
      . ((:en . "%{name} is deleted.")
         (:ja . "%{name} が削除されました")))
+    ;; editable-link
+    (:editableLinkEmpty
+     . ((:en . "Empty")
+        (:ja . "空")))
+    ;; pages/books Dialog Create
+    (:bookDialogCreate
+     . ((:en . "Create")
+        (:ja . "新規作成")))
+    ;; pages/notes Dialog Create
+    (:noteDialogCreate
+     . ((:en . "Create")
+        (:ja . "新規作成")))
+    ;; barcode-scanner
+    (:barcodeScannerStop
+     . ((:en . "Stop scanning")
+        (:ja . "スキャンをやめる")))
     ))
 
-(Defun Filter-Lang (Lang-Key)
+(defun filter-lang (lang-key)
   (mapcar #'(lambda (m)
               (cons (car m) (cdr (assoc lang-key (cdr m)))))
           messages))

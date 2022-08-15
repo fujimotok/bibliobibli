@@ -1,4 +1,18 @@
 {
+  "bookLabelTitle": "タイトル",
+  "bookLabelAuthors": "著者",
+  "bookLabelPublisher": "出版者",
+  "bookLabelPublishDate": "出版日",
+  "bookLabelCover": "表紙",
+  "bookLabelTags": "タグ",
+  "bookLabelLink": "リンク",
+  "bookLabelCreatedAt": "作成日時",
+  "bookLabelUpdatedAt": "更新日時",
+  "bookLabelStatus": "ステータス",
+  "bookLabelStatusToRead": "読みたい",
+  "bookLabelStatusPurchased": "購入済み",
+  "bookLabelStatusReading": "読書中",
+  "bookLabelStatusHaveRead": "既読",
   "bookCreateNote": "ノートを書く",
   "bookDelete": "削除",
   "bookDeleteConfirm": "本当に削除しても良いですか?",
@@ -33,5 +47,9 @@
   "diaryUpdateActivityTitle": "日記更新",
   "diaryUpdateActivityContent": "%{name} が更新されました",
   "diaryDeleteActivityTitle": "日記削除",
-  "diaryDeleteActivityContent": "%{name} が削除されました"
+  "diaryDeleteActivityContent": "%{name} が削除されました",
+  "editableLinkEmpty": "空",
+  "bookDialogCreate": "新規作成",
+  "noteDialogCreate": "新規作成",
+  "barcodeScannerStop": "スキャンをやめる"
 }
