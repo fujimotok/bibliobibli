@@ -45,7 +45,9 @@ export default Mixin.extend({
       
       const ret = await noteRepo.store(this.note)
       if (ret) {
-        await this.recordActivity(`/notes/${ret.id}`, 'Created Note', `${ret.path} is created.`)
+        await this.recordActivity(`/notes/${ret.id}`,
+                                  this.$t('noteCreateActivityTitle').toString(),
+                                  this.$t('noteCreateActivityContent', {name: ret.path}).toString())
         
         this.$router.push({ path: `/notes/${ret.id}` })
       }

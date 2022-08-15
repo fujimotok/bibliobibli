@@ -30,6 +30,7 @@
     },
     "types": [
       "@nuxtjs/vuetify",
+      "@nuxtjs/i18n",
       "@types/node",
       "@nuxt/types"
     ]

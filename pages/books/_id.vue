@@ -13,9 +13,9 @@
         label="isbn13"
         @change="onChangeISBN"
       />
-      <v-text-field v-model="book.title" label="title" />
-      <v-combobox v-model="book.authors" multiple label="authors" />
-      <v-text-field v-model="book.publisher" label="publisher" />
+      <v-text-field v-model="book.title" :label="$t('bookLabelTitle')" />
+      <v-combobox v-model="book.authors" multiple :label="$t('bookLabelAuthors')" />
+      <v-text-field v-model="book.publisher" :label="$t('bookLabelPublisher')" />
       <v-menu
         ref="datePickerMenu"
         v-model="datePickerMenu"
@@ -27,7 +27,7 @@
         <template #activator="{ on, attrs }">
           <v-text-field
             v-model="book.publishedAt"
-            label="publish date"
+            :label="$t('bookLabelPublishDate')"
             prepend-icon="mdi-calendar"
             readonly
             v-bind="attrs"
@@ -42,18 +42,18 @@
           @change="dateChanged"
         />
       </v-menu>
-      <v-text-field v-model="book.cover" label="cover" />
+      <v-text-field v-model="book.cover" :label="$t('bookLabelCover')" />
       <v-select
         v-model="book.tags"
         multiple
         :items="tagItems"
         item-value="id"
         item-text="name"
-        label="tags"
+        :label="$t('bookLabelTags')"
         :menu-props="{ offsetY: true }"
       />
       <div v-for="(link, index) in book.links" :key="`${index}-link`">
-        <editable-link v-model="book.links[index]" label="link" />
+        <editable-link v-model="book.links[index]" :label="$t('bookLabelLink')" />
       </div>
       <div class="mb-2">
         <v-btn icon @click="addLink">
@@ -64,8 +64,8 @@
         </v-btn>
       </div>
     
-      <v-text-field v-model="book.createdAt" label="created at" readonly />
-      <v-text-field v-model="book.updatedAt" label="updated at" readonly />
+      <v-text-field v-model="book.createdAt" :label="$t('bookLabelCreatedAt')" readonly />
+      <v-text-field v-model="book.updatedAt" :label="$t('bookLabelUpdatedAt')" readonly />
     </div>
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
@@ -83,7 +83,7 @@
               </v-avatar>
             </v-list-item-avatar>
             <v-list-item-title>
-              削除
+              {{ $t('bookDelete') }}
             </v-list-item-title>
           </v-list-item>
           <v-divider />
@@ -96,7 +96,7 @@
               </v-avatar>
             </v-list-item-avatar>
             <v-list-item-title>
-              ノートを書く
+              {{ $t('bookCreateNote') }}
             </v-list-item-title>
           </v-list-item>
         </v-list-item-group>
@@ -134,10 +134,10 @@ export default Mixin.extend({
       datePickerMenu: false,
       bottomSheet: false,
       states: [
-        { text: '読みたい', value: 0, icon: 'mdi-progress-star' },
-        { text: '未読', value: 1, icon: 'mdi-progress-clock' },
-        { text: '読中', value: 2, icon: 'mdi-progress-check' },
-        { text: '読了', value: 3, icon: 'mdi-check' }
+        { text: this.$t('bookLabelStatusToRead').toString(), value: 0, icon: 'mdi-progress-star' },
+        { text: this.$t('bookLabelStatusPurchased').toString(), value: 1, icon: 'mdi-progress-clock' },
+        { text: this.$t('bookLabelStatusReading').toString(), value: 2, icon: 'mdi-progress-check' },
+        { text: this.$t('bookLabelStatusHaveRead').toString(), value: 3, icon: 'mdi-check' }
       ],
       tagItems: [],
       book: {
@@ -247,7 +247,7 @@ export default Mixin.extend({
                   '-' + res.data[0].summary.pubdate.substr(4, 2) +
                   '-' + res.data[0].summary.pubdate.substr(6, 2)
               }
-              
+
               this.book.cover = res.data[0].summary.cover || '/noimage.png'
             }
           })
@@ -266,7 +266,7 @@ export default Mixin.extend({
       this.book.links.push('')
     },
     delLink () {
-      if (confirm('linkを本当に削除しても良いですか？')) {
+      if (confirm(this.$t('bookLinkDeleteConfirm').toString())) {
         this.book.links.pop()
       }
     },
@@ -276,7 +276,10 @@ export default Mixin.extend({
       
       const oldBook = await bookRepo.findById(book.id || -1)
       if (oldBook && JSON.stringify(oldBook) !== JSON.stringify(book)) {
-        await this.recordActivity(`/books/${book.id}`, 'Update Book Info', `${book.title} is updated.`)
+        await this.recordActivity(`/books/${book.id}`,
+                                  this.$t('bookUpdateActivityTitle').toString(),
+                                  this.$t('bookUpdateActivityContent', {name: book.title}).toString())
+
         await bookRepo.store(book)
       }
     },
@@ -284,8 +287,10 @@ export default Mixin.extend({
       this.bottomSheet = true
     },
     async remove () {
-      if (confirm('本当に削除しても良いですか？')) {
-        await this.recordActivity('', 'Delete Book Info', `${this.book.title} is deleted.`)
+      if (confirm(this.$t('bookDeleteConfirm').toString())) {
+        await this.recordActivity('',
+                                  this.$t('bookDeleteActivityTitle').toString(),
+                                  this.$t('bookDeleteActivityContent', {name: this.book.title}).toString())
         const bookRepo: BookRepository = this.$bookRepository
         if (this.book.id) {
           await bookRepo.remove(this.book.id)
@@ -305,7 +310,9 @@ export default Mixin.extend({
 
       const ret = await noteRepo.store(note)
       if (ret) {
-        await this.recordActivity(`/notes/${ret.id}`, 'Created Note', `${ret.path} is created.`)
+        await this.recordActivity(`/notes/${ret.id}`,
+                                  this.$t('noteCreateActivityTitle').toString(),
+                                  this.$t('noteCreateActivityContent', {name: ret.path}).toString())
         
         if (this.book) {
           this.book.links.push(`/notes/${ret.id}`)

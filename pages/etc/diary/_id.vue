@@ -85,7 +85,9 @@ export default Mixin.extend({
   methods: {
     async save () {
       const diary = this.diary // When page update or leave, this.diary change after 'await'.
-      await this.recordActivity(`etc/diary/${diary.eventAt}`, 'Update Diary Info', `${diary.eventAt} is updated.`)
+      await this.recordActivity(`/etc/diary/${diary.eventAt}`,
+                                this.$t('diaryUpdateActivityTitle').toString(),
+                                this.$t('diaryUpdateActivityContent', {name: diary.eventAt}).toString())
       const diaryRepo: DiaryRepository = this.$diaryRepository
       await diaryRepo.store(diary)
     },
@@ -93,8 +95,11 @@ export default Mixin.extend({
       this.bottomSheet = true
     },
     async remove () {
-      if (confirm('本当に削除しても良いですか？')) {
-        await this.recordActivity('', 'Delete Diary', `${this.diary.eventAt} is deleted.`)
+      if (confirm(this.$t('diaryDeleteConfirm').toString())) {
+        await this.recordActivity('',
+                                  this.$t('diaryDeleteActivityTitle').toString(),
+                                  this.$t('diaryDeleteActivityContent', {name: this.diary.eventAt}).toString())
+
         const diaryRepo: DiaryRepository = this.$diaryRepository
         if (this.diary.id) {
           await diaryRepo.remove(this.diary.id)

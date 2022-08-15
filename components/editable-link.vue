@@ -27,7 +27,7 @@
           {{ value }}
         </a>
         <p v-else style="word-wrap: break-word;">
-          {{ label }} is empty
+          {{ $t('editableLinkEmpty') }}
         </p>
       </div>
     </div>

@@ -17,7 +17,7 @@
               </v-avatar>
             </v-list-item-avatar>
             <v-list-item-title>
-              名称変更
+              {{ $t('noteNameChange') }}
             </v-list-item-title>
           </v-list-item>
           <v-divider />
@@ -30,7 +30,7 @@
               </v-avatar>
             </v-list-item-avatar>
             <v-list-item-title>
-              削除
+              {{ $t('noteDelete') }}
             </v-list-item-title>
           </v-list-item>
         </v-list-item-group>
@@ -107,7 +107,9 @@ export default Mixin.extend({
   methods: {
     async save () {
       const note = this.note // When page update or leave, this.note change after 'await'.
-      await this.recordActivity(`/notes/${note.id}`, 'Update Note', `${note.path} is updated.`)
+      await this.recordActivity(`/notes/${note.id}`,
+                                this.$t('noteUpdateActivityTitle').toString(),
+                                this.$t('noteUpdateActivityContent', {name: note.path}).toString())
       const noteRepo: NoteRepository = this.$noteRepository
       const res = await noteRepo.store(note)
       console.log('saved', res)
@@ -116,8 +118,11 @@ export default Mixin.extend({
       this.bottomSheet = true
     },
     async remove () {
-      if (confirm('本当に削除しても良いですか？')) {
-        await this.recordActivity('', 'Delete Note', `${this.note.path} is deleted.`)
+      if (confirm(this.$t('noteDeleteConfirm').toString())) {
+        await this.recordActivity('',
+                                  this.$t('noteDeleteActivityTitle').toString(),
+                                  this.$t('noteDeleteActivityContent', {name: this.note.path}).toString())
+
         const noteRepo: NoteRepository = this.$noteRepository
         if (this.note.id) {
           await noteRepo.remove(this.note.id)
@@ -127,14 +132,16 @@ export default Mixin.extend({
       }
     },
     async rename () {
-      const ret = prompt('名称変更', this.note.path)
+      const ret = prompt(this.$t('noteNameChange').toString(), this.note.path)
       if (ret) {
-        await this.recordActivity(`/notes/${this.note.id}`, 'Update Note', `${this.note.path} is deleted.`)
         const noteRepo: NoteRepository = this.$noteRepository
         if (this.note.id) {
           this.note.path = ret
           await noteRepo.store(this.note)
         }
+        await this.recordActivity(`/notes/${this.note.id}`,
+                                  this.$t('noteUpdateActivityTitle').toString(),
+                                  this.$t('noteUpdateActivityContent', {name: this.note.path}).toString())
         this.bottomSheet = false
       }
     },
