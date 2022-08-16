@@ -74,6 +74,7 @@ export default Mixin.extend({
         noteRepo.findById(id).then((note) =>{
           if (note) {
             this.note = note
+            this.$store.commit('CHANGE_CONTENT_TITLE', this.note.path)
           }
         })
       }
@@ -86,11 +87,9 @@ export default Mixin.extend({
       const ret = await noteRepo.findById(id)
       if (ret) {
         this.note = ret
+        this.$store.commit('CHANGE_CONTENT_TITLE', this.note.path)
       }
     }
-    
-    this.$store.commit('CHANGE_IS_SHOW_SAVE', true)
-    this.$store.commit('CHANGE_IS_SHOW_DEL', false)
   },
   mounted () {
   },
@@ -111,8 +110,7 @@ export default Mixin.extend({
                                 this.$t('noteUpdateActivityTitle').toString(),
                                 this.$t('noteUpdateActivityContent', {name: note.path}).toString())
       const noteRepo: NoteRepository = this.$noteRepository
-      const res = await noteRepo.store(note)
-      console.log('saved', res)
+      await noteRepo.store(note)
     },
     menu () {
       this.bottomSheet = true
@@ -143,6 +141,7 @@ export default Mixin.extend({
                                   this.$t('noteUpdateActivityTitle').toString(),
                                   this.$t('noteUpdateActivityContent', {name: this.note.path}).toString())
         this.bottomSheet = false
+        this.$store.commit('CHANGE_CONTENT_TITLE', this.note.path)
       }
     },
   }

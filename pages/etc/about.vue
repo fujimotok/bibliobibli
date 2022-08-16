@@ -1,32 +1,38 @@
 <template>
-  <v-container class="fill-height" fluid>
-    <v-card style="width: 100%">
-      <v-card-title>
-        アプリ情報
-      </v-card-title>
-
-      <v-card-text>
-        <v-container>
-          <v-row justify="center">
-            <v-img src="../icon.png" max-width="128" :aspect-ratio="1/1" />
-          </v-row>
-          <v-row>
-            <v-col>アプリ名</v-col><v-col>BIBLIoBIBLI</v-col>
-          </v-row>
-          <v-row>
-            <v-col>バージョン</v-col><v-col>0.0.1</v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-    </v-card>
-    <v-card style="width: 100%" class="mt-4">
-      <v-card-title>
-        使い方
-      </v-card-title>
-      <v-card-text>
-        iOS Safariでホーム画面に追加
-      </v-card-text>
-    </v-card>
+  <v-container class="pa-4" fluid>
+    <v-row>
+      <v-col>
+        {{ $t('aboutTitle') }}
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-card style="width: 100%">
+          <v-card-text>
+            <v-container>
+              <v-row justify="center">
+                <v-img src="../icon.png" max-width="128" :aspect-ratio="1/1" />
+              </v-row>
+              <v-row>
+                <v-col>{{ $t('aboutName') }}</v-col><v-col style="text-align: end;">
+                  BIBLIoBIBLI
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>{{ $t('aboutVersion') }}</v-col><v-col style="text-align: end;">
+                  0.0.1
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>{{ $t('aboutWeb') }}</v-col><v-col style="text-align: end;">
+                  <a href="https://github.com/fujimotok/bibliobibli">github.com/fujimotok/bibliobibli</a>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -35,8 +41,11 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'AboutPage',
-  head: () => ({
-    title: 'About'
-  })
+  beforeMount () {
+    this.$store.commit('CHANGE_CONTENT_TITLE', 'About')
+  },
+  methods: {
+    menu(){}
+  }
 })
 </script>

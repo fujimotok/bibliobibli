@@ -4,7 +4,7 @@
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
         <p class="text-h6 ma-4">
-          {{ diary.id }}: {{ diary.content.split(/\r\n|\r|\n/)[0] }}
+          {{ diary.id }}: {{ diary.eventAt }}
         </p>
         <v-divider />
         <v-list-item-group>
@@ -17,7 +17,7 @@
               </v-avatar>
             </v-list-item-avatar>
             <v-list-item-title>
-              削除
+              {{ $t('diaryDelete') }}
             </v-list-item-title>
           </v-list-item>
         </v-list-item-group>
@@ -58,7 +58,8 @@ export default Mixin.extend({
       const diaryRepo: DiaryRepository = this.$diaryRepository
       diaryRepo.findByDate(to.params.id).then((diary) =>{
         if (diary) {
-          this.diary = diary          
+          this.diary = diary
+          this.$store.commit('CHANGE_CONTENT_TITLE', this.diary.eventAt)
         }
       })
     }
@@ -68,6 +69,7 @@ export default Mixin.extend({
     const ret = await diaryRepo.findByDate(this.$route.params.id)
     if (ret) {
       this.diary = ret
+      this.$store.commit('CHANGE_CONTENT_TITLE', this.diary.eventAt)
     }
   },
   mounted () {

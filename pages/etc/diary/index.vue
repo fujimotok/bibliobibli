@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="fill-height">
+  <v-container fluid class="pa-4">
     <v-row>
       <v-col>
         <v-btn icon @click="$refs.calendar.prev()">
@@ -59,6 +59,8 @@ export default Mixin.extend({
         })
       })
     }
+
+    this.$store.commit('CHANGE_CONTENT_TITLE', 'Diary')
   },
   methods: {
     onEventClick({ event }: { event: any }) {
