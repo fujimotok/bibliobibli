@@ -15,7 +15,7 @@
         </v-btn>
       </div>
     </div>
-    <div v-else style="padding: 16px;">
+    <div v-else>
       <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height" />
     </div>
   </div>
@@ -55,7 +55,7 @@
         style="position: relative;"
       >
         <v-card class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
-          <div style="padding: 16px;">
+          <div>
             <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height" />
           </div>
         </v-card>

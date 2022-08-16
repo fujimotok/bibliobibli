@@ -1,7 +1,34 @@
 <template>
   <div>
-    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" />
+    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0; margin: 0; padding: 0;" />
     <vue-simplemde ref="mde" v-model="internalValue" :configs="config" />
+    <v-sheet
+      id="bottom-sheet"
+      class="pa-1"
+      outlined
+      style="width: 100%; bottom: 0; left: 0; z-index: 2;"
+      @click="$refs.mde.simplemde.codemirror.focus()"
+    >
+      <v-slide-group
+        multiple
+        show-arrows
+        @click:prev="$refs.mde.simplemde.codemirror.focus()"
+        @click:next="$refs.mde.simplemde.codemirror.focus()"
+      >
+        <v-slide-item
+          v-for="(t, i) in toolbar"
+          :key="i"
+        >
+          <v-btn
+            icon
+            class="mx-2"
+            @click.stop.prevent="t.action()"
+          >
+            <v-icon>{{ t.icon }}</v-icon>
+          </v-btn>
+        </v-slide-item>
+      </v-slide-group>
+    </v-sheet>
     <v-sheet v-if="dialog" class="pa-2" outlined style="position: absolute; width: 100%; bottom: 0; left: 0; z-index: 2;">
       <v-text-field
         v-model="searchWord"
@@ -47,6 +74,7 @@ export type DataType = {
   current: number
   searchWord: string
   config: object
+  toolbar: {name: string, icon: string, action: () => void }[]
 }
 
 export interface Marker extends Vue {
@@ -84,61 +112,98 @@ export default Vue.extend({
       matches: [],
       current: 0,
       searchWord: '',
+      toolbar: [
+        {
+          name: 'test',
+          icon: 'mdi-format-bold',
+          action: () => { alert('test') }
+        },
+        {
+          name: 'test',
+          icon: 'mdi-format-strikethrough',
+          action: () => { alert('test') }
+        },
+        {
+          name: 'test',
+          icon: 'mdi-format-header-pound',
+          action: () => { alert('test') }
+        },
+        {
+          name: 'test',
+          icon: 'mdi-format-list-numbered',
+          action: () => { alert('test') }
+        },
+        {
+          name: 'test',
+          icon: 'mdi-format-list-bulleted',
+          action: () => { alert('test') }
+        },
+        {
+          name: 'test',
+          icon: 'mdi-code-braces',
+          action: () => { alert('test') }
+        },
+        {
+          name: 'test',
+          icon: 'mdi-link',
+          action: () => { alert('test') }
+        },
+      ],
       config: {
         spellChecker: false,
         forceSync: true,
         indentWithTabs: false,
         status: false,
         toolbar: [
-          'bold',
-          'strikethrough',
-          '|',
-          'heading',
-          'unordered-list',
-          'ordered-list',
-          '|',
-          'code',
-          'quote',
-          '|',
-          'link',
-          {
-            name: 'image',
-            action: (editor: any) => {
-              const self = this as any
-              const file = this.$refs.fileInput as Vue
-              if (file) {
-                const input = file.$refs.input as HTMLElement
-                if (input) {
-                  input.addEventListener('change', function onChange () {
-                    input.removeEventListener('change', onChange)
-                    const fileReader = new FileReader()
-                    fileReader.onload = function () {
-                      const dataURI = this.result
-                      const cm = editor.codemirror
-                      const pos = cm.getCursor('start')
-                      cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
-                    }
-                    if (self.file) {
-                      fileReader.readAsDataURL(self.file)
-                    }
-                  })
-                  input.click()
-                }
-              }
-            },
-            className: 'fa fa-image',
-            title: 'image'
-          },
-          {
-            name: 'find',
-            action: () => {
-              this.$data.dialog = true
-            },            
-            className: 'fa fa-binoculars',
-            title: 'find'
-          },
-          '|',
-          'preview'
+          /* 'bold', */
+          /* 'strikethrough', */
+          /* '|', */
+          /* 'heading', */
+          /* 'unordered-list', */
+          /* 'ordered-list', */
+          /* '|', */
+          /* 'code', */
+          /* 'quote', */
+          /* '|', */
+          /* 'link', */
+          /* { */
+          /*   name: 'image', */
+          /*   action: (editor: any) => { */
+          /*     const self = this as any */
+          /*     const file = this.$refs.fileInput as Vue */
+          /*     if (file) { */
+          /*       const input = file.$refs.input as HTMLElement */
+          /*       if (input) { */
+          /*         input.addEventListener('change', function onChange () { */
+          /*           input.removeEventListener('change', onChange) */
+          /*           const fileReader = new FileReader() */
+          /*           fileReader.onload = function () { */
+          /*             const dataURI = this.result */
+          /*             const cm = editor.codemirror */
+          /*             const pos = cm.getCursor('start') */
+          /*             cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 }) */
+          /*           } */
+          /*           if (self.file) { */
+          /*             fileReader.readAsDataURL(self.file) */
+          /*           } */
+          /*         }) */
+          /*         input.click() */
+          /*       } */
+          /*     } */
+          /*   }, */
+          /*   className: 'fa fa-image', */
+          /*   title: 'image' */
+          /* }, */
+          /* { */
+          /*   name: 'find', */
+          /*   action: () => { */
+          /*     this.$data.dialog = true */
+          /*   },             */
+          /*   className: 'fa fa-binoculars', */
+          /*   title: 'find' */
+          /* }, */
+          /* '|', */
+          /* 'preview' */
         ]
       }
     }
@@ -173,8 +238,10 @@ export default Vue.extend({
   },
   methods: {
     resize () {
-      const toolbarHeight = document.querySelector('.editor-toolbar')?.clientHeight || 0
-      const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
+      const appbarHeight = 48
+      const bs = document.getElementById("bottom-sheet")
+      const bsHeight = bs?.clientHeight || 0
+      const height = window.visualViewport.height - (appbarHeight + bsHeight)
       const node = document.querySelector('.CodeMirror') as HTMLElement
       const style = node?.style
       if (style) {
@@ -261,6 +328,10 @@ export default Vue.extend({
 </script>
 
 <style>
+.CodeMirror {
+    border: 0;
+}
+
 .CodeMirror .mark {
     background: yellow
 }
