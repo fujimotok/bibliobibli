@@ -1,6 +1,7 @@
 <template>
   <v-app v-if="isMobile" ref="app">
     <v-app-bar
+      v-if="hasHeader"
       color="primary"
       class="white--text text--lighten-1"
       dense
@@ -171,6 +172,9 @@ export default Vue.extend({
     },
     count () {
       return this.$store.state.searchCount
+    },
+    hasHeader () {
+      return this.$store.state.hasHeader
     },
   },
   watch:{

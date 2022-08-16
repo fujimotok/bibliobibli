@@ -2,6 +2,7 @@ export const state = () => ({
   listTitle: "",
   contentTitle: "",
   searchCount: 0,
+  hasHeader: true,
 })
 
 export const mutations = {
@@ -13,5 +14,8 @@ export const mutations = {
   },
   CHANGE_SEARCH_COUNT (state, value) {
     state.searchCount = value
+  },
+  CHANGE_HAS_HEADER (state, value) {
+    state.hasHeader = value
   },
 }

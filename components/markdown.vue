@@ -87,6 +87,7 @@ export interface CodeMirror extends Vue {
   setSelection(anchor: object, head: object): void
   markText(anchor: object, head: object, option: object): void
   getAllMarks(): Marker[]
+  on(event: string, func: (e: any) => void): void
 }
 
 export interface Simplemde extends Vue {
@@ -231,17 +232,30 @@ export default Vue.extend({
     window.addEventListener('resize', this.resize)
     window.visualViewport.addEventListener('resize', this.resize)
     this.resize()
+
+    const vmde = this.$refs.mde as VueSimplemde
+    const editor = vmde.simplemde.codemirror
+    editor.on('focus', this.onFocus)
+    editor.on('blur', this.onBlur)
   },
   beforeDestroy () {
     window.removeEventListener('resize', this.resize)
     window.visualViewport.removeEventListener('resize', this.resize)
+
+    this.$store.commit('CHANGE_HAS_HEADER', true)
   },
   methods: {
+    onFocus() {
+      this.$store.commit('CHANGE_HAS_HEADER', false)
+    },
+    onBlur() {
+      this.$store.commit('CHANGE_HAS_HEADER', true)
+    },
     resize () {
-      const appbarHeight = 48
+      const appbarHeight = this.$store.state.hasHeader ? 48 : 0
       const bs = document.getElementById("bottom-sheet")
       const bsHeight = bs?.clientHeight || 0
-      const height = window.visualViewport.height - (appbarHeight + bsHeight)
+      const height = window.visualViewport.height - (appbarHeight + bsHeight + 2)
       const node = document.querySelector('.CodeMirror') as HTMLElement
       const style = node?.style
       if (style) {
