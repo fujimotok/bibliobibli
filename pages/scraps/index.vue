@@ -8,5 +8,9 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+  name: 'ScrapsPageIndex',
+  beforeMount () {
+    this.$store.commit('CHANGE_CONTENT_TITLE', '')
+  }
 })
 </script>

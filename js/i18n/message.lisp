@@ -190,6 +190,19 @@
     (:exportErrorImportFailed
      . ((:en . "Export failed.")
         (:ja . "エクスポートに失敗しました。")))
+    ;; about
+    (:aboutTitle
+     . ((:en . "App info")
+        (:ja . "アプリ情報")))
+    (:aboutName
+     . ((:en . "App Name")
+        (:ja . "アプリ名")))
+    (:aboutVersion
+     . ((:en . "Version")
+        (:ja . "バージョン")))
+    (:aboutWeb
+     . ((:en . "Web")
+        (:ja . "ウェブ")))
     ))
 
 (defun filter-lang (lang-key)

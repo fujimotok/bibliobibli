@@ -1,19 +1,28 @@
 <template>
-  <v-container class="fill-height" fluid>
-    <v-card style="width: 100%;">
-      <v-card-title>
+  <v-container fluid class="pa-4">
+    <v-row>
+      <v-col>
         {{ $t('importTitle') }}
-      </v-card-title>
-      <v-btn @click="test">
-        test
-      </v-btn>
-      <v-card-actions>
-        <v-file-input v-model="file" :label="$t('importLabelImport')" accept=".json" class="mr-4" @change="dataImport" />
-        <v-btn @click="dataExport">
-          {{ $t('importLabelExport') }}
-        </v-btn>
-      </v-card-actions>
-    </v-card>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-card>
+          <v-list-item @click="dataImport">
+            <v-list-item-content>
+              <v-list-item-title>{{ $t('importLabelImport') }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-divider />
+          <v-list-item @click="dataExport">
+            <v-list-item-content>
+              <v-list-item-title>{{ $t('importLabelExport') }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" accept=".json" @change="onChange" />
   </v-container>
 </template>
 
@@ -28,16 +37,16 @@ export default Vue.extend({
       file: null
     }
   },
+  beforeMount () {
+    this.$store.commit('CHANGE_CONTENT_TITLE', this.$t('importTitle').toString())
+  },
   methods: {
-    test(){
-      alert(navigator.language + document.cookie)
-    },
-    async dataImport () {
+    async onChange () {
       if (!window.File) {
         alert(this.$t('importErrorFileNotSupport').toString())
         return
       }
-
+      
       if (!this.file) {
         return
       }
@@ -45,7 +54,7 @@ export default Vue.extend({
       const ret = await this.readFileAsync(this.file).catch((e) => {
         alert(`${e}`)
       })
-
+      
       const ei: ExportImport = this.$exportImport
       if (typeof(ret) !== 'string') {
         return
@@ -57,11 +66,19 @@ export default Vue.extend({
         alert(this.$t('importErrorImportFailed').toString())
         return
       }
-
+      
       alert(this.$t('importSuccess').toString())
-      sessionStorage.setItem('DBChangeEvent', 'import')
       this.$router.push('/')
     },
+    dataImport () {
+      const file = this.$refs.fileInput as Vue
+      if (file) {
+        const input = file.$refs.input as HTMLElement
+        if (input) {
+          input.click()
+        }
+      }
+    },    
     async dataExport () {
       const ei: ExportImport = this.$exportImport
       const json = await ei.Export()
@@ -89,7 +106,8 @@ export default Vue.extend({
         reader.onerror = reject
         reader.readAsText(file)
       })
-    }
+    },
+    menu(){}
   }
 })
 </script>

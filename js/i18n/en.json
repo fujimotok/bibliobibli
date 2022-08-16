@@ -58,5 +58,9 @@
   "importErrorFileNotSupport": "Your browser does not support File API.",
   "importErrorImportFailed": "Import failed.",
   "importSuccess": "Import complete.",
-  "exportErrorImportFailed": "Export failed."
+  "exportErrorImportFailed": "Export failed.",
+  "aboutTitle": "App info",
+  "aboutName": "App Name",
+  "aboutVersion": "Version",
+  "aboutWeb": "Web"
 }

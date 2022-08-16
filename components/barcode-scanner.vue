@@ -35,8 +35,7 @@ export default Vue.extend({
       config: {},
     }
   },
-  errorCaptured (err) {
-    console.log('catched by `CHILD errorCaptured`', err.toString())
+  errorCaptured () {
     this.isError = true
     return false
   },

@@ -1,5 +1,5 @@
 <template>
-  <v-list>
+  <v-list class="pa-4">
     <v-list-item-group>
       <template v-for="(tag, index) in tags">
         <v-list-item :key="index">
@@ -78,9 +78,9 @@ export default Vue.extend({
       dialogTitle: ''
     }
   },
-  head: () => ({
-    title: 'タグ管理'
-  }),
+  beforeMount () {
+    this.$store.commit('CHANGE_CONTENT_TITLE', 'Tags')
+  },
   mounted () {
     this.load()
   },
@@ -130,7 +130,8 @@ export default Vue.extend({
         this.load()
       }
       this.dialog = false
-    }
+    },
+    menu(){}
   }
 })
 </script>

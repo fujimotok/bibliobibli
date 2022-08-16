@@ -1,31 +1,67 @@
 <template>
   <div>
-    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" />
+    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0; margin: 0; padding: 0;" @change="onChange" />
+    <v-sheet
+      v-if="dialog"
+      id="top-sheet"
+      class="pa-1"
+      outlined
+      style="width: 100%; top: 0; left: 0; z-index: 2;"
+    >
+      <div>
+        <v-text-field
+          ref="search"
+          v-model="searchWord"
+          label="Search Word"
+          hide-details="true"
+          outlined
+          dense
+          :suffix="(current + 1).toString() + '/' + matches.length.toString()"
+          @keydown.enter="find(searchWord)"
+        >
+          <template #prepend>
+            <v-btn icon small @click.stop="dialog = false; clearMarksAndSelection()">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </template>
+          <template #append-outer>
+            <v-btn icon small @click.stop="findForward">
+              <v-icon>mdi-chevron-down</v-icon>
+            </v-btn>
+            <v-btn icon small @click.stop="findBackward">
+              <v-icon>mdi-chevron-up</v-icon>
+            </v-btn>
+          </template>
+        </v-text-field>
+      </div>
+    </v-sheet>
     <vue-simplemde ref="mde" v-model="internalValue" :configs="config" />
-    <v-sheet v-if="dialog" class="pa-2" outlined style="position: absolute; width: 100%; bottom: 0; left: 0; z-index: 2;">
-      <v-text-field
-        v-model="searchWord"
-        label="Search Word"
-        hide-details="true"
-        outlined
-        dense
-        :suffix="(current + 1).toString() + '/' + matches.length.toString()"
-        @keydown.enter="find(searchWord)"
+    <v-sheet
+      id="bottom-sheet"
+      class="pa-1"
+      outlined
+      style="width: 100%; bottom: 0; left: 0; z-index: 2;"
+    >
+      <v-slide-group
+        multiple
+        show-arrows
+        @click:prev="$refs.mde.simplemde.codemirror.focus()"
+        @click:next="$refs.mde.simplemde.codemirror.focus()"
+        @click="$refs.mde.simplemde.codemirror.focus()"
       >
-        <template #prepend>
-          <v-btn icon small @click.stop="dialog = false; clearMarksAndSelection()">
-            <v-icon>mdi-close</v-icon>
+        <v-slide-item
+          v-for="(t, i) in toolbar"
+          :key="i"
+        >
+          <v-btn
+            icon
+            class="mx-2"
+            @click.stop.prevent="t.action()"
+          >
+            <v-icon>{{ t.icon }}</v-icon>
           </v-btn>
-        </template>
-        <template #append-outer>
-          <v-btn icon small @click.stop="findForward">
-            <v-icon>mdi-chevron-down</v-icon>
-          </v-btn>
-          <v-btn icon small @click.stop="findBackward">
-            <v-icon>mdi-chevron-up</v-icon>
-          </v-btn>
-        </template>
-      </v-text-field>
+        </v-slide-item>
+      </v-slide-group>
     </v-sheet>
   </div>
 </template>
@@ -47,6 +83,7 @@ export type DataType = {
   current: number
   searchWord: string
   config: object
+  toolbar: {name: string, icon: string, action: () => void }[]
 }
 
 export interface Marker extends Vue {
@@ -59,6 +96,8 @@ export interface CodeMirror extends Vue {
   setSelection(anchor: object, head: object): void
   markText(anchor: object, head: object, option: object): void
   getAllMarks(): Marker[]
+  focus(): void
+  on(event: string, func: (e: any) => void): void
 }
 
 export interface Simplemde extends Vue {
@@ -84,62 +123,13 @@ export default Vue.extend({
       matches: [],
       current: 0,
       searchWord: '',
+      toolbar: [],
       config: {
         spellChecker: false,
         forceSync: true,
         indentWithTabs: false,
         status: false,
-        toolbar: [
-          'bold',
-          'strikethrough',
-          '|',
-          'heading',
-          'unordered-list',
-          'ordered-list',
-          '|',
-          'code',
-          'quote',
-          '|',
-          'link',
-          {
-            name: 'image',
-            action: (editor: any) => {
-              const self = this as any
-              const file = this.$refs.fileInput as Vue
-              if (file) {
-                const input = file.$refs.input as HTMLElement
-                if (input) {
-                  input.addEventListener('change', function onChange () {
-                    input.removeEventListener('change', onChange)
-                    const fileReader = new FileReader()
-                    fileReader.onload = function () {
-                      const dataURI = this.result
-                      const cm = editor.codemirror
-                      const pos = cm.getCursor('start')
-                      cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
-                    }
-                    if (self.file) {
-                      fileReader.readAsDataURL(self.file)
-                    }
-                  })
-                  input.click()
-                }
-              }
-            },
-            className: 'fa fa-image',
-            title: 'image'
-          },
-          {
-            name: 'find',
-            action: () => {
-              this.$data.dialog = true
-            },            
-            className: 'fa fa-binoculars',
-            title: 'find'
-          },
-          '|',
-          'preview'
-        ]
+        toolbar: []
       }
     }
   },
@@ -162,15 +152,167 @@ export default Vue.extend({
       }
     }
   },
+  beforeMount () {
+    this.toolbar = [
+      {
+        name: 'Preview',
+        icon: 'mdi-eye',
+        action: () => {
+          // copy from simplemde.js
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+	        const cm = editor.codemirror;
+	        const wrapper = cm.getWrapperElement();
+	        let preview = wrapper.lastChild;
+	        if(!preview || !/editor-preview/.test(preview.className)) {
+		        preview = document.createElement("div");
+		        preview.className = "editor-preview";
+		        wrapper.appendChild(preview);
+	        }
+	        if(/editor-preview-active/.test(preview.className)) {
+		        preview.className = preview.className.replace(
+			        /\s*editor-preview-active\s*/g, ""
+		        );
+	        } else {
+		        setTimeout(function() {
+			        preview.className += " editor-preview-active";
+		        }, 1);
+	        }
+	        preview.innerHTML = editor.options.previewRender(editor.value(), preview);
+        },
+      },
+      {
+        name: 'Undo',
+        icon: 'mdi-undo',
+        action: () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+	        editor.undo(editor)
+        },
+      },
+      {
+        name: 'Redo',
+        icon: 'mdi-redo',
+        action: () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+	        editor.redo(editor)
+        },
+      },
+      {
+        name: 'Find',
+        icon: 'mdi-file-find',
+        action: () => {
+          this.dialog = true
+
+          this.$nextTick(() => {
+            const s = this.$refs.search as HTMLElement
+            s.focus({ preventScroll: true })
+          })
+        },
+      },
+      {
+        name: 'Bold',
+        icon: 'mdi-format-bold',
+        action: () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+	        editor.toggleBold(editor)
+        },
+      },
+      {
+        name: 'Strikethrough',
+        icon: 'mdi-format-strikethrough',
+        action: () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+	        editor.toggleStrikethrough(editor)
+        }
+      },
+      {
+        name: 'Heading Smaller',
+        icon: 'mdi-format-header-pound',
+        action: () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+	        editor.toggleHeadingSmaller(editor)
+        }
+      },
+      {
+        name: 'List Numbered',
+        icon: 'mdi-format-list-numbered',
+        action: () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+	        editor.toggleOrderedList(editor)
+        }
+      },
+      {
+        name: 'List',
+        icon: 'mdi-format-list-bulleted',
+        action: () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+	        editor.toggleUnorderedList(editor)
+        }
+      },
+      {
+        name: 'Code',
+        icon: 'mdi-code-braces',
+        action: () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+	        editor.toggleCodeBlock(editor)
+        }
+      },
+      {
+        name: 'Link',
+        icon: 'mdi-link',
+        action: () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+	        editor.drawLink(editor)
+        }
+      },
+      {
+        name: 'Image',
+        icon: 'mdi-image',
+        action: () => {
+          const file = this.$refs.fileInput as Vue
+          const input = file.$refs.input as HTMLElement
+          input.click()
+        }
+      },
+    ]
+  },
   mounted () {
     window.addEventListener('resize', this.resize)
     window.visualViewport.addEventListener('resize', this.resize)
     this.resize()
+    
+    const vmde = this.$refs.mde as VueSimplemde
+    const editor = vmde.simplemde.codemirror
+    editor.on('focus', this.onFocus)
+    editor.on('blur', this.onBlur)
+  },
+  beforeDestroy () {
+    window.removeEventListener('resize', this.resize)
+    window.visualViewport.removeEventListener('resize', this.resize)
+    
+    this.$store.commit('CHANGE_HAS_HEADER', true)
   },
   methods: {
+    onFocus() {
+      this.$store.commit('CHANGE_HAS_HEADER', false)
+    },
+    onBlur() {
+      this.$store.commit('CHANGE_HAS_HEADER', true)
+    },
     resize () {
-      const toolbarHeight = document.querySelector('.editor-toolbar')?.clientHeight || 0
-      const height = window.visualViewport.height - (48 + 66 + 16 * 2 + toolbarHeight)
+      const appbarHeight = this.$store.state.hasHeader ? 48 : 0
+      const bs = document.getElementById("bottom-sheet")
+      const bsHeight = bs?.clientHeight || 0
+      const height = window.visualViewport.height - (appbarHeight + bsHeight + 2)
       const node = document.querySelector('.CodeMirror') as HTMLElement
       const style = node?.style
       if (style) {
@@ -178,11 +320,27 @@ export default Vue.extend({
       }
       window.scroll(0, 0)
     },
+    // toolbar functions
+    onChange() {
+      const fileReader = new FileReader()
+      const vmde = this.$refs.mde as VueSimplemde
+      const editor = vmde.simplemde as any
+
+      fileReader.onload = function () {
+        const dataURI = this.result
+        const cm = editor.codemirror
+        const pos = cm.getCursor('start')
+        cm.replaceRange('![](' + dataURI + ')', { line: pos.line, ch: 0 })
+      }
+      if (this.file) {
+        fileReader.readAsDataURL(this.file as Blob)
+      }
+    },
     find (word: string) {
       if (word.length === 0) {
         return
       }
-
+      
       this.current = 0
       this.matches = []
       this.clearMarksAndSelection()
@@ -246,6 +404,11 @@ export default Vue.extend({
       cm.getAllMarks().filter(m => m.className === 'mark').forEach(m => m.clear())
       cm.getAllMarks().filter(m => m.className === 'selection').forEach(m => m.clear())
     },
+    focus () {
+      const vmde = this.$refs.mde as VueSimplemde
+      const cm = vmde.simplemde.codemirror
+      cm.focus()
+    },
     async leave () {
       if (this.dirty) {
         await this.$props.save()
@@ -257,6 +420,10 @@ export default Vue.extend({
 </script>
 
 <style>
+.CodeMirror {
+    border: 0;
+}
+
 .CodeMirror .mark {
     background: yellow
 }

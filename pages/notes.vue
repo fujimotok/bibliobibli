@@ -9,42 +9,15 @@
           elevation="2"
           fab
           color="secondary"
-          @click.stop="dialog = true"
+          @click.stop="add"
         >
           <v-icon>mdi-plus</v-icon>
         </v-btn>
       </div>
-      <v-dialog v-model="dialog" max-width="100%" scrollable class="ma-0">
-        <v-card>
-          <v-card-title class="px-2">
-            <v-btn
-              icon
-              small
-              class="mr-2"
-              @click.stop="dialog = false; $refs.newMobl.close()"
-            >
-              <v-icon>mdi-window-close</v-icon>
-            </v-btn>
-            {{ $t('noteDialogCreate') }}
-            <v-spacer />
-            <v-btn
-              icon
-              small
-              @click.stop="dialog = false; $refs.newMobl.save()"
-            >
-              <v-icon>mdi-content-save</v-icon>
-            </v-btn>
-          </v-card-title>
-          <v-divider />
-          <new-note ref="newMobl" class="pa-4 overflow-y-auto always-show-scrollbar" />
-        </v-card>
-      </v-dialog>
     </div>
-    <v-card v-else>
-      <div style="padding: 16px;">
-        <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height" />
-      </div>
-    </v-card>
+    <div v-else>
+      <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height" />
+    </div>
   </div>
   <v-container v-else class="ma-0 pa-0 fill-height" fluid>
     <v-row class="ma-0 pa-0 fill-height" no-gutters>
@@ -66,7 +39,7 @@
             fab
             small
             color="secondary"
-            @click.stop="dialog = true"
+            @click.stop="add"
           >
             <v-icon>mdi-plus</v-icon>
           </v-btn>
@@ -82,42 +55,18 @@
         style="position: relative;"
       >
         <v-card class="overflow-y-auto" style="position: absolute; height: 100%; width: 100%">
-          <div style="padding: 16px;">
+          <div>
             <nuxt-child ref="contentDesktop" class="ma-0 pa-0 fill-height" />
           </div>
         </v-card>
       </v-col>
     </v-row>
-    <v-dialog v-model="dialog" max-width="80%" scrollable>
-      <v-card>
-        <v-card-title>
-          <v-btn
-            icon
-            small
-            class="mr-2"
-            @click.stop="dialog = false; $refs.newDesk.close()"
-          >
-            <v-icon>mdi-window-close</v-icon>
-          </v-btn>
-          {{ $t('noteDialogCreate') }}
-          <v-spacer />
-          <v-btn
-            icon
-            small
-            @click.stop="dialog = false; $refs.newDesk.save()"
-          >
-            <v-icon>mdi-content-save</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-divider />
-        <new-note ref="newDesk" class="pa-4 overflow-y-auto always-show-scrollbar" />
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Mixin from '~/js/mixin/record-activity'
+import { NoteRepository, Note } from '~/js/db/interfaces/NoteRepository'
 import ListNotes from '~/components/list/notes.vue'
 
 export interface Content extends Vue {
@@ -125,7 +74,7 @@ export interface Content extends Vue {
   menu(): void
 }
 
-export default Vue.extend({
+export default Mixin.extend({
   name: 'NotesPage',
   data: () => ({
     dialog: false
@@ -143,8 +92,31 @@ export default Vue.extend({
   mounted () {
   },
   methods: {
-    add (): void {
-      this.$router.push({ path: '/notes/new'})
+    formatDate(dt: Date): string {
+      const yyyy = dt.getFullYear()
+      const MM = ('00' + (dt.getMonth()+1)).slice(-2)
+      const dd = ('00' + dt.getDate()).slice(-2)
+      const hh = ('00' + dt.getHours()).slice(-2)
+      const mm = ('00' + dt.getMinutes()).slice(-2)
+      const ss = ('00' + dt.getSeconds()).slice(-2)
+      return `${yyyy}-${MM}-${dd}-${hh}:${mm}:${ss}`
+    },
+    async add () {
+      const noteRepo: NoteRepository = this.$noteRepository
+
+      const note: Note = {
+        path: '/Fleeting/' + this.formatDate(new Date),
+        content: '',
+        createdAt: '',
+        updatedAt: '',
+      }
+      const ret = await noteRepo.store(note)
+      if (ret) {
+        await this.recordActivity(`/notes/${ret.id}`,
+                                  this.$t('noteCreateActivityTitle').toString(),
+                                  this.$t('noteCreateActivityContent', {name: ret.path}).toString())
+        this.$router.push({ path: `/notes/${ret.id}` })
+      }
     },
     search (): void {
       if (this.isMobile) {

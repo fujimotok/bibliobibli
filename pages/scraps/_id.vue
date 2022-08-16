@@ -1,20 +1,21 @@
 <template>
   <div>
-    <v-select
-      v-model="scrap.tags"
-      multiple
-      :items="tagItems"
-      item-value="id"
-      item-text="name"
-      label="tags"
-      :menu-props="{ offsetY: true }"
-    />
     <markdown ref="markdown" v-model="scrap.content" :save="save" />
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
         <p class="text-h6 ma-4">
           {{ scrap.id }}: {{ scrap.content.split(/\r\n|\r|\n/)[0] }}
         </p>
+        <v-select
+          v-model="scrap.tags"
+          class="ma-4"
+          multiple
+          :items="tagItems"
+          item-value="id"
+          item-text="name"
+          label="tags"
+          :menu-props="{ offsetY: true, top: true }"
+        />
         <v-divider />
         <v-list-item-group>
           <v-list-item @click="remove">
@@ -48,6 +49,7 @@ export type DataType = {
 
 export interface Markdown extends Vue {
   leave(): void
+  focus(): void
 }
 
 export default Mixin.extend({
@@ -70,9 +72,23 @@ export default Mixin.extend({
       const scrapRepo: ScrapRepository = this.$scrapRepository
       scrapRepo.findById(Number(to.params.id)).then((scrap) =>{
         if (scrap) {
-          this.scrap = scrap          
+          this.scrap = scrap
+          this.$store.commit('CHANGE_CONTENT_TITLE', this.scrap.content.split(/\r\n|\r|\n/)[0])
         }
       })
+    },
+    'scrap.content' (val) {
+      this.$store.commit('CHANGE_CONTENT_TITLE', val.split(/\r\n|\r|\n/)[0])
+    },
+    'scrap.tags' () {
+      this.save()
+    },
+    'bottomSheet' (val) {
+      if (val === false) {
+        this.$nextTick(() => {
+          window.scrollTo(0, 0)
+        })
+      }
     }
   },
   async beforeMount () {
@@ -87,6 +103,7 @@ export default Mixin.extend({
     const ret = await scrapRepo.findById(Number(this.$route.params.id))
     if (ret) {
       this.scrap = ret
+      this.$store.commit('CHANGE_CONTENT_TITLE', this.scrap.content.split(/\r\n|\r|\n/)[0])
     }
   },
   mounted () {
