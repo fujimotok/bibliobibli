@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>
+    <div v-if="barcode === false">
       <div style="display: flex;align-items: center;">
         <icon-combobox v-model="book.status" :items="states" item-value="id" item-text="status" />
         <h2>{{ book.title }}</h2>
@@ -10,8 +10,10 @@
       <v-text-field
         ref="isbn"
         v-model="book.isbn"
+        append-outer-icon="mdi-barcode-scan"
         label="isbn13"
         @change="onChangeISBN"
+        @click:append-outer="barcode = true"
       />
       <v-text-field v-model="book.title" :label="$t('bookLabelTitle')" />
       <v-combobox v-model="book.authors" multiple :label="$t('bookLabelAuthors')" />
@@ -67,6 +69,14 @@
       <v-text-field v-model="book.createdAt" :label="$t('bookLabelCreatedAt')" readonly />
       <v-text-field v-model="book.updatedAt" :label="$t('bookLabelUpdatedAt')" readonly />
     </div>
+    <div v-else>
+      <barcode-scanner v-model="code" />
+      <div class="center">
+        <v-btn class="ma-2" @click="barcode = false">
+          {{ $t('barcodeScannerStop') }}
+        </v-btn>
+      </div>
+    </div>
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
         <p class="text-h6 ma-4">
@@ -117,6 +127,8 @@ export type DataType = {
   activePicker: string | undefined
   datePickerMenu: boolean
   bottomSheet: boolean
+  barcode: boolean
+  code: string,
   states: object[]
   tagItems: object[]
   book: Book
@@ -133,6 +145,8 @@ export default Mixin.extend({
       activePicker: undefined,
       datePickerMenu: false,
       bottomSheet: false,
+      barcode: false,
+      code: '',
       states: [
         { text: this.$t('bookLabelStatusToRead').toString(), value: 0, icon: 'mdi-progress-star' },
         { text: this.$t('bookLabelStatusPurchased').toString(), value: 1, icon: 'mdi-progress-clock' },
@@ -160,6 +174,13 @@ export default Mixin.extend({
   watch: {
     datePickerMenu (val) {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
+    },
+    code (val) {
+      if (val.startsWith('978') || val.startsWith('979')) {
+        this.barcode = false
+        this.book.isbn = val
+        this.onChangeISBN(this.book.isbn)
+      }
     },
     '$route' (to) {
       const tagRepo: TagRepository = this.$tagRepository
@@ -197,6 +218,9 @@ export default Mixin.extend({
   beforeRouteLeave(_, ___, next) {
     this.save()
     next()
+  },
+  deactivated () {
+    this.barcode = false
   },
   methods: {
     barcodeReader () {
@@ -329,5 +353,9 @@ export default Mixin.extend({
 <style scoped>
 .v-sheet {
     border-radius: 20px 20px 0 0;
+}
+
+.center {
+    text-align: center;
 }
 </style>
