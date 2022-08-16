@@ -78,9 +78,6 @@ export default Vue.extend({
       dialogTitle: ''
     }
   },
-  head: () => ({
-    title: 'タグ管理'
-  }),
   mounted () {
     this.load()
   },

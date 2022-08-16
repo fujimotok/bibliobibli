@@ -41,9 +41,6 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'AboutPage',
-  head: () => ({
-    title: 'About'
-  }),
   methods: {
     menu(){}
   }

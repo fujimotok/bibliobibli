@@ -15,12 +15,11 @@ const config = {
         defer:true
       }
     ],
-    titleTemplate: '%s - BIBLIoBIBLI',
     title: 'BIBLIoBIBLI',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
-      { hid: 'description', name: 'description', content: '' },
+      { hid: 'description', name: 'description', content: 'Personal knowledge management system' },
       { name: 'format-detection', content: 'telephone=no' },
       { name: 'mobile-web-app-capable', content: 'yes' }
     ],
