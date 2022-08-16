@@ -167,6 +167,10 @@ export default Vue.extend({
     window.visualViewport.addEventListener('resize', this.resize)
     this.resize()
   },
+  beforeDestroy () {
+    window.removeEventListener('resize', this.resize)
+    window.visualViewport.removeEventListener('resize', this.resize)
+  },
   methods: {
     resize () {
       const toolbarHeight = document.querySelector('.editor-toolbar')?.clientHeight || 0
