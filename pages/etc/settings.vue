@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="pa-4">
     <v-row>
       <v-col>
         {{ $t('importTitle') }}

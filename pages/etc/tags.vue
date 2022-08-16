@@ -1,5 +1,5 @@
 <template>
-  <v-list>
+  <v-list class="pa-4">
     <v-list-item-group>
       <template v-for="(tag, index) in tags">
         <v-list-item :key="index">

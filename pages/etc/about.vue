@@ -1,5 +1,5 @@
 <template>
-  <v-container class="fill-height" fluid>
+  <v-container class="pa-4" fluid>
     <v-row>
       <v-col>
         {{ $t('aboutTitle') }}

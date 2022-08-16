@@ -96,6 +96,7 @@ export interface CodeMirror extends Vue {
   setSelection(anchor: object, head: object): void
   markText(anchor: object, head: object, option: object): void
   getAllMarks(): Marker[]
+  focus(): void
   on(event: string, func: (e: any) => void): void
 }
 
@@ -402,6 +403,11 @@ export default Vue.extend({
       const cm = vmde.simplemde.codemirror
       cm.getAllMarks().filter(m => m.className === 'mark').forEach(m => m.clear())
       cm.getAllMarks().filter(m => m.className === 'selection').forEach(m => m.clear())
+    },
+    focus () {
+      const vmde = this.$refs.mde as VueSimplemde
+      const cm = vmde.simplemde.codemirror
+      cm.focus()
     },
     async leave () {
       if (this.dirty) {

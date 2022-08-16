@@ -4,7 +4,7 @@
     <v-bottom-sheet v-model="bottomSheet" max-width="480px">
       <v-list style="padding-bottom: 40px;">
         <p class="text-h6 ma-4">
-          {{ diary.id }}: {{ diary.content.split(/\r\n|\r|\n/)[0] }}
+          {{ diary.id }}: {{ diary.eventAt }}
         </p>
         <v-divider />
         <v-list-item-group>
@@ -17,7 +17,7 @@
               </v-avatar>
             </v-list-item-avatar>
             <v-list-item-title>
-              削除
+              {{ $t('diaryDelete') }}
             </v-list-item-title>
           </v-list-item>
         </v-list-item-group>
