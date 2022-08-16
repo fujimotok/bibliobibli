@@ -78,6 +78,9 @@ export default Vue.extend({
       dialogTitle: ''
     }
   },
+  beforeMount () {
+    this.$store.commit('CHANGE_CONTENT_TITLE', 'Tags')
+  },
   mounted () {
     this.load()
   },

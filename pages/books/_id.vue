@@ -1,12 +1,12 @@
 <template>
   <div>
     <div v-if="barcode === false">
-      <div style="display: flex;align-items: center;">
+      <v-img :src="book.cover" max-height="256" contain />
+
+      <div class="my-4" style="display: flex;align-items: center;">
         <icon-combobox v-model="book.status" :items="states" item-value="id" item-text="status" />
         <h2>{{ book.title }}</h2>
       </div>
-      <v-img :src="book.cover" max-height="256" contain />
-
       <v-text-field
         ref="isbn"
         v-model="book.isbn"
@@ -196,6 +196,9 @@ export default Mixin.extend({
           this.book = book          
         }
       })
+    },
+    'book.title' (val) {
+      this.$store.commit('CHANGE_CONTENT_TITLE', val)
     }
   },
   async beforeMount () {
@@ -209,6 +212,7 @@ export default Mixin.extend({
     const ret = await bookRepo.findById(Number(this.$route.params.id))
     if (ret !== undefined) {
       this.book = ret
+      this.$store.commit('CHANGE_CONTENT_TITLE', this.book.title)
     }
   },
   beforeRouteUpdate(_, __, next) {

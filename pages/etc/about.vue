@@ -41,6 +41,9 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'AboutPage',
+  beforeMount () {
+    this.$store.commit('CHANGE_CONTENT_TITLE', 'About')
+  },
   methods: {
     menu(){}
   }

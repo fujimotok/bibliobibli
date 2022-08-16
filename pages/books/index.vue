@@ -1,6 +1,6 @@
 <template>
   <div>
-  no select
+    no select
   </div>
 </template>
 
@@ -8,5 +8,9 @@
 import Vue from 'vue'
 
 export default Vue.extend({
+  name: 'BooksPageIndex',
+  beforeMount () {
+    this.$store.commit('CHANGE_CONTENT_TITLE', '')
+  }
 })
 </script>

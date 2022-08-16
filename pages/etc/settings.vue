@@ -37,6 +37,9 @@ export default Vue.extend({
       file: null
     }
   },
+  beforeMount () {
+    this.$store.commit('CHANGE_CONTENT_TITLE', this.$t('importTitle').toString())
+  },
   methods: {
     async onChange () {
       if (!window.File) {

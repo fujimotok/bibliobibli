@@ -70,9 +70,13 @@ export default Mixin.extend({
       const scrapRepo: ScrapRepository = this.$scrapRepository
       scrapRepo.findById(Number(to.params.id)).then((scrap) =>{
         if (scrap) {
-          this.scrap = scrap          
+          this.scrap = scrap
+          this.$store.commit('CHANGE_CONTENT_TITLE', this.scrap.content.split(/\r\n|\r|\n/)[0])
         }
       })
+    },
+    'scrap.content' (val) {
+      this.$store.commit('CHANGE_CONTENT_TITLE', val.split(/\r\n|\r|\n/)[0])
     }
   },
   async beforeMount () {
@@ -87,6 +91,7 @@ export default Mixin.extend({
     const ret = await scrapRepo.findById(Number(this.$route.params.id))
     if (ret) {
       this.scrap = ret
+      this.$store.commit('CHANGE_CONTENT_TITLE', this.scrap.content.split(/\r\n|\r|\n/)[0])
     }
   },
   mounted () {

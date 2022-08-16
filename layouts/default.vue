@@ -7,7 +7,7 @@
       app
     >
       <v-btn
-        v-show="!isRoot"
+        v-if="!isRoot"
         color="white"
         icon
         small
@@ -15,7 +15,8 @@
       >
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
-      <v-toolbar-title class="mx-2" v-text="title" />
+      <v-toolbar-title v-if="isRoot" class="mx-2" v-text="listTitle" />
+      <v-toolbar-title v-else class="mx-2" v-text="contentTitle" />
       <v-spacer />
       <v-toolbar-title v-show="isRoot" class="mx-2" v-text="count" />
       <v-btn
@@ -68,7 +69,7 @@
             lx="4"
           >
             <v-row>
-              <v-toolbar-title class="mx-2" v-text="title" />
+              <v-toolbar-title class="mx-2" v-text="listTitle" />
               <v-spacer />
               <v-toolbar-title class="mx-2" v-text="count" />
               <v-btn
@@ -92,7 +93,7 @@
           >
             <v-row>
               <v-divider vertical />
-              <v-toolbar-title class="mx-2" v-text="title" />
+              <v-toolbar-title class="mx-4" v-text="contentTitle" />
               <v-spacer />
               <v-btn color="white" icon small class="mx-2" @click.stop="menu()">
                 <v-icon>mdi-dots-vertical</v-icon>
@@ -162,8 +163,11 @@ export default Vue.extend({
           return false
       }
     },
-    title () {
-      return this.$store.state.title
+    listTitle () {
+      return this.$store.state.listTitle
+    },
+    contentTitle () {
+      return this.$store.state.contentTitle
     },
     count () {
       return this.$store.state.searchCount
@@ -239,23 +243,28 @@ export default Vue.extend({
         case 'books':
           this.hasSearch = true;
           this.selectedNaviItem = 'Books'
+          this.$store.commit('CHANGE_LIST_TITLE', 'Books')
           break
         case 'notes':
           this.hasSearch = true;
           this.selectedNaviItem = 'Notes'
+          this.$store.commit('CHANGE_LIST_TITLE', 'Notes')
           break
         case 'scraps':
           this.hasSearch = true;
           this.selectedNaviItem = 'Scraps'
+          this.$store.commit('CHANGE_LIST_TITLE', 'Scraps')
           break
         case 'etc':
           this.hasSearch = false;
           this.selectedNaviItem = 'Etc'
+          this.$store.commit('CHANGE_LIST_TITLE', 'Etc')
           this.$store.commit('CHANGE_SEARCH_COUNT', '')
           break
         default:
           this.hasSearch = false;
           this.selectedNaviItem = 'Activity'
+          this.$store.commit('CHANGE_LIST_TITLE', 'Activity')
           this.$store.commit('CHANGE_SEARCH_COUNT', '')
       }
     }

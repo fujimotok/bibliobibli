@@ -58,7 +58,8 @@ export default Mixin.extend({
       const diaryRepo: DiaryRepository = this.$diaryRepository
       diaryRepo.findByDate(to.params.id).then((diary) =>{
         if (diary) {
-          this.diary = diary          
+          this.diary = diary
+          this.$store.commit('CHANGE_CONTENT_TITLE', this.diary.eventAt)
         }
       })
     }
@@ -68,6 +69,7 @@ export default Mixin.extend({
     const ret = await diaryRepo.findByDate(this.$route.params.id)
     if (ret) {
       this.diary = ret
+      this.$store.commit('CHANGE_CONTENT_TITLE', this.diary.eventAt)
     }
   },
   mounted () {

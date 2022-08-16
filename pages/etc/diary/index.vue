@@ -59,6 +59,8 @@ export default Mixin.extend({
         })
       })
     }
+
+    this.$store.commit('CHANGE_CONTENT_TITLE', 'Diary')
   },
   methods: {
     onEventClick({ event }: { event: any }) {
