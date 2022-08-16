@@ -15,11 +15,9 @@
         </v-btn>
       </div>
     </div>
-    <v-card v-else>
-      <div style="padding: 16px;">
-        <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height" />
-      </div>
-    </v-card>
+    <div v-else style="padding: 16px;">
+      <nuxt-child ref="contentMobile" class="ma-0 pa-0 fill-height" />
+    </div>
   </div>
   <v-container v-else class="ma-0 pa-0 fill-height" fluid style="position: relative;">
     <v-row class="ma-0 pa-0 fill-height" no-gutters>
