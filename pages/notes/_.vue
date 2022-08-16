@@ -88,9 +88,6 @@ export default Mixin.extend({
         this.note = ret
       }
     }
-    
-    this.$store.commit('CHANGE_IS_SHOW_SAVE', true)
-    this.$store.commit('CHANGE_IS_SHOW_DEL', false)
   },
   mounted () {
   },
