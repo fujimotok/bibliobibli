@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import { ScrapRepository, Scrap } from '../../js/db/interfaces/ScrapRepository'
+  import { ScrapRepository, Scrap } from '../../js/db/interfaces/ScrapRepository'
 import { TagRepository } from '~/js/db/interfaces/TagRepository'
 import Mixin from '~/js/mixin/record-activity'
 
@@ -121,11 +121,13 @@ export default Mixin.extend({
   methods: {
     async save () {
       const scrap = this.scrap // When page update or leave, this.scrap change after 'await'.
-      await this.recordActivity(`/scraps/${scrap.id}`,
-                                this.$t('scrapUpdateActivityTitle').toString(),
-                                this.$t('scrapUpdateActivityContent', {name: this.scrap.content.split(/\r\n|\r|\n/)[0]}).toString())
-      const scrapRepo: ScrapRepository = this.$scrapRepository
-      await scrapRepo.store(scrap)
+      if (scrap.id) {
+        await this.recordActivity(`/scraps/${scrap.id}`,
+                                  this.$t('scrapUpdateActivityTitle').toString(),
+                                  this.$t('scrapUpdateActivityContent', {name: this.scrap.content.split(/\r\n|\r|\n/)[0]}).toString())
+        const scrapRepo: ScrapRepository = this.$scrapRepository
+        await scrapRepo.store(scrap)
+      }
     },
     menu () {
       this.bottomSheet = true
