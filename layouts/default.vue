@@ -2,6 +2,7 @@
   <v-app v-if="isMobile" ref="app">
     <v-app-bar
       v-if="hasHeader"
+      v-touch="{ down: () => { if ($config.NODE_ENV === 'development') { bottomSheet = true } } }"
       color="primary"
       class="white--text text--lighten-1"
       dense
@@ -45,6 +46,16 @@
       <Nuxt ref="pageMobile" keep-alive :keep-alive-props="{include: cachePageList, max: 2}" />
     </v-main>
     <navi-bottom v-show="isRoot" v-model="selectedNaviItem" app @change="onNaviChanged" />
+    <v-bottom-sheet v-model="bottomSheet">
+      <v-list dense style="height: 50vh;" class="overflow-y-auto">
+        <v-list-item
+          v-for="(log, i) in logs"
+          :key="i"
+        >
+          {{ log }}
+        </v-list-item>
+      </v-list>
+    </v-bottom-sheet>
   </v-app>
   <v-app v-else ref="app">
     <v-app-bar
@@ -123,9 +134,11 @@
 import Vue from 'vue'
 
 export type DataType = {
-  cachePageList: string[],
-  selectedNaviItem: string,
+  cachePageList: string[]
+  selectedNaviItem: string
   hasSearch: boolean
+  bottomSheet: boolean
+  logs: string[]
 }
 
 export interface Page extends Vue {
@@ -139,7 +152,9 @@ export default Vue.extend({
     return {
       cachePageList: ['IndexPage'],
       selectedNaviItem: "Activity",
-      hasSearch: true
+      hasSearch: true,
+      bottomSheet: false,
+      logs: []
     }
   },
   computed: {
@@ -183,6 +198,7 @@ export default Vue.extend({
     }
   },
   mounted () {
+    this.logs = '$logHistory' in this ? this.$logHistory() : []
     this.onRouteChanged(this.$route.path)
 
     // Global click event handler for a tag
