@@ -18,7 +18,7 @@ const config = {
     title: 'BIBLIoBIBLI',
     meta: [
       { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no' },
       { hid: 'description', name: 'description', content: 'Personal knowledge management system' },
       { name: 'format-detection', content: 'telephone=no' },
       { name: 'mobile-web-app-capable', content: 'yes' }
@@ -129,6 +129,11 @@ const config = {
     },
   },
 
+  // env
+  publicRuntimeConfig: {
+    NODE_ENV : process.env.NODE_ENV,
+  },
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
   }
@@ -143,6 +148,7 @@ if (process.env.NODE_ENV === "development") {
       cert: fs.readFileSync(path.resolve(__dirname, 'cert/localhost.pem'))
     }
   }
+  config.plugins.push({ src: '~plugins/console-history.ts', mode: 'client' })
 }
 
 export default config
