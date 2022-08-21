@@ -6,7 +6,7 @@
       id="top-sheet"
       class="pa-1"
       outlined
-      style="width: 100%; top: 0; left: 0; z-index: 2;"
+      style="position: fixed; width: 100%; top: 0; left: 0; z-index: 5; touch-action: none;"
     >
       <div>
         <v-text-field
@@ -35,12 +35,12 @@
         </v-text-field>
       </div>
     </v-sheet>
-    <vue-simplemde ref="mde" v-model="internalValue" :configs="config" />
+    <vue-simplemde id="textarea" ref="mde" v-model="internalValue" :configs="config" />
     <v-sheet
       id="bottom-sheet"
       class="pa-1"
       outlined
-      style="width: 100%; bottom: 0; left: 0; z-index: 2;"
+      style="width: 100%; bottom: 0; left: 0; z-index: 2; touch-action: pan-x;"
     >
       <v-slide-group
         multiple
@@ -294,6 +294,20 @@ export default Vue.extend({
     const editor = vmde.simplemde.codemirror
     editor.on('focus', this.onFocus)
     editor.on('blur', this.onBlur)
+
+    // Workaround for overscroll problem
+    const textarea = document.querySelector('.CodeMirror-scroll')
+    if (textarea) {
+      textarea.scrollTop = 1
+      textarea.addEventListener('scroll', function(_) {
+        if (textarea.scrollTop === 0) {
+          textarea.scrollTop = 1
+        }
+        else if (textarea.scrollTop + textarea.clientHeight === textarea.scrollHeight) {
+          textarea.scrollTop = textarea.scrollTop - 1
+        }
+      }, { passive: false });
+    }
   },
   beforeDestroy () {
     window.removeEventListener('resize', this.resize)
@@ -422,6 +436,7 @@ export default Vue.extend({
 <style>
 .CodeMirror {
     border: 0;
+    overscroll-behavior: contain;
 }
 
 .CodeMirror .mark {
