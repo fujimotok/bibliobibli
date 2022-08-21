@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-touch="{ right: () => navi = true }">
     <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0; margin: 0; padding: 0;" @change="onChange" />
     <v-sheet
       v-if="dialog"
@@ -35,6 +35,22 @@
         </v-text-field>
       </div>
     </v-sheet>
+    <v-navigation-drawer
+      v-model="navi"
+      width="85%"
+      absolute
+      temporary
+    >
+      <v-list dense style="height: 100%;" class="overflow-y-auto">
+        <v-list-item
+          v-for="(t, i) in toc"
+          :key="i"
+          @click="jump(t)"
+        >
+          {{ t.text }}
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
     <vue-simplemde id="textarea" ref="mde" v-model="internalValue" :configs="config" />
     <v-sheet
       id="bottom-sheet"
@@ -76,12 +92,14 @@ export interface Match {
 
 export type DataType = {
   dialog: boolean
+  navi: boolean
   dirty: boolean
   timerID: number
   file: object
   matches: Match[]
   current: number
   searchWord: string
+  toc: {text: string, start: number, end: number}[]
   config: object
   toolbar: {name: string, icon: string, action: () => void }[]
 }
@@ -96,6 +114,8 @@ export interface CodeMirror extends Vue {
   setSelection(anchor: object, head: object): void
   markText(anchor: object, head: object, option: object): void
   getAllMarks(): Marker[]
+  cursorCoords(where: boolean, mode: string): { left: number, right: number, top: number, bottom: number}
+  scrollTo(x: number, y: number): void
   focus(): void
   on(event: string, func: (e: any) => void): void
 }
@@ -117,12 +137,14 @@ export default Vue.extend({
   data(): DataType {
     return {
       dialog: false,
+      navi: false,
       dirty: false,
       timerID: 0,
       file: {},
       matches: [],
       current: 0,
       searchWord: '',
+      toc: [],
       toolbar: [],
       config: {
         spellChecker: false,
@@ -140,6 +162,7 @@ export default Vue.extend({
       },
       set (value: string): void {
         this.dirty = true
+        console.log("set")
         if (this.timerID > 0) {
           window.clearTimeout(this.timerID)
           this.timerID = 0
@@ -149,6 +172,13 @@ export default Vue.extend({
           this.timerID = 0
         }, 3000)
         this.$emit('input', value)
+      }
+    }
+  },
+  watch: {
+    navi: function (value) {
+      if (value) {
+        this.toc = this.createToc()
       }
     }
   },
@@ -349,6 +379,24 @@ export default Vue.extend({
       if (this.file) {
         fileReader.readAsDataURL(this.file as Blob)
       }
+    },
+    createToc (): {text: string, start: number, end: number}[] {
+      const re = /^#+ .*/gm
+      const matches = []
+      let m
+      while ((m = re.exec(this.internalValue)) != null) {
+        matches.push({text: m.toString(), start: m.index, end: m.index + m.toString().length})
+      }
+      return matches
+    },
+    jump (t: {text: string, start: number, end: number}) {
+      const vmde = this.$refs.mde as VueSimplemde
+      const cm = vmde.simplemde.codemirror
+      this.navi = false
+      cm.setSelection(cm.posFromIndex(t.start), cm.posFromIndex(t.end))
+      const p = cm.cursorCoords(true, 'local')
+      cm.scrollTo(0, p.top)
+      console.log(p)
     },
     find (word: string) {
       if (word.length === 0) {
