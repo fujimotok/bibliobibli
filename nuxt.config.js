@@ -2,6 +2,9 @@ import colors from 'vuetify/es5/util/colors'
 import path from 'path'
 import fs from 'fs'
 
+// for Github Pages
+const rootURI = (process.env.DEPLOY_ENV === 'GH_PAGES') ? '/bibliobibli/' : '/'
+
 const config = {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -58,16 +61,20 @@ const config = {
     '@nuxtjs/i18n'
   ],
 
+  router: {
+    base: rootURI
+  },
+
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
     manifest: {
       name: 'BIBLIoBIBLI',
       description: 'Personal knowledge management system',
       orientation: 'portrait',
-      scope: '/',
+      scope: rootURI,
       display: 'standalone',
-      id: '/',
-      start_url: '/',
+      id: rootURI,
+      start_url: rootURI,
       theme_color: '#3C6A0F',
       background_color: '#FFFFFF',
       icons: [
@@ -149,13 +156,6 @@ if (process.env.NODE_ENV === "development") {
     }
   }
   config.plugins.push({ src: '~plugins/console-history.ts', mode: 'client' })
-}
-
-// for Github Pages
-if (process.env.DEPLOY_ENV === 'GH_PAGES') {
-  config.router = {
-    base: '/bibliobibli/'
-  }
 }
 
 export default config
