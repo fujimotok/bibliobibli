@@ -151,4 +151,11 @@ if (process.env.NODE_ENV === "development") {
   config.plugins.push({ src: '~plugins/console-history.ts', mode: 'client' })
 }
 
+// for Github Pages
+if (process.env.DEPLOY_ENV === 'GH_PAGES') {
+  config.router = {
+    base: '/bibliobibli/'
+  }
+}
+
 export default config
