@@ -276,7 +276,7 @@ export default Mixin.extend({
                   '-' + res.data[0].summary.pubdate.substr(6, 2)
               }
 
-              this.book.cover = res.data[0].summary.cover || '/noimage.png'
+              this.book.cover = res.data[0].summary.cover || this.$config.ROOT_URI + 'noimage.png'
             }
           })
       }

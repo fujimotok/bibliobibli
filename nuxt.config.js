@@ -29,7 +29,7 @@ const config = {
       { name: 'mobile-web-app-capable', content: 'yes' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: rootURI + 'favicon.ico' }
     ]
   },
 
@@ -81,7 +81,7 @@ const config = {
       background_color: '#FFFFFF',
       icons: [
         {
-          src: '/icon.png',
+          src: rootURI + 'icon.png',
           sizes: '512x512',
           type: 'image/png'
         }
@@ -141,6 +141,7 @@ const config = {
   // env
   publicRuntimeConfig: {
     NODE_ENV : process.env.NODE_ENV,
+    ROOT_URI : rootURI,
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

@@ -103,7 +103,7 @@ export default Mixin.extend({
         authors: [''],
         publisher: '',
         publishedAt: '',
-        cover: '/noimage.png',
+        cover: this.$config.ROOT_URI + 'noimage.png',
         status: 0,
         readAt: '',
         links: [''],
