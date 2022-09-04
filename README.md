@@ -4,7 +4,7 @@ All data save locally.
 No login. No cloud data.
 
 ## Demo Page 
-https://bibliobibli.herokuapp.com/
+https://fujimotok.github.io/bibliobibli/
 
 ## Build Setup
 
