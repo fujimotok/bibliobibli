@@ -319,7 +319,9 @@ export default Vue.extend({
     window.addEventListener('resize', this.resize)
     window.visualViewport.addEventListener('resize', this.resize)
     this.resize()
-    
+
+    this.applyTheme()    
+
     const vmde = this.$refs.mde as VueSimplemde
     const editor = vmde.simplemde.codemirror
     editor.on('focus', this.onFocus)
@@ -346,6 +348,15 @@ export default Vue.extend({
     this.$store.commit('CHANGE_HAS_HEADER', true)
   },
   methods: {
+    applyTheme() {
+      const mde = this.$refs.mde as VueSimplemde
+      const editor = mde.simplemde as any
+      const cm = editor.codemirror as any
+
+      if (this.$vuetify.theme.dark) {
+        cm.setOption('theme', 'dracula')
+      }
+    },
     onFocus() {
       this.$store.commit('CHANGE_HAS_HEADER', false)
     },
@@ -482,6 +493,8 @@ export default Vue.extend({
 </script>
 
 <style>
+@import 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/dracula.min.css';
+
 .CodeMirror {
     border: 0;
     overscroll-behavior: contain;
