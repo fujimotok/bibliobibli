@@ -52,7 +52,7 @@ export default Vue.extend({
     this.items = [
       { id: 0, link: '/etc/about', name: 'about', icon: 'mdi-information' },
       { id: 1, link: '/etc/tags', name: 'tags', icon: 'mdi-tag' },
-      { id: 2, link: '/etc/settings', name: 'import & export', icon: 'mdi-file-arrow-left-right-outline' },
+      { id: 2, link: '/etc/settings', name: 'settings', icon: 'mdi-cog-outline' },
       { id: 2, link: '/etc/diary', name: 'diary', icon: 'mdi-calendar-edit' }
     ]
   },

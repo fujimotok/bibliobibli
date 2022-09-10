@@ -168,7 +168,16 @@
     (:barcodeScannerStop
      . ((:en . "Stop scanning")
         (:ja . "スキャンをやめる")))
-    ;; import-export
+    ;; settings
+    (:settingsTitle
+     . ((:en . "Settings")
+        (:ja . "設定")))
+    (:appearanceTitle
+     . ((:en . "Appearance")
+        (:ja . "外観")))
+    (:themeLabel
+     . ((:en . "Theme")
+        (:ja . "テーマ")))
     (:importTitle
      . ((:en . "Import & Export")
         (:ja . "インポート & エクスポート")))

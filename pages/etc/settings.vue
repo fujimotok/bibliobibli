@@ -2,6 +2,24 @@
   <v-container fluid class="pa-4">
     <v-row>
       <v-col>
+        {{ $t('appearanceTitle') }}
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <client-only>
+          <v-card>
+            <v-list-item>
+              {{ $t('themeLabel') }}
+              <v-spacer />
+              <v-switch v-model="theme" append-icon="mdi-weather-night" prepend-icon="mdi-weather-sunny" />
+            </v-list-item>
+          </v-card>
+        </client-only>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         {{ $t('importTitle') }}
       </v-col>
     </v-row>
@@ -22,12 +40,16 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" accept=".json" @change="onChange" />
+    <v-row>
+      <v-col>
+        <v-file-input ref="fileInput" v-model="file" style="visibility: hidden; width: 0; height: 0;" accept=".json" @change="onChange" />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
+import Vue from 'vue'
 import { ExportImport } from '../../js/db/interfaces/ExportImport'
 
 export default Vue.extend({
@@ -37,8 +59,19 @@ export default Vue.extend({
       file: null
     }
   },
+  computed: {
+    theme: {
+      get: function () {
+        return this.$vuetify.theme.dark
+      },
+      set: function (newValue :boolean) {
+        this.$vuetify.theme.dark = newValue
+        localStorage.setItem('themeDark', newValue.toString())
+      }
+    }
+  },
   beforeMount () {
-    this.$store.commit('CHANGE_CONTENT_TITLE', this.$t('importTitle').toString())
+    this.$store.commit('CHANGE_CONTENT_TITLE', this.$t('settingsTitle').toString())
   },
   methods: {
     async onChange () {
