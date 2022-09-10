@@ -94,10 +94,9 @@ export default Mixin.extend({
   methods: {
     async add () {
       const scrapRepo: ScrapRepository = this.$scrapRepository
-      const clipboard = await navigator.clipboard.readText().catch(() => '');
 
       const scrap: Scrap = {
-        content: clipboard,
+        content: '',
         tags: []
       }
       const ret = await scrapRepo.store(scrap)
