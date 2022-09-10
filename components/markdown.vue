@@ -162,7 +162,6 @@ export default Vue.extend({
       },
       set (value: string): void {
         this.dirty = true
-        console.log("set")
         if (this.timerID > 0) {
           window.clearTimeout(this.timerID)
           this.timerID = 0
@@ -210,6 +209,19 @@ export default Vue.extend({
 	        }
 	        preview.innerHTML = editor.options.previewRender(editor.value(), preview);
         },
+      },
+      {
+        name: 'paste',
+        icon: 'mdi-content-paste',
+        action: async () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+          const cm = editor.codemirror
+          const pos = cm.getCursor()
+          const paste = await navigator.clipboard.readText().catch(() => '')
+          cm.replaceRange(paste, pos)
+          cm.focus()
+        }
       },
       {
         name: 'Undo',
@@ -407,7 +419,6 @@ export default Vue.extend({
       cm.setSelection(cm.posFromIndex(t.start), cm.posFromIndex(t.end))
       const p = cm.cursorCoords(true, 'local')
       cm.scrollTo(0, p.top)
-      console.log(p)
     },
     find (word: string) {
       if (word.length === 0) {
