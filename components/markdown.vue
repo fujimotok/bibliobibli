@@ -162,7 +162,6 @@ export default Vue.extend({
       },
       set (value: string): void {
         this.dirty = true
-        console.log("set")
         if (this.timerID > 0) {
           window.clearTimeout(this.timerID)
           this.timerID = 0
@@ -210,6 +209,19 @@ export default Vue.extend({
 	        }
 	        preview.innerHTML = editor.options.previewRender(editor.value(), preview);
         },
+      },
+      {
+        name: 'paste',
+        icon: 'mdi-content-paste',
+        action: async () => {
+          const mde = this.$refs.mde as VueSimplemde
+          const editor = mde.simplemde as any
+          const cm = editor.codemirror
+          const pos = cm.getCursor()
+          const paste = await navigator.clipboard.readText().catch(() => '')
+          cm.replaceRange(paste, pos)
+          cm.focus()
+        }
       },
       {
         name: 'Undo',
@@ -319,7 +331,9 @@ export default Vue.extend({
     window.addEventListener('resize', this.resize)
     window.visualViewport.addEventListener('resize', this.resize)
     this.resize()
-    
+
+    this.applyTheme()    
+
     const vmde = this.$refs.mde as VueSimplemde
     const editor = vmde.simplemde.codemirror
     editor.on('focus', this.onFocus)
@@ -346,6 +360,15 @@ export default Vue.extend({
     this.$store.commit('CHANGE_HAS_HEADER', true)
   },
   methods: {
+    applyTheme() {
+      const mde = this.$refs.mde as VueSimplemde
+      const editor = mde.simplemde as any
+      const cm = editor.codemirror as any
+
+      if (this.$vuetify.theme.dark) {
+        cm.setOption('theme', 'dracula')
+      }
+    },
     onFocus() {
       this.$store.commit('CHANGE_HAS_HEADER', false)
     },
@@ -396,7 +419,6 @@ export default Vue.extend({
       cm.setSelection(cm.posFromIndex(t.start), cm.posFromIndex(t.end))
       const p = cm.cursorCoords(true, 'local')
       cm.scrollTo(0, p.top)
-      console.log(p)
     },
     find (word: string) {
       if (word.length === 0) {
@@ -482,6 +504,8 @@ export default Vue.extend({
 </script>
 
 <style>
+@import 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/dracula.min.css';
+
 .CodeMirror {
     border: 0;
     overscroll-behavior: contain;

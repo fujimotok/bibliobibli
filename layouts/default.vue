@@ -197,6 +197,9 @@ export default Vue.extend({
       this.onRouteChanged(to.path)
     }
   },
+  beforeMount() {
+    this.applyTheme()
+  },
   mounted () {
     this.logs = '$logHistory' in this ? this.$logHistory() : []
     this.onRouteChanged(this.$route.path)
@@ -216,6 +219,25 @@ export default Vue.extend({
     })
   },
   methods: {
+    applyTheme () {
+      const theme = localStorage.getItem('themeDark');
+      if (theme) {
+        if (theme === "true") {
+          this.$vuetify.theme.dark = true
+        } else {
+          this.$vuetify.theme.dark = false
+        }
+      } else if (
+        window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+      ) {
+        this.$vuetify.theme.dark = true;
+        localStorage.setItem(
+          'themeDark',
+          this.$vuetify.theme.dark.toString()
+        )
+      }
+    },
     search () {
       if (this.isMobile) {
         const elem = this.$refs.pageMobile as Vue
